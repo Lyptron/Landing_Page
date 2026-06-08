@@ -1,26 +1,280 @@
 @import "tailwindcss";
+@import "../styles/animations.css";
+@config "../../tailwind.config.ts";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+  color-scheme: dark;
+  /* Backgrounds */
+  --bg:              #050505;
+  --surface:         #111113;
+  --surface-2:       #18181B;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  /* Glass */
+  --glass-fill:      rgba(255,255,255,0.03);
+  --glass-fill-md:   rgba(255,255,255,0.06);
+  --glass-border:    rgba(255,255,255,0.10);
+  --glass-border-sm: rgba(255,255,255,0.06);
+  --glass-highlight: rgba(255,255,255,0.08);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* Text */
+  --text-primary:    #f0f0f5;
+  --text-secondary:  rgba(240,240,245,0.55);
+  --text-muted:      rgba(240,240,245,0.28);
+  --text-ghost:      rgba(240,240,245,0.10);
+
+  /* Accent */
+  --blue:            #1d7ef5;
+  --blue-dim:        #1560c0;
+  --blue-glow:       rgba(29,126,245,0.15);
+  --blue-glass:      rgba(29,126,245,0.08);
+  --silver:          #c0c0cc;
+  --silver-muted:    rgba(192,192,204,0.4);
+
+  /* Semantic */
+  --green:           #22c55e;
+  --green-glow:      rgba(34,197,94,0.3);
+
+  /* Easing */
+  --ease-out:        cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring:     cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Radius */
+  --r-sm:   8px;
+  --r-md:   14px;
+  --r-lg:   20px;
+  --r-xl:   28px;
+  --r-pill: 100px;
+
+  /* Service Specific Colors and Glows */
+  --c-web-dev:       #1d7ef5;
+  --g-web-dev:       rgba(29, 126, 245, 0.15);
+  --c-mobile-dev:    #22c55e;
+  --g-mobile-dev:    rgba(34, 197, 94, 0.15);
+  --c-ai-automation: #8b5cf6;
+  --g-ai-automation: rgba(139, 92, 246, 0.15);
+  --c-ui-ux-design:  #ec4899;
+  --g-ui-ux-design:  rgba(236, 72, 153, 0.15);
+  --c-cloud-devops:  #f97316;
+  --g-cloud-devops:  rgba(249, 115, 22, 0.15);
+  --c-brand-strategy:#c0c0cc;
+  --g-brand-strategy:rgba(192, 192, 204, 0.15);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--bg);
+  color: var(--text-primary);
+  font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
 }
+
+/* Custom Hide Scrollbars */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Glassmorphism helpers */
+.glass-panel {
+  background: var(--glass-fill);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(32px);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 32px 64px rgba(0,0,0,0.4);
+}
+
+/* Force consistent anti-aliasing */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Dark select dropdowns */
+select, select option {
+  color-scheme: dark;
+  background-color: #111;
+  color: rgba(255,255,255,0.8);
+}
+
+/* Remove any text rendering issues on large headlines */
+h1 {
+  text-rendering: optimizeLegibility;
+  -webkit-text-size-adjust: none;
+}
+
+/* Hero background is now inline (cinematic spotlight) — no CSS overrides needed */
+
+/* Premium gradient text */
+.hero-gradient-text {
+  background: linear-gradient(
+    135deg,
+    #1d7ef5 0%,
+    #818cf8 25%,
+    #c084fc 50%,
+    #818cf8 75%,
+    #1d7ef5 100%
+  );
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: heroGradientShift 6s ease infinite;
+}
+
+/* Hero headline glow pulse */
+.hero-headline-glow {
+  animation: heroTextGlow 4s ease-in-out infinite;
+}
+
+/* Premium CTA shine effect */
+.hero-cta-primary {
+  position: relative;
+  overflow: hidden;
+}
+.hero-cta-primary::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  animation: ctaShine 3.5s ease-in-out infinite;
+}
+
+/* Premium stat bar animation */
+.hero-stat-bar {
+  transform-origin: left;
+  animation: heroStatBar 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Scroll indicator */
+.hero-scroll-indicator {
+  animation: scrollPulse 2s ease-in-out infinite;
+}
+
+/* Hero badge pulse */
+.hero-badge-dot {
+  animation: heroBadgePulse 2.5s ease-out infinite;
+}
+
+/* Floating card subtle animation */
+.hero-card-float {
+  animation: floatSubtle 8s ease-in-out infinite;
+}
+
+/* Premium card wrapper */
+.hero-card-premium {
+  position: relative;
+}
+
+/* 3D Depth System classes */
+.hero-container-3d {
+  perspective: 1400px;
+  perspective-origin: 50% 45%;
+  transform-style: preserve-3d;
+}
+
+.tier-1-far {
+  transform: scale(0.55) translateZ(-200px);
+  opacity: 0.12;
+  filter: blur(3px);
+  pointer-events: none;
+}
+
+.tier-2-mid {
+  transform: scale(0.75) translateZ(-100px);
+  opacity: 0.28;
+  filter: blur(1px);
+  pointer-events: none;
+}
+
+.tier-3-fore {
+  transform: scale(1) translateZ(0px);
+  opacity: 1;
+  filter: none;
+  pointer-events: all;
+}
+
+/* Capabilities Stacked Cards CSS overrides */
+.desktop-stacked-card:not(:first-child) {
+  opacity: 0;
+}
+
+/* ═══ Admin / Client Premium Design System ═══ */
+
+/* Custom scrollbar for admin/client */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.06);
+  border-radius: 3px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.12);
+}
+
+/* Noise grain overlay (shared SVG data URI) */
+.noise-grain::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.018;
+  pointer-events: none;
+  z-index: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Premium card — base */
+.premium-card {
+  position: relative;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 20px;
+  overflow: hidden;
+  transition: border-color 0.4s ease, box-shadow 0.4s ease;
+}
+.premium-card:hover {
+  border-color: rgba(255,255,255,0.1);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.3);
+}
+
+/* Premium card accent line (top) */
+.premium-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 18%;
+  right: 18%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(29,126,245,0.2), rgba(129,140,248,0.12), transparent);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Premium card inner sheen */
+.premium-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, transparent 40%, rgba(29,126,245,0.01) 100%);
+}
+
+/* Gradient section divider */
+.gradient-divider {
+  height: 1px;
+  width: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06) 15%, rgba(255,255,255,0.06) 85%, transparent);
+}
+
+

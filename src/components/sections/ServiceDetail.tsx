@@ -1,0 +1,182 @@
+'use client'
+import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
+import { motion } from 'framer-motion'
+import { X, CheckCircle2 } from 'lucide-react'
+import { Service } from '@/types'
+import { useCursor } from '../providers/CursorProvider'
+
+interface ServiceDetailProps {
+  service: Service | null
+  onClose: () => void
+}
+
+export default function ServiceDetail({ service, onClose }: ServiceDetailProps) {
+  const { setCursorState } = useCursor()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  useEffect(() => {
+    if (!service) return
+    document.body.style.overflow = 'hidden'
+    const lenis = (window as any).lenis
+    if (lenis) lenis.stop()
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.body.style.overflow = ''
+      if (lenis) lenis.start()
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [service, onClose])
+
+  if (!service || !mounted) return null
+
+  return createPortal(
+    <>
+      {/* Backdrop */}
+      <motion.div
+        className="fixed inset-0 z-40 bg-black/70 backdrop-blur-[8px]"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={onClose}
+      />
+
+      {/* Modal */}
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-6 overflow-hidden pointer-events-none">
+        <motion.div
+          className="w-full max-w-[920px] pointer-events-auto"
+          initial={{ opacity: 0, scale: 0.95, y: 12, filter: 'blur(8px)' }}
+          animate={{ opacity: 1, scale: 1, y: 0, filter: 'blur(0px)' }}
+          exit={{ opacity: 0, scale: 0.95, y: 12, filter: 'blur(8px)' }}
+          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <div
+            className="w-full max-h-[85vh] p-8 md:p-12 flex flex-col overflow-y-auto no-scrollbar rounded-[20px] relative"
+            style={{
+              background: 'linear-gradient(160deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              boxShadow: '0 48px 96px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06)',
+              backdropFilter: 'blur(48px)',
+            }}
+          >
+            {/* Header */}
+            <div className="flex justify-between items-center mb-6">
+              <span className="font-mono text-[11px] text-white/30 tracking-[0.2em] uppercase">
+                {service.number} // Capability Details
+              </span>
+              <button
+                onClick={onClose}
+                className="p-2.5 rounded-full border border-white/[0.07] hover:border-white/15 hover:bg-white/[0.03] text-white/60 hover:text-white transition-all duration-300 cursor-none"
+                onMouseEnter={() => setCursorState('hover')}
+                onMouseLeave={() => setCursorState('default')}
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Title */}
+            <div className="flex items-center gap-4 mb-4">
+              <span className="text-4xl md:text-5xl drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]">{service.icon}</span>
+              <h2 className="font-display font-bold text-3xl md:text-4xl lg:text-5xl text-white/90 tracking-[-0.03em]">
+                {service.name}
+              </h2>
+            </div>
+
+            {/* Blank preview window — placeholder for images */}
+            <div className="w-full h-[200px] md:h-[260px] rounded-xl overflow-hidden relative mb-6"
+              style={{ background: 'linear-gradient(135deg, #0e0e10 0%, #08080A 100%)', border: '1px solid rgba(255,255,255,0.05)' }}
+            >
+              {/* Browser chrome */}
+              <div className="flex items-center gap-1.5 px-4 h-9" style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', background: 'rgba(255,255,255,0.01)' }}>
+                <div className="flex gap-1.5">
+                  <div className="w-[6px] h-[6px] rounded-full bg-white/12" />
+                  <div className="w-[6px] h-[6px] rounded-full bg-white/8" />
+                  <div className="w-[6px] h-[6px] rounded-full bg-white/6" />
+                </div>
+                <div className="ml-3 h-[18px] flex-1 max-w-[160px] rounded bg-white/[0.03] flex items-center px-2">
+                  <span className="font-mono text-[7px] text-white/12">{service.id}.lyptron.com</span>
+                </div>
+              </div>
+              {/* Blank content area */}
+              <div className="flex-1 flex items-center justify-center h-[calc(100%-36px)]">
+                <span className="font-mono text-[10px] text-white/10 uppercase tracking-widest">Preview</span>
+              </div>
+            </div>
+
+            <p className="font-body text-[15px] text-white/30 leading-relaxed mb-8 border-b border-white/[0.04] pb-6">
+              {service.desc}
+            </p>
+
+            {/* Two column details */}
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-10 text-left">
+
+              {/* Left: Stack & Results */}
+              <div className="md:col-span-6 flex flex-col gap-8">
+                <div>
+                  <h4 className="font-mono text-[10px] text-white/20 uppercase tracking-wider block mb-4 border-b border-white/[0.04] pb-2">Tech Stack</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {service.stack.map((item) => (
+                      <span
+                        key={item}
+                        className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-white/[0.06] bg-white/[0.02] font-mono text-[10px] text-white/40 tracking-wider uppercase"
+                      >
+                        <span className="w-1.5 h-1.5 rounded-full bg-white/20" />
+                        {item}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="font-mono text-[10px] text-white/20 uppercase tracking-wider block mb-4 border-b border-white/[0.04] pb-2">Proven Results</h4>
+                  <div className="flex flex-col gap-4">
+                    {service.works.map((work) => (
+                      <div
+                        key={work.name}
+                        className="p-5 rounded-xl"
+                        style={{
+                          background: 'linear-gradient(160deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0.005) 100%)',
+                          border: '1px solid rgba(255,255,255,0.05)',
+                        }}
+                      >
+                        <div className="flex justify-between items-center mb-1.5">
+                          <h5 className="font-display font-semibold text-[15px] text-white/80">{work.name}</h5>
+                          <span className="font-mono text-[9px] text-white/25 uppercase tracking-wider">{work.badge}</span>
+                        </div>
+                        <p className="font-body text-[13px] text-white/25 mb-3 leading-relaxed">{work.desc}</p>
+                        <span className="font-mono text-[11px] text-white/50 tracking-wide uppercase">{work.result}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Right: Deliverables */}
+              <div className="md:col-span-6 flex flex-col gap-8">
+                <div>
+                  <h4 className="font-mono text-[10px] text-white/20 uppercase tracking-wider block mb-4 border-b border-white/[0.04] pb-2">Deliverables & Benefits</h4>
+                  <div className="flex flex-col gap-5">
+                    {service.helps.map((help) => (
+                      <div key={help} className="flex gap-3 items-start">
+                        <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0 text-white/25" />
+                        <span className="font-body text-[14px] text-white/35 leading-relaxed">{help}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    </>,
+    document.body
+  )
+}
