@@ -47,7 +47,7 @@ function CapabilityBullet({ text, delay }: { text: string; delay: number }) {
   )
 }
 
-function OutcomeCard({ work, delay, setCursorState }: { work: Service['works'][0]; delay: number; setCursorState: (s: string) => void }) {
+function OutcomeCard({ work, delay, setCursorState }: { work: Service['works'][0]; delay: number; setCursorState: any }) {
   const ref = useRef<HTMLDivElement>(null)
   const inView = useInView(ref, { once: true, margin: '-40px' })
 

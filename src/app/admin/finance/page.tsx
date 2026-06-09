@@ -121,7 +121,7 @@ export default function FinanceHubPage() {
                     contentStyle={{ backgroundColor: 'rgba(10,10,12,0.95)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '10px', padding: '8px 12px' }}
                     labelStyle={{ color: 'rgba(255,255,255,0.3)', fontSize: '9px', fontFamily: 'monospace' }}
                     itemStyle={{ color: 'rgba(255,255,255,0.7)', fontSize: '11px' }}
-                    formatter={(value: number, name: string) => [`₹${value.toLocaleString('en-IN')}`, name === 'mrr' ? 'Revenue' : 'Expenses']}
+                    formatter={(value: any, name: any) => [`₹${Number(value).toLocaleString('en-IN')}`, name === 'mrr' ? 'Revenue' : 'Expenses']}
                   />
                   <Area type="monotone" dataKey="mrr" stroke="rgba(255,255,255,0.4)" strokeWidth={1.5} fillOpacity={1} fill="url(#colorMrr)" dot={false} />
                   <Area type="monotone" dataKey="expenses" stroke="rgba(255,255,255,0.12)" strokeWidth={1} fillOpacity={1} fill="url(#colorExp)" dot={false} />

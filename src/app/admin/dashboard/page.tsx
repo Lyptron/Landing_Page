@@ -155,7 +155,7 @@ export default function AdminDashboard() {
                   contentStyle={{ backgroundColor: 'rgba(10,10,12,0.95)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '10px', padding: '8px 12px' }}
                   labelStyle={{ color: 'rgba(255,255,255,0.3)', fontSize: '9px', fontFamily: 'monospace' }}
                   itemStyle={{ color: 'rgba(255,255,255,0.7)', fontSize: '11px' }}
-                  formatter={(value: number) => [`₹${value.toLocaleString('en-IN')}`, 'Revenue']}
+                  formatter={(value: any) => [`₹${Number(value).toLocaleString('en-IN')}`, 'Revenue']}
                 />
                 <Area type="monotone" dataKey="revenue" stroke="rgba(255,255,255,0.4)" strokeWidth={1.5} fillOpacity={1} fill="url(#colorRevenue)" dot={false} />
               </AreaChart>
