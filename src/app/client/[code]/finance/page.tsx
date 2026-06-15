@@ -2,8 +2,11 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { CreditCard, DollarSign, ArrowUpRight, Receipt, CheckCircle2, Wallet } from 'lucide-react'
+import { Wallet, ArrowUpRight } from 'lucide-react'
 import { fetchProjectByAccessCode } from '@/lib/db'
+import { PageHeader, EmptyState, Loading, Badge } from '@/components/portal/PortalUI'
+
+const fmt = (n: number) => `₹${n.toLocaleString('en-IN')}`
 
 export default function FinancePage() {
   const params = useParams()
@@ -29,124 +32,140 @@ export default function FinancePage() {
     load()
   }, [code])
 
-  const progress = totalValue > 0 ? (paidAmount / totalValue) * 100 : 0
+  if (loading) return <Loading />
 
-  if (loading) {
+  if (invoices.length === 0 && totalValue === 0) {
     return (
-      <div className="flex items-center justify-center py-32">
-        <div className="w-6 h-6 border-2 border-white/10 border-t-white/40 rounded-full animate-spin" />
-      </div>
+      <EmptyState
+        icon={Wallet}
+        title="No financial details yet"
+        description="Your contract value, payments, and invoices will appear here once they're added."
+      />
     )
   }
 
+  const remaining = totalValue - paidAmount
+  const progress = totalValue > 0 ? (paidAmount / totalValue) * 100 : 0
+  const sortedInvoices = [...invoices].sort((a, b) => {
+    const da = a.due_date ? new Date(a.due_date).getTime() : 0
+    const db = b.due_date ? new Date(b.due_date).getTime() : 0
+    return da - db
+  })
+
   return (
-    <div className="flex flex-col gap-6 max-w-4xl mx-auto">
-      <div>
-        <h1 className="font-display text-2xl font-bold tracking-tight text-white/90 mb-1">Finance</h1>
-        <p className="text-white/25 text-[13px]">Track payments, invoices, and your project investment.</p>
+    <div className="flex flex-col gap-8 w-full">
+      {/* Header */}
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="pb-5 border-b" style={{ borderColor: 'var(--cp-border-soft)' }}>
+        <PageHeader
+          title="Payments & Invoices"
+          description="Track your contract value, completed payments, and outstanding invoices."
+          action={
+            <div className="text-[12px]" style={{ color: 'var(--cp-text-faint)' }}>
+              As of {new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+            </div>
+          }
+        />
+      </motion.div>
+
+      {/* Summary Details Row */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 py-6 border-b" style={{ borderColor: 'var(--cp-border-soft)' }}>
+        <div>
+          <span className="text-[11px] font-semibold uppercase tracking-wider block" style={{ color: 'var(--cp-text-muted)' }}>Total Contract</span>
+          <span className="text-[22px] font-bold mt-1 block" style={{ color: 'var(--cp-text)' }}>{fmt(totalValue)}</span>
+        </div>
+        <div>
+          <span className="text-[11px] font-semibold uppercase tracking-wider block" style={{ color: 'var(--cp-text-muted)' }}>Amount Paid</span>
+          <span className="text-[22px] font-bold mt-1 block" style={{ color: 'var(--cp-emerald)' }}>{fmt(paidAmount)}</span>
+        </div>
+        <div>
+          <span className="text-[11px] font-semibold uppercase tracking-wider block" style={{ color: 'var(--cp-text-muted)' }}>Outstanding</span>
+          <span className="text-[22px] font-bold mt-1 block" style={{ color: 'var(--cp-cyan)' }}>{fmt(remaining)}</span>
+        </div>
+        <div>
+          <span className="text-[11px] font-semibold uppercase tracking-wider block" style={{ color: 'var(--cp-text-muted)' }}>Status</span>
+          <span className="text-[22px] font-bold mt-1 block" style={{ color: remaining === 0 ? 'var(--cp-emerald)' : 'var(--cp-cyan)' }}>
+            {remaining === 0 ? 'Fully Paid' : `${Math.round(progress)}% Completed`}
+          </span>
+        </div>
       </div>
 
-      {invoices.length === 0 && totalValue === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 text-center">
-          <Wallet className="w-12 h-12 text-white/[0.05] mb-4" />
-          <h3 className="text-base font-semibold text-white/30 mb-1">No financial data yet</h3>
-          <p className="text-[13px] text-white/15">Payment details and invoices will appear here once added.</p>
-        </div>
-      ) : (
-        <>
-          {/* Summary Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="p-5 rounded-2xl" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}>
-              <DollarSign className="w-4 h-4 text-white/25 mb-2" />
-              <div className="text-[9px] font-mono uppercase tracking-[0.15em] text-white/20 mb-1">Total Value</div>
-              <div className="text-[24px] font-display font-bold text-white/85 tracking-tight">
-                ₹{totalValue.toLocaleString('en-IN')}
-              </div>
-            </motion.div>
+      {/* Progress Bar */}
+      <div className="w-full h-1 rounded-full overflow-hidden -mt-4" style={{ background: 'var(--cp-surface-strong)' }}>
+        <motion.div
+          initial={{ width: 0 }}
+          animate={{ width: `${progress}%` }}
+          transition={{ delay: 0.2, duration: 0.8, ease: 'easeOut' }}
+          className="h-full rounded-full"
+          style={{ background: 'linear-gradient(90deg, var(--cp-cyan), var(--cp-emerald))' }}
+        />
+      </div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.05 }}
-              className="p-5 rounded-2xl"
-              style={{ background: 'rgba(16,185,129,0.025)', border: '1px solid rgba(16,185,129,0.1)' }}
-            >
-              <ArrowUpRight className="w-4 h-4 text-emerald-400/50 mb-2" />
-              <div className="text-[9px] font-mono uppercase tracking-[0.15em] text-emerald-400/40 mb-1">Amount Paid</div>
-              <div className="text-[24px] font-display font-bold text-emerald-400 tracking-tight">
-                ₹{paidAmount.toLocaleString('en-IN')}
-              </div>
-            </motion.div>
+      {/* Invoices List */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.15 }}
+        className="flex flex-col gap-4 mt-2"
+      >
+        <h2 className="text-[15px] font-bold tracking-tight" style={{ color: 'var(--cp-text)' }}>
+          Ledger
+        </h2>
 
-            <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="p-5 rounded-2xl" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}>
-              <CreditCard className="w-4 h-4 text-white/25 mb-2" />
-              <div className="text-[9px] font-mono uppercase tracking-[0.15em] text-white/20 mb-1">Remaining</div>
-              <div className="text-[24px] font-display font-bold text-white/85 tracking-tight">
-                ₹{(totalValue - paidAmount).toLocaleString('en-IN')}
-              </div>
-            </motion.div>
-          </div>
-
-          {/* Progress Bar */}
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }} className="p-5 rounded-2xl" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}>
-            <div className="flex justify-between items-center mb-3">
-              <span className="text-[12px] font-medium text-white/50">Payment Progress</span>
-              <span className="text-[12px] font-mono text-emerald-400/70">{Math.round(progress)}%</span>
-            </div>
-            <div className="w-full h-2 bg-white/[0.04] rounded-full overflow-hidden">
-              <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: `${progress}%` }}
-                transition={{ duration: 1.2, delay: 0.3, ease: 'easeOut' }}
-                className="h-full rounded-full"
-                style={{ background: 'linear-gradient(90deg, rgba(16,185,129,0.5), rgba(255,255,255,0.5))' }}
-              />
-            </div>
-          </motion.div>
-
-          {/* Invoices */}
-          <div className="flex flex-col gap-3">
-            <h2 className="text-[9px] font-mono uppercase tracking-[0.2em] text-white/15">Invoices</h2>
-            {invoices.map((inv, idx) => (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 + idx * 0.06 }}
+        <div className="cp-card cp-list overflow-hidden">
+          {sortedInvoices.map((inv) => {
+            const isPaid = inv.status === 'paid'
+            const date = inv.due_date ? new Date(inv.due_date) : null
+            return (
+              <div
                 key={inv.id}
-                className="p-4 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
-                style={{ background: 'rgba(255,255,255,0.015)', border: '1px solid rgba(255,255,255,0.04)' }}
+                className="flex flex-col sm:flex-row sm:items-center justify-between p-4 gap-3 transition-colors hover:bg-[var(--cp-bg-soft)]"
               >
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
-                    <Receipt className="w-4 h-4 text-white/30" />
+                {/* Description & Date */}
+                <div className="flex items-center gap-3.5 min-w-0">
+                  <div className="shrink-0">
+                    <div className="w-2.5 h-2.5 rounded-full" style={{ background: isPaid ? 'var(--cp-emerald)' : 'var(--cp-cyan)' }} />
                   </div>
-                  <div>
-                    <h4 className="text-[13px] font-medium text-white/70">{inv.description || inv.for || 'Payment'}</h4>
-                    <span className="text-[9px] font-mono text-white/15 uppercase tracking-[0.15em]">
-                      {inv.invoice_number || inv.id} &bull;{' '}
-                      {inv.due_date ? new Date(inv.due_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : ''}
-                    </span>
+                  <div className="min-w-0">
+                    <h3 className="text-[13.5px] font-semibold truncate" style={{ color: 'var(--cp-text)' }}>
+                      {inv.description || inv.for || 'Project Payment'}
+                    </h3>
+                    <p className="text-[11px] mt-0.5" style={{ color: 'var(--cp-text-faint)' }}>
+                      Due: {date ? date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}
+                      {inv.invoice_number && ` · REF: ${inv.invoice_number}`}
+                    </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
-                  <span className="text-[20px] font-display font-bold text-white/80 tracking-tight">
-                    ₹{(inv.amount || 0).toLocaleString('en-IN')}
+
+                {/* Amount & Status Badge */}
+                <div className="flex justify-between sm:justify-end items-center gap-5 mt-1 sm:mt-0">
+                  <span className="text-[15px] font-bold tabular-nums" style={{ color: 'var(--cp-text)' }}>
+                    {fmt(inv.amount || 0)}
                   </span>
-                  {inv.status === 'paid' ? (
-                    <span className="flex items-center gap-1 px-3 py-1 rounded-lg bg-emerald-500/[0.06] border border-emerald-500/10 text-emerald-400 text-[9px] font-bold font-mono uppercase tracking-[0.15em]">
-                      <CheckCircle2 className="w-3 h-3" /> Paid
-                    </span>
-                  ) : (
-                    <span className="px-3 py-1 rounded-lg bg-orange-500/[0.06] border border-orange-500/10 text-orange-400 text-[9px] font-bold font-mono uppercase tracking-[0.15em]">
-                      Pending
-                    </span>
-                  )}
+                  <Badge tone={isPaid ? 'emerald' : 'cyan'}>{isPaid ? 'Paid' : 'Pending'}</Badge>
                 </div>
-              </motion.div>
-            ))}
-          </div>
-        </>
-      )}
+              </div>
+            )
+          })}
+        </div>
+      </motion.div>
+
+      {/* Footer Support */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.25 }}
+        className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6 text-[12px] border-t mt-4"
+        style={{ color: 'var(--cp-text-faint)', borderColor: 'var(--cp-border-soft)' }}
+      >
+        <span>Invoice questions? Contact your project manager.</span>
+        <a
+          href="mailto:billing@lyptron.com"
+          className="flex items-center gap-1 transition-colors text-[var(--cp-text-muted)] hover:text-[var(--cp-cyan)]"
+        >
+          billing@lyptron.com
+          <ArrowUpRight className="w-3.5 h-3.5" />
+        </a>
+      </motion.div>
     </div>
   )
 }

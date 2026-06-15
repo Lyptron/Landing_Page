@@ -122,15 +122,16 @@ export default function Nav() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { setCursorState } = useCursor()
 
-  if (pathname?.startsWith('/admin') || pathname?.startsWith('/client')) {
-    return null
-  }
-
   useEffect(() => {
+    if (pathname?.startsWith('/admin') || pathname?.startsWith('/client')) return
     const handleScroll = () => setScrolled(window.scrollY > 60)
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+  }, [pathname])
+
+  if (pathname?.startsWith('/admin') || pathname?.startsWith('/client')) {
+    return null
+  }
 
   const navItems = [
     { name: 'Who We Are', href: '#who-we-are' },
@@ -174,11 +175,12 @@ export default function Nav() {
             onMouseEnter={() => setCursorState('hover')}
             onMouseLeave={() => setCursorState('default')}
           >
-            <img
+            <Image
               src="/images/logo.gif"
               alt="Lyptron"
               width={38}
               height={38}
+              unoptimized
               className="rounded-lg"
             />
             <LyptronLogo />

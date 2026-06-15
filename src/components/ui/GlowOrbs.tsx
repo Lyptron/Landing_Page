@@ -1,6 +1,13 @@
 'use client'
+import { usePathname } from 'next/navigation'
 
 export default function GlowOrbs() {
+  const pathname = usePathname()
+
+  if (pathname?.startsWith('/admin') || pathname?.startsWith('/client')) {
+    return null
+  }
+
   return (
     <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
       {/* Orb 1 (primary — top right) */}

@@ -4,320 +4,550 @@ import { useParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import {
   CheckCircle2,
-  Clock,
   Activity,
   ArrowRight,
-  GitCommit,
-  CheckSquare,
-  Zap,
+  Hammer,
+  ClipboardCheck,
+  Rocket,
   TrendingUp,
+  CalendarClock,
   Calendar,
-  CreditCard,
+  Layers,
+  IndianRupee,
   Inbox,
+  Image as ImageIcon,
+  FileText,
+  Video,
+  MessageSquare,
+  Package,
+  Sparkles,
+  Users,
+  Map,
+  Megaphone,
+  AlertTriangle,
+  OctagonAlert,
+  type LucideIcon,
 } from 'lucide-react'
 import Link from 'next/link'
-import { fetchProjectByAccessCode } from '@/lib/db'
+import { fetchProjectByAccessCode, fetchProjectTeam, fetchAnnouncements } from '@/lib/db'
+import {
+  EmptyState,
+  Loading,
+  SectionLabel,
+  QuickAction,
+  getHealthInfo,
+  TONE_TEXT,
+  type PortalTone,
+} from '@/components/portal/PortalUI'
 
-const ACTIVITY_ICONS: Record<string, { icon: any; color: string; bg: string }> = {
-  commit: { icon: GitCommit, color: 'text-blue-400', bg: 'bg-blue-500/[0.08]' },
-  milestone: { icon: CheckCircle2, color: 'text-emerald-400', bg: 'bg-emerald-500/[0.08]' },
-  deployment: { icon: Zap, color: 'text-purple-400', bg: 'bg-purple-500/[0.08]' },
-  approval: { icon: CheckSquare, color: 'text-orange-400', bg: 'bg-orange-500/[0.08]' },
+const ACTIVITY_META: Record<string, { icon: LucideIcon; tone: PortalTone; label: string }> = {
+  commit: { icon: Hammer, tone: 'cyan', label: 'Development' },
+  milestone: { icon: CheckCircle2, tone: 'emerald', label: 'Milestone' },
+  deployment: { icon: Rocket, tone: 'cyan', label: 'Release' },
+  approval: { icon: ClipboardCheck, tone: 'amber', label: 'Approval' },
 }
+
+const ANNOUNCEMENT_META: Record<string, { icon: LucideIcon; tone: PortalTone }> = {
+  info: { icon: Megaphone, tone: 'cyan' },
+  success: { icon: CheckCircle2, tone: 'emerald' },
+  warning: { icon: AlertTriangle, tone: 'amber' },
+  alert: { icon: OctagonAlert, tone: 'red' },
+}
+
+const STAGES = ['Backlog', 'Design', 'Development', 'Review', 'Completed']
+const STAGE_DESCRIPTIONS: Record<string, string> = {
+  Backlog: 'Scoping the work and lining up priorities.',
+  Design: 'Shaping the look, feel and user experience.',
+  Development: 'Building out the core functionality.',
+  Review: 'Final testing and polish before launch.',
+  Completed: 'Delivered and live.',
+}
+
+/** Strong ease-out (matches the global --ease-out token) for entrance and hover motion. */
+const EASE_OUT: [number, number, number, number] = [0.16, 1, 0.3, 1]
 
 function timeAgo(date: string) {
   const diff = Date.now() - new Date(date).getTime()
   const mins = Math.floor(diff / 60000)
-  if (mins < 60) return `${mins} min ago`
+  if (mins < 1) return 'just now'
+  if (mins < 60) return `${mins} min${mins === 1 ? '' : 's'} ago`
   const hrs = Math.floor(mins / 60)
-  if (hrs < 24) return `${hrs} hours ago`
-  return `${Math.floor(hrs / 24)} days ago`
+  if (hrs < 24) return `${hrs} hour${hrs === 1 ? '' : 's'} ago`
+  return `${Math.floor(hrs / 24)} day${Math.floor(hrs / 24) === 1 ? '' : 's'} ago`
 }
+
+function formatDate(date?: string) {
+  if (!date) return 'TBD'
+  return new Date(date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+}
+
+/** A milestone needs a real, descriptive title to be worth surfacing to the client. */
+function hasMeaningfulTitle(m: any) {
+  return ((m?.name || m?.title || '') as string).trim().length >= 3
+}
+
+const DIVIDER = { borderColor: 'var(--cp-border-soft)' }
 
 export default function ClientDashboardPage() {
   const params = useParams()
   const code = params.code as string
   const [project, setProject] = useState<any>(null)
+  const [team, setTeam] = useState<any[]>([])
+  const [announcements, setAnnouncements] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [daysRemaining, setDaysRemaining] = useState<number | null>(null)
 
   useEffect(() => {
     async function load() {
       const { data, error } = await fetchProjectByAccessCode(code)
-      if (!error && data) setProject(data)
+      if (!error && data) {
+        setProject(data)
+        const days = data.due_date
+          ? Math.max(0, Math.ceil((new Date(data.due_date).getTime() - Date.now()) / 86400000))
+          : null
+        setDaysRemaining(days)
+        const [{ data: teamData }, { data: announcementData }] = await Promise.all([
+          fetchProjectTeam(data.id),
+          fetchAnnouncements(data.id),
+        ])
+        setTeam(teamData || [])
+        setAnnouncements(announcementData || [])
+      }
       setLoading(false)
     }
     load()
   }, [code])
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-32">
-        <div className="w-6 h-6 border-2 border-white/10 border-t-white/40 rounded-full animate-spin" />
-      </div>
-    )
-  }
+  if (loading) return <Loading />
 
   if (!project) {
     return (
-      <div className="flex flex-col items-center justify-center py-32 text-center">
-        <Inbox className="w-12 h-12 text-white/[0.06] mb-4" />
-        <h3 className="text-lg font-semibold text-white/40 mb-2">Project not found</h3>
-        <p className="text-[13px] text-white/20">This access code may be invalid or expired.</p>
-      </div>
+      <EmptyState
+        icon={Inbox}
+        title="We couldn't find this project"
+        description="Your access link may be out of date. Please double-check the link, or reach out to your project manager for a new one."
+      />
     )
   }
 
   const progress = project.progress || 0
-  const daysRemaining = project.due_date
-    ? Math.max(0, Math.ceil((new Date(project.due_date).getTime() - Date.now()) / 86400000))
-    : null
-  const health = project.health || 'on-track'
+  const health = getHealthInfo(project.health)
+  const isMusicClient = (project.clients?.industry || '').toLowerCase().includes('music')
   const pendingApprovals = (project.approvals || []).filter((a: any) => a.status === 'pending')
-  const nextMilestone = (project.milestones || []).find(
-    (m: any) => m.status === 'in-progress' || m.status === 'upcoming'
-  )
+  const inReviewFeedback = (project.feedback || []).filter((f: any) => f.status === 'In Review')
+  const upcomingMilestones = (project.milestones || [])
+    .filter((m: any) => m.status !== 'completed' && hasMeaningfulTitle(m))
+    .slice(0, 3)
   const recentActivity = (project.activities || []).slice(0, 5).map((a: any) => {
-    const meta = ACTIVITY_ICONS[a.type] || ACTIVITY_ICONS.commit
-    return { ...a, text: a.action_text, time: timeAgo(a.created_at), icon: meta.icon, color: meta.color, bg: meta.bg }
+    const meta = ACTIVITY_META[a.type] || ACTIVITY_META.commit
+    return { ...a, time: timeAgo(a.created_at), ...meta }
   })
-  const totalPaid = (project.payments || [])
-    .filter((p: any) => p.status === 'paid')
-    .reduce((s: number, p: any) => s + (p.amount || 0), 0)
-  const totalValue = project.contract_value || (project.payments || []).reduce((s: number, p: any) => s + (p.amount || 0), 0)
 
-  const getHealthStyle = (h: string) => {
-    if (h === 'on-track') return { text: 'text-emerald-400', bg: 'bg-emerald-500/[0.06]', border: 'border-emerald-500/15', label: 'On Track' }
-    if (h === 'at-risk') return { text: 'text-orange-400', bg: 'bg-orange-500/[0.06]', border: 'border-orange-500/15', label: 'At Risk' }
-    return { text: 'text-red-400', bg: 'bg-red-500/[0.06]', border: 'border-red-500/15', label: 'Delayed' }
-  }
-  const hs = getHealthStyle(health)
+  const accentTone: PortalTone = isMusicClient ? 'violet' : 'cyan'
+  const actionsTone: PortalTone = pendingApprovals.length > 0 ? 'amber' : 'emerald'
+  const currentStageIndex = Math.max(0, STAGES.indexOf(project.stage || 'Backlog'))
+
+  const quickActions: { icon: LucideIcon; label: string; href: string; tone: PortalTone }[] = [
+    { icon: ClipboardCheck, label: 'Approvals', href: `/client/${code}/approvals`, tone: 'amber' },
+    { icon: MessageSquare, label: 'Feedback', href: `/client/${code}/feedback`, tone: 'cyan' },
+    { icon: IndianRupee, label: 'Finance', href: `/client/${code}/finance`, tone: 'emerald' },
+    { icon: FileText, label: 'Documents', href: `/client/${code}/documents`, tone: 'cyan' },
+    { icon: Video, label: 'Meetings', href: `/client/${code}/meetings`, tone: 'emerald' },
+    { icon: ImageIcon, label: 'Gallery', href: `/client/${code}/gallery`, tone: isMusicClient ? 'violet' : 'emerald' },
+    { icon: Package, label: 'Deliverables', href: `/client/${code}/deliverables`, tone: 'cyan' },
+    { icon: Users, label: 'Team', href: `/client/${code}/team`, tone: 'cyan' },
+  ]
 
   return (
-    <div className="flex flex-col gap-6">
-      {/* Welcome Header */}
-      <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-1">
-        <h1 className="font-display text-[clamp(24px,4vw,36px)] font-bold tracking-[-0.02em] text-white/90">
-          {project.name}
-        </h1>
-        <div className="flex items-center gap-3 flex-wrap">
-          <span className="text-[13px] text-white/30">
-            Phase: <span className="text-white/60 font-medium">{project.status || 'Not started'}</span>
-          </span>
-          <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-mono uppercase tracking-[0.15em] border ${hs.bg} ${hs.text} ${hs.border}`}>
-            {hs.label}
-          </span>
+    <div className="flex flex-col gap-10 sm:gap-14">
+      {/* Project Health */}
+      <motion.div
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ ease: EASE_OUT }}
+        className="flex flex-col sm:flex-row sm:items-end justify-between gap-5 pb-8 sm:pb-10 border-b"
+        style={DIVIDER}
+      >
+        <div className="min-w-0 flex-1">
+          <SectionLabel tone="cyan">{project.status || 'In Progress'}</SectionLabel>
+          <h1
+            className="font-display text-[28px] sm:text-[40px] font-bold tracking-[-0.025em] mt-1.5 leading-[1.05] text-balance"
+            style={{ color: 'var(--cp-text)' }}
+          >
+            {project.name}
+          </h1>
+          <p className="text-[14px] sm:text-[15px] mt-3 max-w-xl leading-relaxed text-balance" style={{ color: 'var(--cp-text-secondary)' }}>
+            {health.description}
+          </p>
+        </div>
+        <div className="flex flex-col items-start sm:items-end gap-4 shrink-0">
+          <div className="flex items-center gap-2.5" style={{ color: TONE_TEXT[health.tone] }}>
+            <span className="inline-block w-2 h-2" style={{ background: 'currentColor' }} />
+            <health.icon className="w-4 h-4" />
+            <span className="text-[12px] font-semibold uppercase tracking-[0.16em]">{health.label}</span>
+          </div>
+          {recentActivity[0] && (
+            <span className="text-[11.5px]" style={{ color: 'var(--cp-text-faint)' }}>
+              Updated {recentActivity[0].time}
+            </span>
+          )}
+          <Link
+            href={`/client/${code}/timeline`}
+            className="cp-btn-primary inline-flex items-center justify-center gap-2 px-5 py-2.5 text-[13px]"
+          >
+            <Map className="w-4 h-4" />
+            View Timeline
+          </Link>
         </div>
       </motion.div>
 
-      {/* Stats Row */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        {/* Progress */}
+      {/* Announcements */}
+      {announcements.length > 0 && (
         <motion.div
-          initial={{ opacity: 0, y: 15 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.05 }}
-          className="p-5 rounded-2xl relative overflow-hidden"
-          style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}
+          transition={{ delay: 0.03, ease: EASE_OUT }}
+          className="pb-10 sm:pb-14 border-b"
+          style={DIVIDER}
         >
-          <TrendingUp className="w-4 h-4 text-blue-400/60 mb-3" />
-          <div className="text-[9px] font-mono uppercase tracking-[0.15em] text-white/20 mb-1">Progress</div>
-          <div className="text-[28px] font-display font-bold text-white/90 tracking-tight leading-none">{progress}%</div>
-          <div className="w-full h-1 bg-white/[0.04] rounded-full overflow-hidden mt-3">
+          <SectionLabel>Announcements</SectionLabel>
+          <div className="cp-card cp-list overflow-hidden mt-4">
+            {announcements.map((a: any) => {
+              const meta = ANNOUNCEMENT_META[a.tone] || ANNOUNCEMENT_META.info
+              return (
+                <div key={a.id} className="flex items-start gap-3 p-4 sm:p-5">
+                  <meta.icon className="w-[18px] h-[18px] shrink-0 mt-0.5" style={{ color: TONE_TEXT[meta.tone] }} />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[13.5px] font-semibold" style={{ color: 'var(--cp-text)' }}>{a.title}</p>
+                    {a.body && (
+                      <p className="text-[12.5px] mt-0.5 leading-relaxed text-balance" style={{ color: 'var(--cp-text-secondary)' }}>
+                        {a.body}
+                      </p>
+                    )}
+                  </div>
+                  <span className="text-[11px] shrink-0 tabular-nums" style={{ color: 'var(--cp-text-faint)' }}>
+                    {timeAgo(a.created_at)}
+                  </span>
+                </div>
+              )
+            })}
+          </div>
+        </motion.div>
+      )}
+
+      {/* Progress % + Current Phase */}
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.05, ease: EASE_OUT }}
+        className="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-14 pb-10 sm:pb-14 border-b"
+        style={DIVIDER}
+      >
+        {/* Overall progress — featured */}
+        <div className={`lg:col-span-2 cp-card ${isMusicClient ? 'cp-card-accent-violet' : 'cp-card-accent'} pl-5 sm:pl-6 flex flex-col gap-7`}>
+          <div className="flex items-center gap-2.5">
+            <TrendingUp className="w-[18px] h-[18px]" style={{ color: TONE_TEXT[accentTone] }} />
+            <SectionLabel tone={accentTone}>Progress</SectionLabel>
+          </div>
+
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6">
+            <div className="flex items-baseline gap-2">
+              <span
+                className="font-display font-bold tabular-nums leading-none text-[72px] sm:text-[88px] tracking-[-0.03em]"
+                style={{ color: 'var(--cp-text)' }}
+              >
+                {progress}
+              </span>
+              <span className="font-display font-bold leading-none text-[28px] sm:text-[34px]" style={{ color: 'var(--cp-text-muted)' }}>
+                %
+              </span>
+            </div>
+            <p className="text-[12.5px] sm:text-right" style={{ color: 'var(--cp-text-muted)' }}>
+              {daysRemaining !== null ? `${daysRemaining} day${daysRemaining === 1 ? '' : 's'} remaining` : 'Timeline to be confirmed'}
+            </p>
+          </div>
+
+          <div className="w-full h-[3px]" style={{ background: 'var(--cp-surface-strong)' }}>
             <motion.div
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
-              transition={{ duration: 1.2, delay: 0.5, ease: 'easeOut' }}
-              className="h-full rounded-full"
-              style={{ background: 'linear-gradient(90deg, rgba(59,130,246,0.6), rgba(255,255,255,0.5))' }}
+              transition={{ duration: 1, delay: 0.4, ease: EASE_OUT }}
+              className="h-full"
+              style={{ background: isMusicClient ? 'var(--cp-violet)' : 'var(--cp-cyan)' }}
             />
           </div>
-        </motion.div>
 
-        {/* Days Remaining */}
-        <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="p-5 rounded-2xl"
-          style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}
-        >
-          <Calendar className="w-4 h-4 text-purple-400/60 mb-3" />
-          <div className="text-[9px] font-mono uppercase tracking-[0.15em] text-white/20 mb-1">Days Left</div>
-          <div className="text-[28px] font-display font-bold text-white/90 tracking-tight leading-none">
-            {daysRemaining !== null ? daysRemaining : '—'}
-          </div>
-        </motion.div>
-
-        {/* Approvals Pending */}
-        <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15 }}
-          className="p-5 rounded-2xl"
-          style={{
-            background: pendingApprovals.length > 0 ? 'rgba(249,115,22,0.03)' : 'rgba(255,255,255,0.02)',
-            border: pendingApprovals.length > 0 ? '1px solid rgba(249,115,22,0.1)' : '1px solid rgba(255,255,255,0.05)',
-          }}
-        >
-          <CheckSquare className={`w-4 h-4 mb-3 ${pendingApprovals.length > 0 ? 'text-orange-400/60' : 'text-white/20'}`} />
-          <div className="text-[9px] font-mono uppercase tracking-[0.15em] text-white/20 mb-1">Needs Review</div>
-          <div className="text-[28px] font-display font-bold text-white/90 tracking-tight leading-none">
-            {pendingApprovals.length}
-          </div>
-        </motion.div>
-
-        {/* Paid */}
-        <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="p-5 rounded-2xl"
-          style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}
-        >
-          <CreditCard className="w-4 h-4 text-emerald-400/60 mb-3" />
-          <div className="text-[9px] font-mono uppercase tracking-[0.15em] text-white/20 mb-1">Paid</div>
-          <div className="text-[22px] font-display font-bold text-emerald-400/80 tracking-tight leading-none">
-            {totalPaid > 0 ? `₹${totalPaid.toLocaleString('en-IN')}` : '—'}
-          </div>
-        </motion.div>
-      </div>
-
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
-        {/* Left Column - Actions + Milestone */}
-        <div className="lg:col-span-2 flex flex-col gap-5">
-          {/* Pending Approvals */}
-          {pendingApprovals.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.25 }}
-              className="p-5 rounded-2xl relative overflow-hidden"
-              style={{ background: 'rgba(249,115,22,0.03)', border: '1px solid rgba(249,115,22,0.1)' }}
-            >
-              <div className="absolute top-0 left-[15%] right-[15%] h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(249,115,22,0.2), transparent)' }} />
-              <div className="flex items-center gap-2.5 mb-4">
-                <CheckSquare className="w-4 h-4 text-orange-400" />
-                <h3 className="text-[14px] font-bold text-white/80">Action Required</h3>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <div className="text-[11px] font-semibold uppercase tracking-[0.12em] mb-1" style={{ color: 'var(--cp-text-muted)' }}>
+                Started
               </div>
-              <div className="flex flex-col gap-2.5">
-                {pendingApprovals.slice(0, 3).map((a: any) => (
-                  <Link key={a.id} href={`/client/${code}/approvals`}>
-                    <div className="p-3.5 rounded-xl border border-white/[0.05] hover:border-orange-400/20 transition-all cursor-pointer group" style={{ background: 'rgba(0,0,0,0.2)' }}>
-                      <div className="flex justify-between items-center mb-1">
-                        <span className="text-[9px] uppercase tracking-[0.15em] text-orange-400/70 font-bold font-mono">{a.type || 'Review'}</span>
-                        <span className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse" />
-                      </div>
-                      <h4 className="text-[13px] font-medium text-white/70 group-hover:text-white/90 transition-colors">{a.title}</h4>
-                    </div>
-                  </Link>
-                ))}
+              <div className="text-[13.5px] font-semibold flex items-center gap-1.5" style={{ color: 'var(--cp-text)' }}>
+                <Calendar className="w-3.5 h-3.5" style={{ color: 'var(--cp-text-muted)' }} />
+                {formatDate(project.created_at)}
               </div>
-              <Link href={`/client/${code}/approvals`} className="flex items-center gap-1 mt-3 text-[11px] font-medium text-orange-400/60 hover:text-orange-400 transition-colors">
-                Review all <ArrowRight className="w-3 h-3" />
-              </Link>
-            </motion.div>
-          )}
-
-          {/* Next Milestone */}
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="p-5 rounded-2xl flex flex-col"
-            style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}
-          >
-            <Clock className="w-5 h-5 text-blue-400/50 mb-3" />
-            <div className="text-[9px] font-mono uppercase tracking-[0.15em] text-white/20 mb-2">Next Milestone</div>
-            {nextMilestone ? (
-              <>
-                <h3 className="text-[16px] font-bold text-white/80 mb-1">{nextMilestone.name || nextMilestone.title}</h3>
-                <p className="text-[12px] text-white/30 mb-4">{nextMilestone.date_range || 'Date TBD'}</p>
-              </>
-            ) : (
-              <p className="text-[13px] text-white/25 mb-4">No upcoming milestones</p>
-            )}
-            <Link
-              href={`/client/${code}/timeline`}
-              className="text-[11px] font-medium text-blue-400/50 hover:text-blue-400 transition-colors mt-auto"
-            >
-              View full timeline &rarr;
-            </Link>
-          </motion.div>
-
-          {/* Quick Links */}
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.35 }}
-            className="grid grid-cols-2 gap-2.5"
-          >
-            {[
-              { label: 'Gallery', href: `/client/${code}/gallery`, icon: '🖼' },
-              { label: 'Documents', href: `/client/${code}/documents`, icon: '📄' },
-              { label: 'Meetings', href: `/client/${code}/meetings`, icon: '📹' },
-              { label: 'Feedback', href: `/client/${code}/feedback`, icon: '💬' },
-            ].map((link) => (
-              <Link key={link.label} href={link.href}>
-                <div
-                  className="p-3.5 rounded-xl text-center hover:bg-white/[0.03] transition-all cursor-pointer group"
-                  style={{ background: 'rgba(255,255,255,0.015)', border: '1px solid rgba(255,255,255,0.04)' }}
-                >
-                  <span className="text-lg mb-1 block">{link.icon}</span>
-                  <span className="text-[11px] font-medium text-white/30 group-hover:text-white/60 transition-colors">{link.label}</span>
-                </div>
-              </Link>
-            ))}
-          </motion.div>
+            </div>
+            <div>
+              <div className="text-[11px] font-semibold uppercase tracking-[0.12em] mb-1" style={{ color: 'var(--cp-text-muted)' }}>
+                Target Date
+              </div>
+              <div className="text-[13.5px] font-semibold flex items-center gap-1.5" style={{ color: 'var(--cp-text)' }}>
+                <CalendarClock className="w-3.5 h-3.5" style={{ color: 'var(--cp-text-muted)' }} />
+                {formatDate(project.due_date)}
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Right Column - Activity Feed */}
-        <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="lg:col-span-3 p-5 rounded-2xl"
-          style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}
-        >
-          <div className="flex justify-between items-center mb-5">
-            <div className="flex items-center gap-2.5">
-              <Activity className="w-4 h-4 text-white/30" />
-              <h3 className="text-[14px] font-bold text-white/80">Recent Activity</h3>
-            </div>
-            <Link href={`/client/${code}/development`} className="text-[11px] text-white/25 hover:text-white/50 transition-colors">
-              View all &rarr;
-            </Link>
+        {/* Current phase */}
+        <div className="cp-card p-5 sm:p-6 flex flex-col h-full">
+          <div className="flex items-center gap-2.5 mb-5">
+            <Layers className="w-[18px] h-[18px]" style={{ color: 'var(--cp-cyan)' }} />
+            <SectionLabel>Current Phase</SectionLabel>
           </div>
+          <div className="flex flex-col">
+            {STAGES.map((stage, i) => {
+              const isDone = i < currentStageIndex
+              const isCurrent = i === currentStageIndex
+              const isLast = i === STAGES.length - 1
+              return (
+                <div key={stage} className="flex gap-3">
+                  <div className="flex flex-col items-center">
+                    <div
+                      className="w-[10px] h-[10px] rounded-full shrink-0"
+                      style={
+                        isDone
+                          ? { background: 'var(--cp-cyan)' }
+                          : isCurrent
+                          ? { background: 'var(--cp-surface)', border: '2px solid var(--cp-cyan)' }
+                          : { background: 'var(--cp-surface)', border: '2px solid var(--cp-border)' }
+                      }
+                    />
+                    {!isLast && (
+                      <div className="w-px flex-1" style={{ background: isDone ? 'var(--cp-cyan)' : 'var(--cp-border-soft)' }} />
+                    )}
+                  </div>
+                  <div className={isLast ? 'pb-0' : 'pb-6'}>
+                    <span className="text-[13px] font-semibold block" style={{ color: isCurrent || isDone ? 'var(--cp-text)' : 'var(--cp-text-faint)' }}>
+                      {stage}
+                    </span>
+                    {isCurrent && (
+                      <span className="text-[12px] block mt-0.5 leading-relaxed" style={{ color: 'var(--cp-text-muted)' }}>
+                        {STAGE_DESCRIPTIONS[stage]}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      </motion.div>
 
-          {recentActivity.length > 0 ? (
-            <div className="relative pl-5 border-l border-white/[0.04] flex flex-col gap-5">
-              {recentActivity.map((activity: any, i: number) => (
-                <motion.div
-                  initial={{ opacity: 0, x: -8 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.4 + i * 0.08 }}
-                  key={i}
-                  className="relative"
-                >
-                  <div className={`absolute -left-[29px] top-1 w-5 h-5 rounded-full flex items-center justify-center ${activity.bg} border border-white/[0.04]`}>
-                    <activity.icon className={`w-2.5 h-2.5 ${activity.color}`} />
-                  </div>
-                  <div className="p-3.5 rounded-xl border border-white/[0.03] hover:border-white/[0.06] transition-colors" style={{ background: 'rgba(255,255,255,0.01)' }}>
-                    <p className="text-[13px] text-white/65 font-medium mb-1">{activity.text}</p>
-                    <span className="text-[9px] text-white/20 uppercase tracking-[0.15em] font-mono">{activity.time}</span>
-                  </div>
-                </motion.div>
+      {/* Pending Client Actions + Upcoming Milestones + Team Members */}
+      <motion.div
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1, ease: EASE_OUT }}
+        className="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-14 pb-10 sm:pb-14 border-b"
+        style={DIVIDER}
+      >
+        {/* Pending client actions */}
+        <div className="cp-card p-5 sm:p-6 flex flex-col gap-3.5 h-full">
+          <div className="flex items-center gap-2.5">
+            <ClipboardCheck className="w-[18px] h-[18px]" style={{ color: TONE_TEXT[actionsTone] }} />
+            <SectionLabel tone={actionsTone}>Pending Client Actions</SectionLabel>
+          </div>
+          <div className="font-display font-bold tabular-nums leading-none text-[44px]" style={{ color: 'var(--cp-text)' }}>
+            {pendingApprovals.length}
+          </div>
+          {pendingApprovals.length > 0 ? (
+            <div className="flex flex-col gap-1">
+              {pendingApprovals.slice(0, 2).map((a: any) => (
+                <p key={a.id} className="text-[12px] truncate" style={{ color: 'var(--cp-text-muted)' }}>
+                  {a.title}
+                </p>
               ))}
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center py-12 text-center">
-              <Activity className="w-10 h-10 text-white/[0.05] mb-3" />
-              <p className="text-[13px] text-white/25">No activity yet</p>
-              <p className="text-[11px] text-white/15 mt-1">Updates will appear here as your project progresses.</p>
+            <p className="text-[12.5px]" style={{ color: 'var(--cp-text-muted)' }}>
+              You&apos;re all caught up — nothing pending.
+            </p>
+          )}
+          {inReviewFeedback.length > 0 && (
+            <p className="text-[11.5px]" style={{ color: 'var(--cp-text-faint)' }}>
+              {inReviewFeedback.length} feedback item{inReviewFeedback.length === 1 ? '' : 's'} awaiting a response
+            </p>
+          )}
+          <Link
+            href={pendingApprovals.length > 0 ? `/client/${code}/approvals` : `/client/${code}/feedback`}
+            className="group inline-flex items-center gap-1.5 text-[12.5px] font-semibold mt-auto pt-2"
+            style={{ color: pendingApprovals.length > 0 ? 'var(--cp-amber)' : 'var(--cp-cyan)' }}
+          >
+            {pendingApprovals.length > 0 ? 'Review now' : 'Go to feedback'}
+            <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-1" />
+          </Link>
+        </div>
+
+        {/* Upcoming milestones */}
+        <div className="cp-card p-5 sm:p-6 flex flex-col gap-3.5 h-full">
+          <div className="flex items-center gap-2.5">
+            <CalendarClock className="w-[18px] h-[18px]" style={{ color: 'var(--cp-cyan)' }} />
+            <SectionLabel>Upcoming Milestones</SectionLabel>
+          </div>
+          {upcomingMilestones.length > 0 ? (
+            <div className="flex flex-col gap-3">
+              {upcomingMilestones.map((m: any) => (
+                <div key={m.id} className="flex items-start gap-2.5">
+                  <span
+                    className="w-2 h-2 rounded-full shrink-0 mt-1.5"
+                    style={{ background: m.status === 'in-progress' ? 'var(--cp-cyan)' : 'var(--cp-border-strong)' }}
+                  />
+                  <div className="min-w-0">
+                    <p className="text-[13px] font-semibold truncate" style={{ color: 'var(--cp-text)' }}>
+                      {m.name || m.title}
+                    </p>
+                    <p className="text-[11.5px]" style={{ color: 'var(--cp-text-muted)' }}>
+                      {m.date_range || 'Date to be confirmed'}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="flex items-start gap-3">
+              <Calendar className="w-4 h-4 mt-0.5 shrink-0" style={{ color: 'var(--cp-text-faint)' }} />
+              <p className="text-[13px] leading-relaxed" style={{ color: 'var(--cp-text-muted)' }}>
+                Your next milestones will appear here once they&apos;re scheduled.
+              </p>
             </div>
           )}
-        </motion.div>
-      </div>
+          <Link
+            href={`/client/${code}/timeline`}
+            className="group inline-flex items-center gap-1.5 text-[12.5px] font-semibold mt-auto pt-2"
+            style={{ color: 'var(--cp-cyan)' }}
+          >
+            View full timeline
+            <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-1" />
+          </Link>
+        </div>
+
+        {/* Team members */}
+        <div className="cp-card p-5 sm:p-6 flex flex-col gap-3.5 h-full">
+          <div className="flex items-center gap-2.5">
+            <Users className="w-[18px] h-[18px]" style={{ color: 'var(--cp-cyan)' }} />
+            <SectionLabel>Team Members</SectionLabel>
+          </div>
+          {team.length > 0 ? (
+            <div className="flex flex-col gap-3">
+              {team.slice(0, 4).map((t: any) => {
+                const tm = t.team_members || {}
+                return (
+                  <div key={t.id} className="flex items-center gap-3">
+                    <div
+                      className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-[10.5px] font-bold"
+                      style={{ background: 'var(--cp-cyan-soft)', color: 'var(--cp-cyan)' }}
+                    >
+                      {tm.initials}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[13px] font-semibold truncate" style={{ color: 'var(--cp-text)' }}>{tm.name}</p>
+                      <p className="text-[11.5px] truncate" style={{ color: 'var(--cp-text-muted)' }}>{t.role_on_project || tm.role}</p>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          ) : (
+            <p className="text-[13px] leading-relaxed" style={{ color: 'var(--cp-text-muted)' }}>
+              Your team will be introduced here soon.
+            </p>
+          )}
+          <Link
+            href={`/client/${code}/team`}
+            className="group inline-flex items-center gap-1.5 text-[12.5px] font-semibold mt-auto pt-2"
+            style={{ color: 'var(--cp-cyan)' }}
+          >
+            Meet the team
+            <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-1" />
+          </Link>
+        </div>
+      </motion.div>
+
+      {/* Recent activity */}
+      <motion.div
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.18, ease: EASE_OUT }}
+        className="pb-10 sm:pb-14 border-b"
+        style={DIVIDER}
+      >
+        <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center gap-2.5">
+            <Activity className="w-4 h-4" style={{ color: 'var(--cp-cyan)' }} />
+            <h3 className="text-[15px] font-bold" style={{ color: 'var(--cp-text)' }}>
+              Recent Activity
+            </h3>
+          </div>
+          <Link href={`/client/${code}/development`} className="text-[12.5px] font-medium transition-colors" style={{ color: 'var(--cp-text-muted)' }}>
+            View all
+          </Link>
+        </div>
+
+        {recentActivity.length > 0 ? (
+          <div className="flex flex-col">
+            {recentActivity.map((activity: any, i: number) => (
+              <motion.div
+                initial={{ opacity: 0, x: -8 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.22 + i * 0.06, ease: EASE_OUT }}
+                key={activity.id ?? i}
+                className={`flex items-center gap-3.5 py-3.5 ${i < recentActivity.length - 1 ? 'border-b' : ''}`}
+                style={DIVIDER}
+              >
+                <activity.icon className="w-4 h-4 shrink-0" style={{ color: TONE_TEXT[activity.tone as PortalTone] }} />
+                <div className="flex-1 min-w-0">
+                  <p className="text-[13.5px] font-medium truncate" style={{ color: 'var(--cp-text-secondary)' }}>
+                    {activity.action_text}
+                  </p>
+                  <span className="text-[11.5px]" style={{ color: 'var(--cp-text-faint)' }}>
+                    {activity.label}
+                  </span>
+                </div>
+                <span className="text-[12px] shrink-0 tabular-nums" style={{ color: 'var(--cp-text-muted)' }}>
+                  {activity.time}
+                </span>
+              </motion.div>
+            ))}
+          </div>
+        ) : (
+          <div className="flex items-center gap-3 py-2">
+            <Sparkles className="w-4 h-4 shrink-0" style={{ color: 'var(--cp-text-faint)' }} />
+            <p className="text-[13px] leading-relaxed" style={{ color: 'var(--cp-text-muted)' }}>
+              No updates yet — as your team makes progress, updates will show up here.
+            </p>
+          </div>
+        )}
+      </motion.div>
+
+      {/* Quick links */}
+      <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.26, ease: EASE_OUT }}>
+        <SectionLabel>Quick Links</SectionLabel>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-px mt-4" style={{ background: 'var(--cp-border-soft)' }}>
+          {quickActions.map((action, i) => (
+            <motion.div
+              key={action.label}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 + i * 0.04, ease: EASE_OUT }}
+              className="transition-transform duration-150 ease-[cubic-bezier(0.16,1,0.3,1)] active:scale-[0.96]"
+              style={{ background: 'var(--cp-bg)' }}
+            >
+              <QuickAction icon={action.icon} label={action.label} href={action.href} tone={action.tone} />
+            </motion.div>
+          ))}
+        </div>
+      </motion.div>
     </div>
   )
 }

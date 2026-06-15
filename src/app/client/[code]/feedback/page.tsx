@@ -2,10 +2,9 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { MessageSquare, Lightbulb, Bug, Send, CheckCircle2, MessagesSquare } from 'lucide-react'
+import { Send, MessagesSquare } from 'lucide-react'
 import { fetchFeedback, insertFeedback, fetchProjectByAccessCode } from '@/lib/db'
-
-const ICON_MAP: Record<string, any> = { 'Feature Request': Lightbulb, 'Bug Report': Bug, 'General Comment': MessageSquare }
+import { PageHeader, EmptyState, Loading, Badge } from '@/components/portal/PortalUI'
 
 export default function FeedbackPage() {
   const params = useParams()
@@ -16,6 +15,7 @@ export default function FeedbackPage() {
   const [details, setDetails] = useState('')
   const [feedbackList, setFeedbackList] = useState<any[]>([])
   const [projectId, setProjectId] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
@@ -26,6 +26,7 @@ export default function FeedbackPage() {
         const { data } = await fetchFeedback(project.id)
         if (data && data.length > 0) setFeedbackList(data)
       }
+      setLoading(false)
     }
     load()
   }, [code])
@@ -41,58 +42,67 @@ export default function FeedbackPage() {
     setActiveTab('history')
   }
 
-  return (
-    <div className="flex flex-col gap-6 max-w-3xl mx-auto">
-      <div>
-        <h1 className="font-display text-2xl font-bold tracking-tight text-white/90 mb-1">Feedback</h1>
-        <p className="text-white/25 text-[13px]">Submit requests, report issues, or share comments with the team.</p>
-      </div>
+  if (loading) return <Loading />
 
-      {/* Tabs */}
-      <div className="flex gap-1 p-0.5 rounded-xl w-fit" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
-        <button
-          onClick={() => setActiveTab('submit')}
-          className={`px-5 py-1.5 rounded-lg text-[12px] font-medium transition-all ${activeTab === 'submit' ? 'bg-white/[0.06] text-white/80' : 'text-white/25 hover:text-white/50'}`}
-        >
-          Submit
-        </button>
-        <button
-          onClick={() => setActiveTab('history')}
-          className={`px-5 py-1.5 rounded-lg text-[12px] font-medium transition-all ${activeTab === 'history' ? 'bg-white/[0.06] text-white/80' : 'text-white/25 hover:text-white/50'}`}
-        >
-          History {feedbackList.length > 0 && `(${feedbackList.length})`}
-        </button>
+  return (
+    <div className="flex flex-col gap-8 w-full">
+      <PageHeader title="Feedback" description="Share ideas, report issues, or send a quick note to your project team." />
+
+      {/* Tabs — simplified text tabs */}
+      <div className="flex gap-8 border-b" style={{ borderColor: 'var(--cp-border-soft)' }}>
+        {(['submit', 'history'] as const).map((tab) => {
+          const active = activeTab === tab
+          const labelText = tab === 'submit' ? 'Submit Feedback' : `Feedback History${feedbackList.length > 0 ? ` (${feedbackList.length})` : ''}`
+          return (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className="relative pb-3 text-[13px] font-semibold transition-colors"
+              style={{ color: active ? 'var(--cp-text)' : 'var(--cp-text-muted)' }}
+            >
+              {labelText}
+              {active && (
+                <motion.span
+                  layoutId="feedback-tab-active"
+                  className="absolute left-0 right-0 -bottom-px h-[1.5px]"
+                  style={{ background: 'var(--cp-cyan)' }}
+                />
+              )}
+            </button>
+          )
+        })}
       </div>
 
       {activeTab === 'submit' ? (
         <motion.div
-          initial={{ opacity: 0, y: 15 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="p-6 rounded-2xl flex flex-col gap-5"
-          style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}
+          className="flex flex-col gap-6"
         >
           {/* Type Selector */}
-          <div>
-            <label className="block text-[10px] font-semibold uppercase tracking-wider text-white/25 mb-2.5">Type</label>
-            <div className="grid grid-cols-3 gap-2.5">
+          <div className="flex flex-col gap-2.5">
+            <label className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: 'var(--cp-text-muted)' }}>Category</label>
+            <div className="flex flex-wrap gap-2">
               {[
-                { type: 'Feature Request', icon: Lightbulb },
-                { type: 'Bug Report', icon: Bug },
-                { type: 'General Comment', icon: MessageSquare },
-              ].map(({ type, icon: Icon }) => {
+                { type: 'Feature Request', label: 'Feature Request' },
+                { type: 'Bug Report', label: 'Bug Report' },
+                { type: 'General Comment', label: 'General Message' },
+              ].map(({ type, label }) => {
                 const isSelected = feedbackType === type
                 return (
                   <button
                     key={type}
                     onClick={() => setFeedbackType(type)}
-                    className={`p-3 rounded-xl text-[11px] font-medium flex flex-col items-center gap-1.5 transition-all ${isSelected ? 'text-blue-400' : 'text-white/25 hover:text-white/50'}`}
-                    style={{
-                      background: isSelected ? 'rgba(59,130,246,0.05)' : 'rgba(255,255,255,0.015)',
-                      border: isSelected ? '1px solid rgba(59,130,246,0.15)' : '1px solid rgba(255,255,255,0.04)',
-                    }}
+                    className="px-4 py-2 rounded-full text-[12.5px] font-medium transition-colors border"
+                    style={
+                      isSelected
+                        ? { background: 'var(--cp-cyan-soft)', color: 'var(--cp-cyan)', borderColor: 'var(--cp-cyan-border)' }
+                        : { background: 'transparent', color: 'var(--cp-text-muted)', borderColor: 'var(--cp-border)' }
+                    }
+                    onMouseEnter={(e) => { if (!isSelected) { e.currentTarget.style.color = 'var(--cp-text-secondary)'; e.currentTarget.style.borderColor = 'var(--cp-border-strong)' } }}
+                    onMouseLeave={(e) => { if (!isSelected) { e.currentTarget.style.color = 'var(--cp-text-muted)'; e.currentTarget.style.borderColor = 'var(--cp-border)' } }}
                   >
-                    <Icon className="w-4 h-4" />
-                    {type.replace(' Request', '').replace(' Report', '').replace(' Comment', '')}
+                    {label}
                   </button>
                 )
               })}
@@ -100,91 +110,96 @@ export default function FeedbackPage() {
           </div>
 
           {/* Subject */}
-          <div>
-            <label className="block text-[10px] font-semibold uppercase tracking-wider text-white/25 mb-1.5">Subject</label>
+          <div className="flex flex-col gap-2">
+            <label className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: 'var(--cp-text-muted)' }}>Subject</label>
             <input
               type="text"
-              placeholder="Brief description of your request"
+              placeholder="What is this regarding?"
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
-              className="w-full rounded-xl px-4 py-2.5 text-[13px] text-white/70 outline-none transition-all"
-              style={{ background: 'rgba(255,255,255,0.015)', border: '1px solid rgba(255,255,255,0.04)' }}
-              onFocus={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)' }}
-              onBlur={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.04)' }}
+              className="w-full rounded-xl px-4 py-3 text-[13.5px] outline-none transition-colors"
+              style={{ background: 'var(--cp-bg-soft)', border: '1px solid var(--cp-border-soft)', color: 'var(--cp-text)' }}
+              onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--cp-cyan)' }}
+              onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--cp-border-soft)' }}
             />
           </div>
 
           {/* Details */}
-          <div>
-            <label className="block text-[10px] font-semibold uppercase tracking-wider text-white/25 mb-1.5">Details</label>
+          <div className="flex flex-col gap-2">
+            <label className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: 'var(--cp-text-muted)' }}>Details</label>
             <textarea
-              rows={4}
-              placeholder="Describe in detail..."
+              rows={5}
+              placeholder="Please provide details..."
               value={details}
               onChange={(e) => setDetails(e.target.value)}
-              className="w-full rounded-xl px-4 py-2.5 text-[13px] text-white/70 outline-none transition-all resize-none"
-              style={{ background: 'rgba(255,255,255,0.015)', border: '1px solid rgba(255,255,255,0.04)' }}
-              onFocus={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)' }}
-              onBlur={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.04)' }}
+              className="w-full rounded-xl px-4 py-3 text-[13.5px] outline-none transition-colors resize-none"
+              style={{ background: 'var(--cp-bg-soft)', border: '1px solid var(--cp-border-soft)', color: 'var(--cp-text)' }}
+              onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--cp-cyan)' }}
+              onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--cp-border-soft)' }}
             />
           </div>
 
-          <div className="pt-3 border-t border-white/[0.04] flex justify-end">
+          <div className="pt-4 flex justify-end border-t" style={{ borderColor: 'var(--cp-border-soft)' }}>
             <button
               onClick={handleSubmit}
               disabled={submitting || !subject}
-              className="px-6 py-2.5 bg-white text-[#050505] font-semibold text-[11px] rounded-xl flex items-center gap-1.5 hover:bg-white/90 transition-all disabled:opacity-30"
-              style={{ boxShadow: '0 0 12px rgba(255,255,255,0.05)' }}
+              className="cp-btn-primary px-5 py-2.5 text-[12.5px] flex items-center gap-1.5 disabled:opacity-40"
             >
-              <Send className="w-3.5 h-3.5" /> {submitting ? 'Sending...' : 'Submit'}
+              <Send className="w-3.5 h-3.5" />
+              {submitting ? 'Sending…' : 'Submit Feedback'}
             </button>
           </div>
         </motion.div>
       ) : (
-        <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-2.5">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col"
+        >
           {feedbackList.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 text-center">
-              <MessagesSquare className="w-10 h-10 text-white/[0.05] mb-3" />
-              <p className="text-[13px] text-white/25">No feedback submitted yet.</p>
-            </div>
+            <EmptyState
+              icon={MessagesSquare}
+              title="No feedback history"
+              description="Any issues or ideas you submit will show up here along with their action status."
+            />
           ) : (
-            feedbackList.map((item) => {
-              const FBIcon = ICON_MAP[item.type] || MessageSquare
-              return (
-                <div
-                  key={item.id}
-                  className="p-4 rounded-xl flex items-center justify-between gap-4"
-                  style={{ background: 'rgba(255,255,255,0.015)', border: '1px solid rgba(255,255,255,0.04)' }}
-                >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
-                      <FBIcon className="w-4 h-4 text-white/25" />
+            <div className="cp-card cp-list overflow-hidden">
+              {feedbackList.map((item) => {
+                const isResolved = item.status === 'Implemented' || item.status === 'Resolved'
+                const isUnderReview = item.status === 'Under Review' || item.status === 'Planned' || item.status === 'In Review'
+                const date = item.submitted_at ? new Date(item.submitted_at) : null
+                return (
+                  <div
+                    key={item.id}
+                    className="flex flex-col sm:flex-row sm:items-center justify-between p-4 gap-3 transition-colors hover:bg-[var(--cp-bg-soft)]"
+                  >
+                    <div className="flex flex-col gap-1 min-w-0">
+                      <span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: 'var(--cp-text-faint)' }}>
+                        {item.type}
+                      </span>
+                      <h4 className="text-[13.5px] font-semibold truncate" style={{ color: 'var(--cp-text)' }}>
+                        {item.title}
+                      </h4>
+                      {item.description && (
+                        <p className="text-[12px] leading-relaxed mt-0.5 max-w-2xl line-clamp-2" style={{ color: 'var(--cp-text-muted)' }}>
+                          {item.description}
+                        </p>
+                      )}
+                      {date && (
+                        <span className="text-[10.5px] mt-1" style={{ color: 'var(--cp-text-faint)' }}>
+                          Submitted on {date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        </span>
+                      )}
                     </div>
-                    <div className="min-w-0">
-                      <h4 className="text-[13px] font-medium text-white/70 truncate">{item.title}</h4>
-                      <div className="flex items-center gap-1.5 text-[9px] font-mono text-white/15 uppercase tracking-[0.15em]">
-                        <span>{item.type}</span>
-                        <span className="w-0.5 h-0.5 rounded-full bg-white/10" />
-                        <span>{item.submitted_at ? new Date(item.submitted_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : ''}</span>
-                      </div>
+                    <div className="shrink-0 flex items-center justify-between sm:justify-end mt-2 sm:mt-0">
+                      <Badge tone={isResolved ? 'emerald' : isUnderReview ? 'cyan' : 'amber'}>
+                        {item.status || 'Pending'}
+                      </Badge>
                     </div>
                   </div>
-                  <span
-                    className={`shrink-0 px-3 py-1 rounded-lg text-[9px] font-mono uppercase tracking-[0.15em] font-bold ${
-                      item.status === 'Implemented'
-                        ? 'bg-emerald-500/[0.06] border border-emerald-500/10 text-emerald-400'
-                        : 'bg-blue-500/[0.06] border border-blue-500/10 text-blue-400'
-                    }`}
-                  >
-                    {item.status === 'Implemented' ? (
-                      <span className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> Done</span>
-                    ) : (
-                      item.status || 'Pending'
-                    )}
-                  </span>
-                </div>
-              )
-            })
+                )
+              })}
+            </div>
           )}
         </motion.div>
       )}

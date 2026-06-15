@@ -229,7 +229,7 @@ h1 {
   opacity: 0.018;
   pointer-events: none;
   z-index: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-image: url("/");
 }
 
 /* Premium card — base */
@@ -277,4 +277,274 @@ h1 {
   background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06) 15%, rgba(255,255,255,0.06) 85%, transparent);
 }
 
+/* ═══ Client & Admin Portal Design System ═══
+   Warm Editorial (Bone + Graphite): warm bone surfaces, graphite text,
+   one indigo accent for every interactive element (buttons, links,
+   active nav, focus rings). Status hues (emerald/amber/violet/red) are
+   deepened for AA contrast on bone and used sparingly — icon + label,
+   not heavy fills.
+
+   The legacy slot names (--cp-cyan, --cp-emerald, etc.) are kept so we
+   don't have to touch every component — they're semantic slots, not
+   literal colors. --cp-cyan is the single indigo accent.
+
+   .admin-shell[data-theme="dark"] below overrides these slots with the
+   warm near-black + cream dark palette. .client-shell never receives
+   that attribute, so it always stays on this light palette. */
+.client-shell, .admin-shell {
+  --cp-bg:             #F5F3EE;
+  --cp-bg-elevated:    #FBFAF7;
+  --cp-bg-soft:        #EEEBE4;
+
+  --cp-surface:        #FBFAF7;
+  --cp-surface-strong: #F1EEE7;
+  --cp-border:         rgba(20, 20, 15, 0.08);
+  --cp-border-soft:    rgba(20, 20, 15, 0.05);
+  --cp-border-strong:  rgba(20, 20, 15, 0.14);
+
+  --cp-text:           #1B1B1F;
+  --cp-text-secondary: rgba(27, 27, 31, 0.65);
+  --cp-text-muted:     rgba(27, 27, 31, 0.45);
+  --cp-text-faint:     rgba(27, 27, 31, 0.30);
+
+  /* "cyan" slot → single indigo accent */
+  --cp-cyan:        #4F46E5;
+  --cp-cyan-strong: #4338CA;
+  --cp-cyan-soft:   rgba(79, 70, 229, 0.07);
+  --cp-cyan-border: rgba(79, 70, 229, 0.18);
+
+  /* "emerald" slot → success / on-track / paid */
+  --cp-emerald:        #15803D;
+  --cp-emerald-soft:   rgba(21, 128, 61, 0.07);
+  --cp-emerald-border: rgba(21, 128, 61, 0.18);
+
+  /* "amber" slot → warning / at-risk / pending */
+  --cp-amber:        #B45309;
+  --cp-amber-soft:   rgba(180, 83, 9, 0.07);
+  --cp-amber-border: rgba(180, 83, 9, 0.18);
+
+  /* "violet" slot → music-client accent / feature highlight */
+  --cp-violet:        #6D28D9;
+  --cp-violet-soft:   rgba(109, 40, 217, 0.07);
+  --cp-violet-border: rgba(109, 40, 217, 0.18);
+
+  /* "red" slot → alert / delayed / overdue */
+  --cp-red:        #DC2626;
+  --cp-red-soft:   rgba(220, 38, 38, 0.07);
+  --cp-red-border: rgba(220, 38, 38, 0.18);
+
+  /* chart series — semantic, read by src/lib/theme/chartTheme.ts */
+  --cp-chart-1: #4F46E5;
+  --cp-chart-2: #15803D;
+  --cp-chart-3: #B45309;
+  --cp-chart-4: #6D28D9;
+  --cp-chart-5: #0891B2;
+  --cp-chart-grid: rgba(27, 27, 31, 0.06);
+  --cp-chart-axis: rgba(27, 27, 31, 0.45);
+
+  --cp-radius: 12px;
+
+  background: var(--cp-bg);
+  color: var(--cp-text);
+  color-scheme: light;
+  font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Dark mode — warm near-black + cream. Admin-only: toggled via the
+   data-theme attribute on .admin-shell (see src/lib/theme/ThemeProvider).
+   The pre-paint script in admin/layout.tsx sets data-theme on <html>
+   before .admin-shell exists in the DOM, so we match both — the
+   ThemeProvider keeps both attributes in sync after hydration. */
+.admin-shell[data-theme="dark"],
+html[data-theme="dark"] .admin-shell,
+.client-shell[data-theme="dark"],
+html[data-theme="dark"] .client-shell {
+  --cp-bg:             #0F0E0C;
+  --cp-bg-elevated:    #1A1816;
+  --cp-bg-soft:        #14120F;
+
+  --cp-surface:        #1A1816;
+  --cp-surface-strong: #221F1B;
+  --cp-border:         rgba(255, 250, 235, 0.08);
+  --cp-border-soft:    rgba(255, 250, 235, 0.05);
+  --cp-border-strong:  rgba(255, 250, 235, 0.14);
+
+  --cp-text:           #EDEBE5;
+  --cp-text-secondary: rgba(237, 235, 229, 0.65);
+  --cp-text-muted:     rgba(237, 235, 229, 0.45);
+  --cp-text-faint:     rgba(237, 235, 229, 0.28);
+
+  --cp-cyan:        #818CF8;
+  --cp-cyan-strong: #A5B4FC;
+  --cp-cyan-soft:   rgba(129, 140, 248, 0.10);
+  --cp-cyan-border: rgba(129, 140, 248, 0.24);
+
+  --cp-emerald:        #34D399;
+  --cp-emerald-soft:   rgba(52, 211, 153, 0.10);
+  --cp-emerald-border: rgba(52, 211, 153, 0.24);
+
+  --cp-amber:        #FBBF24;
+  --cp-amber-soft:   rgba(251, 191, 36, 0.10);
+  --cp-amber-border: rgba(251, 191, 36, 0.24);
+
+  --cp-violet:        #A78BFA;
+  --cp-violet-soft:   rgba(167, 139, 250, 0.10);
+  --cp-violet-border: rgba(167, 139, 250, 0.24);
+
+  --cp-red:        #F87171;
+  --cp-red-soft:   rgba(248, 113, 113, 0.10);
+  --cp-red-border: rgba(248, 113, 113, 0.24);
+
+  --cp-chart-1: #818CF8;
+  --cp-chart-2: #34D399;
+  --cp-chart-3: #FBBF24;
+  --cp-chart-4: #A78BFA;
+  --cp-chart-5: #22D3EE;
+  --cp-chart-grid: rgba(237, 235, 229, 0.06);
+  --cp-chart-axis: rgba(237, 235, 229, 0.45);
+
+  background: var(--cp-bg);
+  color: var(--cp-text);
+  color-scheme: dark;
+}
+
+/* Theme-toggle transition smoothing — skipped for reduced-motion users */
+.admin-shell,
+.client-shell {
+  transition: background-color 300ms ease, color 300ms ease, border-color 300ms ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .admin-shell,
+  .client-shell {
+    transition: none;
+  }
+}
+
+/* Base "card" — solid surface, hairline border, faint shadow */
+.cp-card {
+  position: relative;
+  background: var(--cp-surface);
+  border: 1px solid var(--cp-border-soft);
+  border-radius: var(--cp-radius);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.cp-card-hover:hover {
+  border-color: var(--cp-border);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+/* Accented "hero" card — flat, with a slim left accent rule */
+.cp-card-accent::before,
+.cp-card-accent-violet::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 2px;
+  border-top-left-radius: inherit;
+  border-bottom-left-radius: inherit;
+}
+.cp-card-accent::before {
+  background: var(--cp-cyan);
+}
+/* Music-client variant */
+.cp-card-accent-violet::before {
+  background: var(--cp-violet);
+}
+
+/* Buttons */
+.cp-btn-primary {
+  background: var(--cp-cyan);
+  color: #FFFFFF;
+  font-weight: 600;
+  border-radius: var(--cp-radius);
+  transition: background 0.2s var(--ease-out), transform 0.2s var(--ease-out), opacity 0.2s var(--ease-out);
+}
+.cp-btn-primary:hover { background: var(--cp-cyan-strong); }
+.cp-btn-primary:active { transform: scale(0.98); }
+.cp-btn-primary:disabled { opacity: 0.4; }
+
+.cp-btn-secondary {
+  background: transparent;
+  border: 1px solid var(--cp-border);
+  border-radius: var(--cp-radius);
+  color: var(--cp-text-secondary);
+  transition: border-color 0.2s var(--ease-out), color 0.2s var(--ease-out), background 0.2s var(--ease-out), transform 0.2s var(--ease-out);
+}
+.cp-btn-secondary:hover {
+  border-color: var(--cp-border-strong);
+  color: var(--cp-text);
+  background: var(--cp-surface-strong);
+}
+.cp-btn-secondary:active { transform: scale(0.98); }
+.cp-btn-secondary:disabled { opacity: 0.4; }
+
+/* "Unified List Box" — divides direct children with a hairline rule */
+.cp-list > * + * {
+  border-top: 1px solid var(--cp-border-soft);
+}
+
+/* Status labels — flat square dot + uppercase text, no pill background */
+.cp-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  white-space: nowrap;
+}
+.cp-pill::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  flex-shrink: 0;
+  background: currentColor;
+}
+
+/* Themed form controls inside the portal shells (overrides the
+   global dark `select` rule above via higher specificity) */
+.client-shell select,
+.admin-shell select,
+.client-shell select option,
+.admin-shell select option,
+.client-shell input[type="date"],
+.admin-shell input[type="date"] {
+  color-scheme: light;
+  background-color: var(--cp-bg-elevated);
+  color: var(--cp-text);
+}
+.admin-shell[data-theme="dark"] select,
+.admin-shell[data-theme="dark"] select option,
+.admin-shell[data-theme="dark"] input[type="date"] {
+  color-scheme: dark;
+}
+
+/* Premium card surface — token-driven inside the admin shell (overrides
+   the hardcoded white-alpha defaults above via higher specificity) */
+.admin-shell .premium-card {
+  background: var(--cp-surface);
+  border: 1px solid var(--cp-border-soft);
+}
+.admin-shell .premium-card:hover {
+  border-color: var(--cp-border);
+}
+.admin-shell .premium-card::before {
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--cp-cyan) 20%, transparent), color-mix(in srgb, var(--cp-violet) 12%, transparent), transparent);
+}
+.admin-shell .premium-card::after {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--cp-text) 3%, transparent) 0%, transparent 40%, color-mix(in srgb, var(--cp-cyan) 1%, transparent) 100%);
+}
+
+/* Custom scrollbar — themed thumb on themed track inside portal shells */
+.client-shell .custom-scrollbar::-webkit-scrollbar-thumb,
+.admin-shell .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--cp-border-strong);
+}
+.client-shell .custom-scrollbar::-webkit-scrollbar-thumb:hover,
+.admin-shell .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--cp-text-faint);
+}
 

@@ -243,12 +243,16 @@ export default function CTA() {
             >
               <label className="font-mono text-[10px] text-white/25 tracking-[0.1em] uppercase">Email</label>
               <input
-                type="email"
+                type="text"
+                inputMode="email"
+                pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$"
+                title="Please enter a valid email address."
                 required
                 placeholder="alex@company.com"
                 value={formData.email}
                 onChange={e => setFormData({ ...formData, email: e.target.value })}
                 className="w-full bg-white/[0.025] border border-white/[0.06] rounded-lg px-4 py-3 text-sm text-white/80 placeholder:text-white/15 focus:outline-none focus:border-white/15 transition-colors"
+                suppressHydrationWarning
               />
             </motion.div>
 

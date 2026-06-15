@@ -2,7 +2,12 @@
 import { useState, Suspense } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
+import { ArrowRight, ShieldCheck } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
+import { LyptronLogo, LyptronMark } from '@/components/ui/LyptronLogo'
+import { LogoProvider } from '@/lib/LogoContext'
+
+const EASE_OUT: [number, number, number, number] = [0.16, 1, 0.3, 1]
 
 function ClientLoginGate() {
   const [accessCode, setAccessCode] = useState('')
@@ -18,7 +23,7 @@ function ClientLoginGate() {
     setError('')
     const { data, error: err } = await supabase.from('projects').select('id').eq('access_code', code).single()
     if (err || !data) {
-      setError('Invalid access token. Please check and try again.')
+      setError("We couldn't find a project for that code. Please check it and try again.")
       setLoading(false)
       return
     }
@@ -26,139 +31,222 @@ function ClientLoginGate() {
   }
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white flex flex-col items-center justify-center relative overflow-hidden">
-      {/* Cinematic Background */}
-      <div className="absolute inset-0 pointer-events-none">
-        {/* Spotlight cone */}
-        <div
-          className="absolute left-1/2 -translate-x-1/2 -top-[10%]"
-          style={{
-            width: '140%',
-            height: '85%',
-            background: 'conic-gradient(from 180deg at 50% 0%, transparent 35%, rgba(255,248,230,0.04) 45%, rgba(255,250,240,0.07) 50%, rgba(255,248,230,0.04) 55%, transparent 65%)',
-            maskImage: 'linear-gradient(to bottom, black 0%, transparent 95%)',
-            WebkitMaskImage: 'linear-gradient(to bottom, black 0%, transparent 95%)',
-          }}
-        />
-        {/* Spotlight pool */}
-        <div
-          className="absolute left-1/2 -translate-x-1/2 top-[15%]"
-          style={{
-            width: '50%',
-            maxWidth: '700px',
-            height: '400px',
-            background: 'radial-gradient(ellipse 100% 100% at 50% 0%, rgba(255,250,235,0.05) 0%, rgba(255,248,225,0.02) 40%, transparent 70%)',
-          }}
-        />
-        {/* Ambient orbs */}
-        <div className="absolute top-[40%] right-[15%] w-[400px] h-[400px] bg-blue-500/[0.02] rounded-full blur-[120px]" />
-        <div className="absolute bottom-[20%] left-[10%] w-[300px] h-[300px] bg-purple-500/[0.02] rounded-full blur-[100px]" />
-        {/* Noise grain */}
-        <div className="absolute inset-0 opacity-[0.018]" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22n%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.75%22 numOctaves=%224%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22/%3E%3C/svg%3E")' }} />
-      </div>
-
-      {/* Top accent line */}
-      <motion.div
-        className="absolute top-0 left-0 right-0 h-px z-30"
-        style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.06) 30%, rgba(255,255,255,0.06) 70%, transparent)' }}
-        initial={{ scaleX: 0 }}
-        animate={{ scaleX: 1 }}
-        transition={{ duration: 2, ease: [0.16, 1, 0.3, 1] }}
+    <div className="client-shell min-h-screen flex flex-col relative overflow-hidden" data-theme="dark">
+      {/* Soft accent ambient — fixed to viewport */}
+      <div
+        aria-hidden
+        className="pointer-events-none fixed -top-[20%] -right-[10%] w-[800px] h-[800px] rounded-full z-0"
+        style={{ background: 'radial-gradient(circle, rgba(79,70,229,0.05) 0%, transparent 70%)' }}
       />
 
-      {/* Logo */}
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-        className="flex items-center gap-3 mb-12 relative z-10"
-      >
-        <div className="w-10 h-10 rounded-xl flex items-center justify-center font-display font-bold text-lg" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7))', color: '#050505' }}>
-          L
-        </div>
-        <span className="font-display font-bold text-xl text-white/80 tracking-tight">Lyptron<span className="text-blue-400">.</span></span>
-      </motion.div>
-
-      {/* Login Card */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-        className="relative max-w-md w-full mx-6 z-10"
-      >
-        <div
-          className="relative overflow-hidden p-10"
-          style={{
-            background: 'rgba(255,255,255,0.02)',
-            border: '1px solid rgba(255,255,255,0.06)',
-            borderRadius: '24px',
-            boxShadow: '0 25px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.03)',
-          }}
+      {/* Top frame — logo + secured tag */}
+      <header className="relative z-10 flex items-center justify-between px-6 sm:px-10 lg:px-16 py-6 sm:py-8">
+        <motion.div
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: EASE_OUT }}
         >
-          {/* Top accent line */}
-          <div className="absolute top-0 left-[15%] right-[15%] h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(29,126,245,0.3), rgba(129,140,248,0.15), transparent)' }} />
-          {/* Inner gradient sheen */}
-          <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.03) 0%, transparent 40%, rgba(29,126,245,0.015) 100%)', borderRadius: 'inherit' }} />
-          {/* Subtle corner glow */}
-          <div className="absolute -top-20 -left-20 w-40 h-40 bg-white/[0.02] rounded-full blur-3xl pointer-events-none" />
+          <LyptronLogo size={36} subtitle="Client Portal" textClassName="text-[18px]" />
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6, duration: 0.8 }}
+          className="hidden sm:flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em]"
+          style={{ color: 'var(--cp-text-faint)' }}
+        >
+          <ShieldCheck className="w-3.5 h-3.5" />
+          <span>Secure access</span>
+        </motion.div>
+      </header>
 
-          <h2 className="font-display text-[28px] font-bold tracking-tight mb-2 relative z-10">
-            <span className="text-white/90">Client </span>
-            <span className="text-transparent bg-clip-text" style={{ backgroundImage: 'linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.4) 100%)' }}>Portal</span>
-          </h2>
-          <p className="text-[13px] text-white/30 mb-8 relative z-10 leading-relaxed">Enter the secure access token provided by your Lyptron project manager.</p>
+      {/* Main editorial layout */}
+      <main className="relative z-10 flex-1 flex items-center px-6 sm:px-10 lg:px-16 pb-16">
+        <div className="w-full max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-12 lg:gap-20 items-center">
 
-          <form onSubmit={handleLogin} className="flex flex-col gap-5 relative z-10">
-            <div>
-              <input
-                type="text"
-                placeholder="Paste Token (e.g. AURA123)"
-                value={accessCode}
-                onChange={(e) => setAccessCode(e.target.value)}
-                className="w-full px-5 py-4 text-[13px] text-white/90 font-mono tracking-[0.15em] outline-none transition-all duration-300"
-                style={{
-                  background: 'rgba(255,255,255,0.015)',
-                  border: '1px solid rgba(255,255,255,0.06)',
-                  borderRadius: '14px',
-                }}
-                onFocus={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)' }}
-                onBlur={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)' }}
-              />
-            </div>
-            {error && <p className="text-red-400 text-[12px] text-center">{error}</p>}
-            <button
-              type="submit"
-              disabled={loading || !accessCode.trim()}
-              className="w-full py-4 font-semibold text-[13px] rounded-full transition-all disabled:opacity-40"
+          {/* Left — editorial pitch */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, ease: EASE_OUT }}
+            className="flex flex-col gap-8"
+          >
+            <span className="text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: 'var(--cp-cyan)' }}>
+              — Welcome back
+            </span>
+            <h1
+              className="font-display font-bold tracking-[-0.035em] leading-[0.95] text-balance"
               style={{
-                background: 'white',
-                color: '#050505',
-                boxShadow: '0 0 25px rgba(255,255,255,0.1)',
+                color: 'var(--cp-text)',
+                fontSize: 'clamp(48px, 7vw, 96px)',
               }}
             >
-              {loading ? 'Authenticating...' : 'Access Dashboard'}
-            </button>
-          </form>
-        </div>
-      </motion.div>
+              Your project,<br />
+              <span style={{ color: 'var(--cp-cyan)' }}>in one place.</span>
+            </h1>
+            <p
+              className="text-[15px] sm:text-[16px] leading-relaxed max-w-md"
+              style={{ color: 'var(--cp-text-secondary)' }}
+            >
+              Track milestones, review approvals, watch live versions, and pay invoices — all from a single, calm
+              workspace your team updates in real time.
+            </p>
 
-      {/* Bottom text */}
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.8, duration: 1 }}
-        className="text-[11px] text-white/15 mt-8 font-mono tracking-[0.1em] relative z-10"
-      >
-        SECURED BY LYPTRON
-      </motion.p>
+            {/* Hairline meta strip */}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8 pt-8 border-t" style={{ borderColor: 'var(--cp-border-soft)' }}>
+              {[
+                { label: 'Built for', value: 'Founders & operators' },
+                { label: 'Updated', value: 'In real time' },
+                { label: 'Hosted', value: 'India' },
+              ].map((item) => (
+                <div key={item.label} className="flex flex-col">
+                  <span className="text-[10.5px] font-semibold uppercase tracking-[0.16em]" style={{ color: 'var(--cp-text-faint)' }}>
+                    {item.label}
+                  </span>
+                  <span className="text-[13px] mt-1" style={{ color: 'var(--cp-text-secondary)' }}>{item.value}</span>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Right — access form */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, delay: 0.15, ease: EASE_OUT }}
+            className="relative"
+          >
+            {/* Soft surface with champagne left-rule */}
+            <div
+              className="relative cp-card cp-card-accent pl-8 sm:pl-10 pr-8 sm:pr-10 py-10 sm:py-12"
+              style={{ background: 'var(--cp-surface)' }}
+            >
+              <div className="flex items-baseline justify-between mb-1">
+                <span className="text-[11px] font-semibold uppercase tracking-[0.16em]" style={{ color: 'var(--cp-cyan)' }}>
+                  Sign in
+                </span>
+                <span className="text-[11px]" style={{ color: 'var(--cp-text-faint)' }}>01 / 01</span>
+              </div>
+
+              <h2
+                className="font-display text-[28px] sm:text-[34px] font-bold tracking-[-0.025em] mt-3 mb-2 leading-[1.05]"
+                style={{ color: 'var(--cp-text)' }}
+              >
+                Enter your access code.
+              </h2>
+              <p className="text-[13.5px] mb-10 leading-relaxed max-w-sm" style={{ color: 'var(--cp-text-secondary)' }}>
+                Your project manager sent a six-character code with your kickoff email.
+              </p>
+
+              <form onSubmit={handleLogin} className="flex flex-col gap-7">
+                <div>
+                  <label
+                    htmlFor="access-code"
+                    className="block text-[10.5px] font-semibold uppercase tracking-[0.18em] mb-3"
+                    style={{ color: 'var(--cp-text-muted)' }}
+                  >
+                    Access code
+                  </label>
+                  <div className="relative">
+                    <input
+                      id="access-code"
+                      type="text"
+                      placeholder="AURA123"
+                      value={accessCode}
+                      onChange={(e) => setAccessCode(e.target.value.toUpperCase())}
+                      maxLength={12}
+                      autoComplete="off"
+                      spellCheck={false}
+                      className="w-full px-0 pb-4 pt-2 text-[28px] sm:text-[32px] font-display font-bold tracking-[0.18em] uppercase outline-none bg-transparent border-0 border-b transition-colors"
+                      style={{ borderColor: 'var(--cp-border)', color: 'var(--cp-text)' }}
+                      onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--cp-cyan)' }}
+                      onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--cp-border)' }}
+                    />
+                    <span
+                      className="absolute right-0 bottom-4 text-[11px] tabular-nums"
+                      style={{ color: 'var(--cp-text-faint)' }}
+                    >
+                      {accessCode.length} chars
+                    </span>
+                  </div>
+                </div>
+
+                {error && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex items-start gap-2.5 py-3 px-4 border-l-2"
+                    style={{ borderColor: 'var(--cp-red)', background: 'var(--cp-red-soft)' }}
+                  >
+                    <span className="text-[12.5px] leading-relaxed" style={{ color: 'var(--cp-text-secondary)' }}>
+                      {error}
+                    </span>
+                  </motion.div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={loading || !accessCode.trim()}
+                  className="cp-btn-primary group w-full py-4 text-[13px] font-semibold tracking-[0.04em] uppercase flex items-center justify-center gap-3 mt-2"
+                >
+                  <span>{loading ? 'Checking…' : 'View my project'}</span>
+                  <ArrowRight className="w-4 h-4 transition-transform duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-0.5" />
+                </button>
+              </form>
+            </div>
+
+            {/* Help line */}
+            <p className="text-[12px] text-center mt-6 leading-relaxed" style={{ color: 'var(--cp-text-faint)' }}>
+              Lost your code? Email{' '}
+              <a href="mailto:hello@lyptron.com" className="transition-colors hover:text-[var(--cp-text-secondary)]" style={{ color: 'var(--cp-text-muted)' }}>
+                hello@lyptron.com
+              </a>
+              {' '}and we&apos;ll resend it.
+            </p>
+          </motion.div>
+        </div>
+      </main>
+
+      {/* Bottom rail */}
+      <footer className="relative z-10 px-6 sm:px-10 lg:px-16 py-5 border-t" style={{ borderColor: 'var(--cp-border-soft)' }}>
+        <div className="flex items-center justify-between gap-4">
+          <span className="text-[10.5px] font-semibold uppercase tracking-[0.18em]" style={{ color: 'var(--cp-text-faint)' }}>
+            © {new Date().getFullYear()} Lyptron
+          </span>
+          <div className="flex items-center gap-6 text-[11px]" style={{ color: 'var(--cp-text-faint)' }}>
+            <a href="https://lyptron.com" className="transition-colors hover:text-[var(--cp-text-muted)]">lyptron.com</a>
+            <a href="https://lyptron.com/privacy" className="transition-colors hover:text-[var(--cp-text-muted)] hidden sm:inline">Privacy</a>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }
 
-export default function ClientDashboard() {
+// ... remaining code (ClientLoginGate) ...
+
+function FullPageSplash() {
   return (
-    <Suspense fallback={<div className="text-white/30 p-10 min-h-screen bg-[#050505]">Loading...</div>}>
-      <ClientLoginGate />
-    </Suspense>
+    <div className="client-shell min-h-screen flex flex-col items-center justify-center bg-[var(--cp-bg)] gap-5 text-center select-none" data-theme="dark">
+      <div className="relative flex items-center justify-center">
+        <div className="absolute w-[68px] h-[68px] rounded-full border border-dashed border-[var(--cp-cyan)] animate-spin [animation-duration:3s]" />
+        <div className="absolute w-14 h-14 rounded-full border border-[var(--cp-cyan-border)] animate-ping opacity-40 [animation-duration:1.5s]" />
+        <LyptronMark size={50} className="relative z-10 shadow-md" />
+      </div>
+      <div className="flex flex-col gap-1">
+        <span className="font-display font-bold text-[18px] tracking-tight text-[var(--cp-text)]">Lyptron</span>
+        <span className="text-[10px] font-mono tracking-[0.18em] uppercase text-[var(--cp-text-faint)]">Loading workspace...</span>
+      </div>
+    </div>
+  )
+}
+
+export default function ClientLoginPage() {
+  return (
+    <LogoProvider>
+      <Suspense fallback={<FullPageSplash />}>
+        <ClientLoginGate />
+      </Suspense>
+    </LogoProvider>
   )
 }

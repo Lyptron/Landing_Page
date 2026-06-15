@@ -50,6 +50,40 @@ const ibmPlexMono = IBM_Plex_Mono({
   display: 'swap',
 })
 
+const NO_FLASH_SCRIPT = `(function () {
+  try {
+    var mode = localStorage.getItem('lyptron.theme.mode') || 'dark';
+    var theme;
+    if (mode === 'light' || mode === 'dark') {
+      theme = mode;
+    } else {
+      var strategy = localStorage.getItem('lyptron.theme.auto.strategy') || 'sunset';
+      var now = new Date();
+      var fixedTheme = (now.getHours() < 7 || now.getHours() >= 19) ? 'dark' : 'light';
+      if (strategy === 'system') {
+        theme = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+      } else if (strategy === 'sunset') {
+        var raw = localStorage.getItem('lyptron.theme.sunTimes');
+        theme = fixedTheme;
+        if (raw) {
+          var cached = JSON.parse(raw);
+          var sunrise = new Date(cached.sunrise);
+          var sunset = new Date(cached.sunset);
+          if (!isNaN(sunrise.getTime()) && !isNaN(sunset.getTime())) {
+            var nowMin = now.getHours() * 60 + now.getMinutes();
+            var sunriseMin = sunrise.getHours() * 60 + sunrise.getMinutes();
+            var sunsetMin = sunset.getHours() * 60 + sunset.getMinutes();
+            theme = (nowMin < sunriseMin || nowMin >= sunsetMin) ? 'dark' : 'light';
+          }
+        }
+      } else {
+        theme = fixedTheme;
+      }
+    }
+    document.documentElement.setAttribute('data-theme', theme);
+  } catch (e) {}
+})();`
+
 const SITE_URL = 'https://lyptron.com'
 const SITE_NAME = 'Lyptron'
 const TITLE = 'Lyptron — Web Development, SaaS, AI Automation & Product Design Agency'
@@ -203,6 +237,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <script
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{ __html: NO_FLASH_SCRIPT }}
+        />
         <script
           type="application/ld+json"
           // eslint-disable-next-line react/no-danger

@@ -16,6 +16,7 @@ export default function ServiceDetail({ service, onClose }: ServiceDetailProps) 
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true)
   }, [])
 
@@ -69,7 +70,7 @@ export default function ServiceDetail({ service, onClose }: ServiceDetailProps) 
             {/* Header */}
             <div className="flex justify-between items-center mb-6">
               <span className="font-mono text-[11px] text-white/30 tracking-[0.2em] uppercase">
-                {service.number} // Capability Details
+                {service.number} &bull; Capability Details
               </span>
               <button
                 onClick={onClose}

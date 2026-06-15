@@ -1,63 +1,87 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# ==============================================================================
+# Dependency directories
+# ==============================================================================
+node_modules/
+/jspm_packages/
+/web_modules/
 
-# Dependencies
-/node_modules
-/.pnp
-.pnp.js
-.pnp.cjs
-
-# Testing
-/coverage
-
-# Next.js
-/.next/
-/out/
+# ==============================================================================
+# Build & Compilation Outputs
+# ==============================================================================
+.next/
+out/
 build/
+dist/
+bin/
+obj/
+*.tsbuildinfo
+next-env.d.ts
 
-# Misc
-.DS_Store
-*.pem
+# ==============================================================================
+# Package Manager & Build Tool Caches
+# ==============================================================================
+.npm/
+.eslintcache
+.parcel-cache/
+.cache/
+.pnp
+.pnp.*
+pnpm-lock.yaml
+yarn.lock
 
-# Debug
+# ==============================================================================
+# Logs and Diagnostics
+# ==============================================================================
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+logs/
+*.pid
+*.seed
+*.pid.lock
 
-# Environment Variables
-.env*.local
+# ==============================================================================
+# Environment Variables & Secrets (Local files ONLY)
+# ==============================================================================
+.env
+.env.local
 .env.development.local
 .env.test.local
 .env.production.local
-.env
+.env*.local
+*.pem
+*.key
+*.cert
+jwt.secret
 
-# Vercel
-.vercel
-
-# TypeScript
-*.tsbuildinfo
-next-env.d.ts
-
-# Editor and IDEs
+# ==============================================================================
+# Editor and IDE Settings
+# ==============================================================================
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
 .idea/
+.vs/
 .fleet/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 *.sublime-workspace
 *.sublime-project
-.vs/
+.history/
+.project
+.classpath
+.settings/
 
-# AI and Agent Tools
-.claude/
-.gemini/
-.cursorrules
-design.md
-supabase-schema.sql
-
-# OS Generated Files
+# ==============================================================================
+# OS Generated Files (System Junk)
+# ==============================================================================
 .DS_Store
 .DS_Store?
 ._*
@@ -65,3 +89,28 @@ supabase-schema.sql
 .Trashes
 ehthumbs.db
 Thumbs.db
+desktop.ini
+[Dd]esktop.ini
+$RECYCLE.BIN/
+
+# ==============================================================================
+# Database & Backend Schema Exports (Prevent tracking local credentials/dumps)
+# ==============================================================================
+supabase-schema.sql
+*.sql.gz
+*.backup
+*.dump
+
+# ==============================================================================
+# AI Agents & IDE Tooling Artifacts
+# ==============================================================================
+.claude/
+.gemini/
+.antigravity/
+.cursorrules
+skills-lock.json
+task.md
+implementation_plan.md
+walkthrough.md
+audit_results.md
+security_audit_results.md
