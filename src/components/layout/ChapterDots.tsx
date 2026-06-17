@@ -1,6 +1,5 @@
 'use client'
 import { useCursor } from '../providers/CursorProvider'
-import { ChapterID } from '@/types'
 
 interface ChapterDotsProps {
   activeChapter: string

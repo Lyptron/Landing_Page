@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useMemo, useRef, useState, useCallback } from 'react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { AnimatePresence } from 'framer-motion'
@@ -23,7 +23,9 @@ export default function Team() {
   const cooldownTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const { setCursorState } = useCursor()
 
-  const tripled = [...team, ...team, ...team]
+  // Marquee tripling — frozen reference so React doesn't recreate the
+  // array (and thus the DOM nodes) every render.
+  const tripled = useMemo(() => [...team, ...team, ...team], [])
 
   const handleCardClick = useCallback((member: TeamMember) => {
     if (clickCooldown.current) return
@@ -84,41 +86,52 @@ export default function Team() {
     const el = containerRef.current
     if (!el) return
 
-    const entranceTrigger = ScrollTrigger.create({
-      trigger: el,
-      start: 'top 75%',
-      once: true,
-      onEnter: () => {
-        gsap.fromTo('.team-header-line',
-          { scaleX: 0 },
-          { scaleX: 1, duration: 1, ease: 'power3.inOut' }
-        )
-        gsap.fromTo('.team-header-content > span, .team-header-content > p',
-          { opacity: 0, y: 20 },
-          { opacity: 1, y: 0, duration: 0.7, stagger: 0.08, ease: 'power3.out', delay: 0.2 }
-        )
-        gsap.fromTo('.team-split-left',
-          { opacity: 0, x: -40, filter: 'blur(12px)' },
-          { opacity: 1, x: 0, filter: 'blur(0px)', duration: 1, ease: 'power3.out', delay: 0.3 }
-        )
-        gsap.fromTo('.team-split-right',
-          { opacity: 0, x: 40, filter: 'blur(12px)' },
-          { opacity: 1, x: 0, filter: 'blur(0px)', duration: 1, ease: 'power3.out', delay: 0.45 }
-        )
-        gsap.fromTo('.team-card',
-          { opacity: 0, y: 40, scale: 0.95 },
-          {
-            opacity: 1, y: 0, scale: 1,
-            duration: 0.8, stagger: 0.06, ease: 'power3.out', delay: 0.4,
-            onComplete: () => setupMarquee(),
-          }
-        )
-      }
-    })
+    // gsap.context() scopes selectors to this section so multiple Team
+    // mounts can't cross-fire animations, and revert() cleans up every
+    // tween + ScrollTrigger created inside it.
+    const ctx = gsap.context(() => {
+      ScrollTrigger.create({
+        trigger: el,
+        start: 'top 75%',
+        once: true,
+        onEnter: () => {
+          gsap.fromTo('.team-header-line',
+            { scaleX: 0 },
+            { scaleX: 1, duration: 1, ease: 'power3.inOut' }
+          )
+          gsap.fromTo('.team-header-content > span, .team-header-content > p',
+            { opacity: 0, y: 20 },
+            { opacity: 1, y: 0, duration: 0.7, stagger: 0.08, ease: 'power3.out', delay: 0.2 }
+          )
+          gsap.fromTo('.team-split-left',
+            { opacity: 0, x: -40, filter: 'blur(12px)' },
+            { opacity: 1, x: 0, filter: 'blur(0px)', duration: 1, ease: 'power3.out', delay: 0.3 }
+          )
+          gsap.fromTo('.team-split-right',
+            { opacity: 0, x: 40, filter: 'blur(12px)' },
+            { opacity: 1, x: 0, filter: 'blur(0px)', duration: 1, ease: 'power3.out', delay: 0.45 }
+          )
+          gsap.fromTo('.team-card',
+            { opacity: 0, y: 40, scale: 0.95 },
+            {
+              opacity: 1, y: 0, scale: 1,
+              duration: 0.8, stagger: 0.06, ease: 'power3.out', delay: 0.4,
+              onComplete: () => setupMarquee(),
+            }
+          )
+        }
+      })
+    }, el)
 
     return () => {
-      entranceTrigger.kill()
+      ctx.revert()
       if (animRef.current) animRef.current.kill()
+      // The cooldown timer fires after modal close; clear it on unmount
+      // so React doesn't get a setState call on an unmounted tree.
+      if (cooldownTimer.current) {
+        clearTimeout(cooldownTimer.current)
+        cooldownTimer.current = null
+      }
     }
   }, [setupMarquee])
 
@@ -180,21 +193,34 @@ export default function Team() {
           setCursorState('hover')
         }}
         onMouseLeave={handleCarouselLeave}
+        onFocus={() => setIsPaused(true)}
+        onBlur={() => setIsPaused(false)}
       >
         {/* Edge fades */}
-        <div className="absolute left-0 top-0 bottom-0 w-32 md:w-48 bg-gradient-to-r from-[#050505] to-transparent z-20 pointer-events-none" />
-        <div className="absolute right-0 top-0 bottom-0 w-32 md:w-48 bg-gradient-to-l from-[#050505] to-transparent z-20 pointer-events-none" />
+        <div className="absolute left-0 top-0 bottom-0 w-32 md:w-48 bg-gradient-to-r from-[#050505] to-transparent z-20 pointer-events-none" aria-hidden="true" />
+        <div className="absolute right-0 top-0 bottom-0 w-32 md:w-48 bg-gradient-to-l from-[#050505] to-transparent z-20 pointer-events-none" aria-hidden="true" />
 
         <div ref={trackRef} className="flex flex-col md:flex-row gap-6 w-full md:w-max py-4 items-center md:items-stretch">
-          {tripled.map((member, i) => (
-            <div key={`${member.id}-${i}`} className={`${i >= team.length ? 'hidden md:block' : ''} w-full md:w-auto flex justify-center`}>
-              <TeamCard
-                member={member}
-                index={team.findIndex(m => m.id === member.id)}
-                onClick={() => handleCardClick(member)}
-              />
-            </div>
-          ))}
+          {tripled.map((member, i) => {
+            // Only the first set is the real, focusable list. The other two
+            // exist purely so the marquee can wrap visually; hide them from
+            // assistive tech so screen readers don't read each member 3x.
+            const isClone = i >= team.length
+            return (
+              <div
+                key={`${member.id}-${i}`}
+                className={`${isClone ? 'hidden md:block' : ''} w-full md:w-auto flex justify-center`}
+                aria-hidden={isClone || undefined}
+                inert={isClone}
+              >
+                <TeamCard
+                  member={member}
+                  index={team.findIndex(m => m.id === member.id)}
+                  onClick={() => handleCardClick(member)}
+                />
+              </div>
+            )
+          })}
         </div>
       </div>
 

@@ -4,31 +4,33 @@ import { motion } from 'framer-motion'
 
 const EASE = [0.16, 1, 0.3, 1] as const
 
+// Showcase tiles. Numbers here are kept in sync with `projectStats`
+// in Work.tsx — if you change one, update the other.
 const PROJECTS = [
   {
     title: 'NexusFlow',
     tag: 'SaaS Platform',
-    result: '+62% signups',
-    url: 'nexusflow.io',
+    result: '$0 → $12k MRR',
+    url: 'lyptron.com/work/nexusflow',
     metrics: [
-      { label: 'MRR', value: '$284k' },
-      { label: 'Users', value: '12.4k' },
+      { label: 'MRR', value: '$12k' },
       { label: 'Uptime', value: '99.99%' },
+      { label: 'Load', value: '8.4ms' },
     ],
     bars: [35, 52, 44, 68, 58, 78, 72, 92, 85, 100],
   },
   {
     title: 'Stratum',
     tag: 'Brand & Marketing',
-    result: '#1 rank in 3mo',
-    url: 'stratum.co',
+    result: 'Lighthouse 100',
+    url: 'lyptron.com/work/stratum',
     preview: 'brand',
   },
   {
-    title: 'Helios AI',
+    title: 'VoxAI',
     tag: 'AI Product',
-    result: '4x conversion',
-    url: 'helios.ai',
+    result: '42% token savings',
+    url: 'lyptron.com/work/voxai',
     preview: 'ai',
   },
 ]
@@ -100,19 +102,32 @@ export default function Hero() {
     return () => { clearTimeout(timer1); clearTimeout(timer2) }
   }, [])
 
+  // Throttle mousemove with rAF so we only repaint once per frame instead
+  // of on every pointer event.
+  const rafRef = useRef<number | null>(null)
+  const lastPosRef = useRef<{ x: number; y: number } | null>(null)
+
   const onMove = useCallback((e: MouseEvent) => {
-    if (!glowRef.current || !sectionRef.current) return
+    if (!sectionRef.current) return
     const r = sectionRef.current.getBoundingClientRect()
-    const x = e.clientX - r.left
-    const y = e.clientY - r.top
-    glowRef.current.style.background = `radial-gradient(500px circle at ${x}px ${y}px, rgba(255,250,240,0.02) 0%, transparent 50%)`
+    lastPosRef.current = { x: e.clientX - r.left, y: e.clientY - r.top }
+    if (rafRef.current != null) return
+    rafRef.current = requestAnimationFrame(() => {
+      rafRef.current = null
+      const pos = lastPosRef.current
+      if (!pos || !glowRef.current) return
+      glowRef.current.style.background = `radial-gradient(500px circle at ${pos.x}px ${pos.y}px, rgba(255,250,240,0.02) 0%, transparent 50%)`
+    })
   }, [])
 
   useEffect(() => {
     const el = sectionRef.current
     if (!el) return
     el.addEventListener('mousemove', onMove, { passive: true })
-    return () => el.removeEventListener('mousemove', onMove)
+    return () => {
+      el.removeEventListener('mousemove', onMove)
+      if (rafRef.current != null) cancelAnimationFrame(rafRef.current)
+    }
   }, [onMove])
 
   return (
@@ -172,7 +187,7 @@ export default function Hero() {
         />
 
         {/* Animated SVG Timeline Thread — synced to story steps */}
-        <svg className="hidden md:block absolute inset-x-0 top-0 w-full pointer-events-none z-10" style={{ height: '800px' }} preserveAspectRatio="none" viewBox="0 0 1440 800">
+        <svg aria-hidden="true" focusable="false" className="hidden md:block absolute inset-x-0 top-0 w-full pointer-events-none z-10" style={{ height: '800px' }} preserveAspectRatio="none" viewBox="0 0 1440 800">
           <motion.path
             d="M -100,200 C 300,200 400,100 720,100 C 1000,100 1200,400 1500,400"
             fill="none"
@@ -232,38 +247,17 @@ export default function Hero() {
 
           {/* Storytelling Headline — smooth crossfade transitions */}
           <div className="relative min-h-[120px] md:min-h-[180px] lg:min-h-[200px] mb-7 w-full">
-            {/* Step 0 — tease line */}
-            <motion.h2
-              initial={{ opacity: 0, filter: 'blur(10px)', y: 8 }}
-              animate={{
-                opacity: storyStep === 0 ? 1 : 0,
-                filter: storyStep === 0 ? 'blur(0px)' : 'blur(10px)',
-                y: storyStep === 0 ? 0 : -6,
-              }}
-              transition={{ duration: 1.6, ease: [0.22, 1, 0.36, 1] }}
-              className="absolute inset-0 font-display font-medium text-[clamp(24px,4.5vw,58px)] md:text-[58px] text-white/50 tracking-[-0.02em] leading-tight flex items-center pointer-events-none"
-            >
-              You have an ambitious vision.
-            </motion.h2>
-
-            {/* Step 1 — problem line */}
-            <motion.h2
-              initial={{ opacity: 0, filter: 'blur(10px)', y: 8 }}
-              animate={{
-                opacity: storyStep === 1 ? 1 : 0,
-                filter: storyStep === 1 ? 'blur(0px)' : 'blur(10px)',
-                y: storyStep === 1 ? 0 : storyStep < 1 ? 8 : -6,
-              }}
-              transition={{ duration: 1.6, ease: [0.22, 1, 0.36, 1] }}
-              className="absolute inset-0 font-display font-medium text-[clamp(24px,4.5vw,58px)] md:text-[58px] text-white/50 tracking-[-0.02em] leading-tight flex items-center pointer-events-none"
-            >
-              But scaling the right technology is hard.
-            </motion.h2>
-
-            {/* Step 2 — main headline (stays) */}
+            {/* Step 2 — main headline. Always present in the DOM so crawlers
+                and no-JS readers see the real H1 immediately; the animated
+                teasers below sit visually in front via z-index but are
+                aria-hidden so they never replace the H1 semantically. */}
             <motion.h1
               initial={{ opacity: 0, filter: 'blur(14px)', scale: 0.98 }}
               animate={{
+                // After 6s storyStep flips to 2 and the H1 fades in. Before
+                // that the H1 is still in the DOM but visually masked by the
+                // teaser spans, so a crawler that doesn't execute the
+                // timeout still picks it up.
                 opacity: storyStep === 2 ? 1 : 0,
                 filter: storyStep === 2 ? 'blur(0px)' : 'blur(14px)',
                 scale: storyStep === 2 ? 1 : 0.98,
@@ -277,6 +271,36 @@ export default function Hero() {
               </span>
               <span className="text-white/30"> that grow your business.</span>
             </motion.h1>
+
+            {/* Step 0 — tease line (visual only, not a heading) */}
+            <motion.span
+              aria-hidden="true"
+              initial={{ opacity: 0, filter: 'blur(10px)', y: 8 }}
+              animate={{
+                opacity: storyStep === 0 ? 1 : 0,
+                filter: storyStep === 0 ? 'blur(0px)' : 'blur(10px)',
+                y: storyStep === 0 ? 0 : -6,
+              }}
+              transition={{ duration: 1.6, ease: [0.22, 1, 0.36, 1] }}
+              className="absolute inset-0 font-display font-medium text-[clamp(24px,4.5vw,58px)] md:text-[58px] text-white/50 tracking-[-0.02em] leading-tight flex items-center pointer-events-none z-20"
+            >
+              You have an ambitious vision.
+            </motion.span>
+
+            {/* Step 1 — problem line (visual only, not a heading) */}
+            <motion.span
+              aria-hidden="true"
+              initial={{ opacity: 0, filter: 'blur(10px)', y: 8 }}
+              animate={{
+                opacity: storyStep === 1 ? 1 : 0,
+                filter: storyStep === 1 ? 'blur(0px)' : 'blur(10px)',
+                y: storyStep === 1 ? 0 : storyStep < 1 ? 8 : -6,
+              }}
+              transition={{ duration: 1.6, ease: [0.22, 1, 0.36, 1] }}
+              className="absolute inset-0 font-display font-medium text-[clamp(24px,4.5vw,58px)] md:text-[58px] text-white/50 tracking-[-0.02em] leading-tight flex items-center pointer-events-none z-20"
+            >
+              But scaling the right technology is hard.
+            </motion.span>
           </div>
 
           {/* Sub + CTAs — full width row */}
@@ -354,11 +378,11 @@ export default function Hero() {
                   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700"
                        style={{ background: 'radial-gradient(circle at 50% 30%, rgba(255,255,255,0.02) 0%, transparent 50%)' }} />
 
-                  {i === 0 && (
+                  {i === 0 && p.metrics && p.bars && (
                     /* Dashboard mockup */
                     <div className="absolute inset-3 flex flex-col gap-2">
                       <div className="flex gap-2">
-                        {p.metrics!.map((m, j) => (
+                        {p.metrics.map((m, j) => (
                           <div key={j} className="flex-1 rounded-lg p-2" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
                             <span className="font-mono text-[6px] text-white/18 uppercase tracking-wider block">{m.label}</span>
                             <span className="font-display font-bold text-[13px] text-white/70 tracking-tight leading-none">{m.value}</span>
@@ -367,7 +391,7 @@ export default function Hero() {
                       </div>
                       <div className="flex-1 rounded-lg p-2.5" style={{ background: 'rgba(255,255,255,0.015)', border: '1px solid rgba(255,255,255,0.035)' }}>
                         <div className="flex items-end gap-[3px] h-full">
-                          {p.bars!.map((h, j) => (
+                          {p.bars.map((h, j) => (
                             <div key={j} className="flex-1 rounded-t-[2px] transition-all duration-300"
                                  style={{ height: `${h}%`, background: j >= 8 ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.05)' }} />
                           ))}
@@ -455,7 +479,13 @@ export default function Hero() {
             <span className="font-mono text-[9px] uppercase tracking-[0.15em] text-white/15 shrink-0">Built with</span>
             <div className="flex items-center gap-8 md:gap-10 opacity-60 grayscale hover:grayscale-0 transition-all duration-700">
               {LOGOS.map(logo => (
-                <div key={logo.name} className="text-white hover:text-white transition-colors duration-300" aria-label={logo.name}>
+                <div
+                  key={logo.name}
+                  role="img"
+                  aria-label={`${logo.name} logo`}
+                  title={logo.name}
+                  className="text-white hover:text-white transition-colors duration-300"
+                >
                   {logo.svg}
                 </div>
               ))}

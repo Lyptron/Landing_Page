@@ -1,10 +1,13 @@
 'use client'
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { motion, useInView } from 'framer-motion'
 import MagneticButton from '../ui/MagneticButton'
 import { useCursor } from '../providers/CursorProvider'
 import { supabase } from '@/lib/supabase'
 import { Clock, MessageCircle, Shield } from 'lucide-react'
+
+const BOOKING_EMAIL = 'hello@lyptron.com'
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 
 const EASE = [0.22, 1, 0.36, 1] as const
 const SPRING = [0.34, 1.56, 0.64, 1] as const
@@ -26,6 +29,7 @@ export default function CTA() {
     description: ''
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
   const { setCursorState } = useCursor()
 
   const headlineRef = useRef<HTMLDivElement>(null)
@@ -35,27 +39,40 @@ export default function CTA() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsSubmitting(true)
-    
-    try {
-      // 1. Save to Supabase (inquiries table)
-      await supabase.from('inquiries').insert([{
-        first_name: formData.firstName,
-        last_name: formData.lastName,
-        email: formData.email,
-        project_type: formData.type,
-        description: formData.description,
-      }])
-      
-      // 2. Redirect to Cal.com
-      window.location.href = 'https://cal.com/lyptron/15min'
-    } catch (err) {
-      console.error('Submission failed', err)
-      // Redirect anyway so they can book the call
-      window.location.href = 'https://cal.com/lyptron/15min'
-    } finally {
-      setIsSubmitting(false)
+    setSubmitError(null)
+
+    if (!EMAIL_REGEX.test(formData.email.trim())) {
+      setSubmitError('Please enter a valid email address.')
+      return
     }
+
+    setIsSubmitting(true)
+    const { error } = await supabase.from('inquiries').insert([{
+      first_name: formData.firstName.trim(),
+      last_name: formData.lastName.trim(),
+      email: formData.email.trim(),
+      project_type: formData.type,
+      description: formData.description.trim() || null,
+    }])
+
+    if (error) {
+      setIsSubmitting(false)
+      setSubmitError("We couldn't save your inquiry. Email hello@lyptron.com or try again.")
+      if (process.env.NODE_ENV !== 'production') {
+        console.error('Inquiry insert failed:', error.message)
+      }
+      return
+    }
+
+    const subject = `Book a free call — ${formData.firstName.trim()} ${formData.lastName.trim()}`.trim()
+    const bodyLines = [
+      `Name: ${formData.firstName.trim()} ${formData.lastName.trim()}`.trim(),
+      `Email: ${formData.email.trim()}`,
+      `Project type: ${formData.type}`,
+      '',
+      formData.description.trim() || '(No additional details provided.)',
+    ]
+    window.location.href = `mailto:${BOOKING_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyLines.join('\n'))}`
   }
 
   return (
@@ -207,9 +224,12 @@ export default function CTA() {
                 animate={formInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.5, delay: 0.5, ease: EASE }}
               >
-                <label className="font-mono text-[10px] text-white/25 tracking-[0.1em] uppercase">First Name</label>
+                <label htmlFor="cta-first-name" className="font-mono text-[10px] text-white/25 tracking-[0.1em] uppercase">First Name</label>
                 <input
+                  id="cta-first-name"
+                  name="firstName"
                   type="text"
+                  autoComplete="given-name"
                   required
                   placeholder="Alex"
                   value={formData.firstName}
@@ -223,9 +243,12 @@ export default function CTA() {
                 animate={formInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.5, delay: 0.55, ease: EASE }}
               >
-                <label className="font-mono text-[10px] text-white/25 tracking-[0.1em] uppercase">Last Name</label>
+                <label htmlFor="cta-last-name" className="font-mono text-[10px] text-white/25 tracking-[0.1em] uppercase">Last Name</label>
                 <input
+                  id="cta-last-name"
+                  name="lastName"
                   type="text"
+                  autoComplete="family-name"
                   required
                   placeholder="Johnson"
                   value={formData.lastName}
@@ -241,12 +264,13 @@ export default function CTA() {
               animate={formInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.5, delay: 0.6, ease: EASE }}
             >
-              <label className="font-mono text-[10px] text-white/25 tracking-[0.1em] uppercase">Email</label>
+              <label htmlFor="cta-email" className="font-mono text-[10px] text-white/25 tracking-[0.1em] uppercase">Email</label>
               <input
-                type="text"
+                id="cta-email"
+                name="email"
+                type="email"
+                autoComplete="email"
                 inputMode="email"
-                pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$"
-                title="Please enter a valid email address."
                 required
                 placeholder="alex@company.com"
                 value={formData.email}
@@ -262,9 +286,11 @@ export default function CTA() {
               animate={formInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.5, delay: 0.65, ease: EASE }}
             >
-              <label className="font-mono text-[10px] text-white/25 tracking-[0.1em] uppercase">What are you building?</label>
+              <label htmlFor="cta-project-type" className="font-mono text-[10px] text-white/25 tracking-[0.1em] uppercase">What are you building?</label>
               <div className="relative">
                 <select
+                  id="cta-project-type"
+                  name="projectType"
                   required
                   value={formData.type}
                   onChange={e => setFormData({ ...formData, type: e.target.value })}
@@ -272,7 +298,7 @@ export default function CTA() {
                   onMouseEnter={() => setCursorState('hover')}
                   onMouseLeave={() => setCursorState('default')}
                 >
-                  <option value="" disabled className="bg-surface text-white/20">Pick one...</option>
+                  <option value="" disabled className="bg-surface text-white/20">Select a project type</option>
                   <option value="web" className="bg-surface text-white/80">Website or Web App</option>
                   <option value="saas" className="bg-surface text-white/80">SaaS Platform</option>
                   <option value="mobile" className="bg-surface text-white/80">Mobile App</option>
@@ -292,8 +318,10 @@ export default function CTA() {
               animate={formInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.5, delay: 0.7, ease: EASE }}
             >
-              <label className="font-mono text-[10px] text-white/25 tracking-[0.1em] uppercase">Tell us more <span className="text-white/12">(optional)</span></label>
+              <label htmlFor="cta-description" className="font-mono text-[10px] text-white/25 tracking-[0.1em] uppercase">Tell us more <span className="text-white/12">(optional)</span></label>
               <textarea
+                id="cta-description"
+                name="description"
                 rows={3}
                 value={formData.description}
                 onChange={e => setFormData({ ...formData, description: e.target.value })}
@@ -309,8 +337,13 @@ export default function CTA() {
               transition={{ duration: 0.5, delay: 0.8, ease: EASE }}
             >
               <MagneticButton type="submit" disabled={isSubmitting} className="w-full group">
-                {isSubmitting ? 'REDIRECTING TO CALENDAR...' : 'BOOK MY FREE CALL'}
+                {isSubmitting ? 'OPENING YOUR EMAIL...' : 'BOOK MY FREE CALL'}
               </MagneticButton>
+              {submitError && (
+                <p role="alert" className="mt-3 text-[12px] text-center text-red-400/80">
+                  {submitError}
+                </p>
+              )}
             </motion.div>
 
             <motion.p

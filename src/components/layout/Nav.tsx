@@ -134,7 +134,7 @@ export default function Nav() {
   }
 
   const navItems = [
-    { name: 'Who We Are', href: '#who-we-are' },
+    { name: 'Who We Are', href: '#about' },
     { name: 'Services', href: '#services' },
     { name: 'Work', href: '#work' },
     { name: 'Team', href: '#team' },
@@ -181,6 +181,7 @@ export default function Nav() {
               width={38}
               height={38}
               unoptimized
+              style={{ width: 'auto', height: '38px' }}
               className="rounded-lg"
             />
             <LyptronLogo />
@@ -234,20 +235,22 @@ export default function Nav() {
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
-            className="fixed inset-0 z-[99] bg-[#050505] flex flex-col justify-center px-8 md:hidden"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Main navigation"
+            className="fixed inset-0 z-[101] bg-[#050505] flex flex-col justify-center px-8 md:hidden"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.35 }}
           >
-            <div className="absolute top-0 left-0 right-0 h-[72px] flex items-center justify-between px-6">
-              <span className="font-display font-black text-[26px] tracking-[0.18em] text-white/90">LYPTRON<span className="text-blue">.</span></span>
+            <div className="absolute top-0 left-0 right-0 h-[72px] flex items-center justify-end px-6">
               <button
                 onClick={() => setMobileMenuOpen(false)}
                 className="p-2 text-white/60 hover:text-white"
                 aria-label="Close menu"
               >
-                <X className="w-5 h-5" />
+                <X className="w-5 h-5" aria-hidden="true" />
               </button>
             </div>
 

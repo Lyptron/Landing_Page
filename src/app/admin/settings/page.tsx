@@ -7,9 +7,7 @@ import {
   Bell,
   Shield,
   Blocks,
-  CreditCard,
   CheckCircle2,
-  Lock,
   Key,
   Copy,
   Trash2,
@@ -36,7 +34,6 @@ import {
   fetchAllProjectsWithCodes,
   generateAccessCode,
   removeAccessCode,
-  updateProject,
   uploadLogo,
   fetchAgencySettings,
   upsertAgencySettings,
@@ -160,6 +157,9 @@ export default function SettingsPage() {
     if (!file) return
     setLogoUploading(true)
     const { data: url, error } = await uploadLogo(file)
+    if (error && process.env.NODE_ENV !== 'production') {
+      console.error('Logo upload failed:', error.message)
+    }
     if (url) {
       setLogoUrl(url)
       setGlobalLogo(url) // Immediately update across the entire app

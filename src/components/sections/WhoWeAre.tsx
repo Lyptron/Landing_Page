@@ -109,7 +109,6 @@ export default function WhoWeAre() {
   })
 
   const globeScale = useTransform(scrollYProgress, [0, 0.3, 0.7], [0.5, 1.1, 1.3])
-  const globeOpacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0.1, 0.35, 0.35, 0.1])
 
   const headlineRef = useRef<HTMLDivElement>(null)
   const headlineInView = useInView(headlineRef, { once: true, margin: '-80px' })

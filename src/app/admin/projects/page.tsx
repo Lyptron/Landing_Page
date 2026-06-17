@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Plus, Calendar, CheckCircle2, AlertCircle, Clock, Search } from 'lucide-react'
 import Link from 'next/link'
-import { fetchProjectsKanban, fetchClients, insertProject, updateProject } from '@/lib/db'
+import { fetchProjectsKanban, fetchClients, insertProject, updateProject, insertClient } from '@/lib/db'
 import Modal, { ModalInput, ModalSelect } from '@/components/ui/Modal'
 
 const STAGES = ['Backlog', 'Design', 'Development', 'Review', 'Completed']
@@ -50,6 +50,9 @@ export default function ProjectsPage() {
   const [formStage, setFormStage] = useState('Backlog')
   const [formCode, setFormCode] = useState('')
   const [saving, setSaving] = useState(false)
+  const [createNewClient, setCreateNewClient] = useState(false)
+  const [formContactPerson, setFormContactPerson] = useState('')
+  const [error, setError] = useState('')
 
   useEffect(() => {
     async function load() {
@@ -103,25 +106,67 @@ export default function ProjectsPage() {
   }
 
   const handleAddProject = async () => {
-    if (!formName || !formClientName) return
+    if (!formName || (!formClientId && !createNewClient) || (createNewClient && !formClientName)) {
+      setError('Project Name and Client details are required.')
+      return
+    }
     setSaving(true)
-    const { data } = await insertProject({
+    setError('')
+
+    let linkedClientId = formClientId || null
+    let clientEmail = null
+    let clientName = null
+
+    if (createNewClient && !linkedClientId) {
+      const { data: newClient, error: clientError } = await insertClient({
+        company: formClientName,
+        contact: formContactPerson || 'Primary Contact',
+        email: formClientEmail,
+      })
+      if (clientError) {
+        setError('Failed to create client: ' + (clientError as any).message)
+        setSaving(false)
+        return
+      }
+      if (newClient) {
+        linkedClientId = newClient.id
+        clientEmail = newClient.email
+        clientName = newClient.company
+        setClients((prev) => [newClient, ...prev])
+      }
+    } else if (linkedClientId) {
+      const client = clients.find((c) => c.id === linkedClientId)
+      clientEmail = client?.email
+      clientName = client?.company
+    }
+
+    const { data, error: projectError } = await insertProject({
       name: formName,
-      client_name: formClientName,
-      client_email: formClientEmail || undefined,
-      client_id: formClientId || null,
+      client_name: clientName || formClientName,
+      client_email: clientEmail || formClientEmail || undefined,
+      client_id: linkedClientId,
       status: 'starting',
       progress: 0,
       description: formDesc || undefined,
       access_code: formCode || slugifyAccessCode(formName),
       stage: formStage,
     })
+
+    if (projectError) {
+      setError('Failed to create project: ' + (projectError as any).message)
+      setSaving(false)
+      return
+    }
+
     if (data) {
+      const finalClientObj = linkedClientId
+        ? (clients.find((c) => c.id === linkedClientId) || (createNewClient ? { id: linkedClientId, company: formClientName, email: formClientEmail } : null))
+        : null
       setProjects([
         {
           ...(data as any),
           team: [],
-          clients: formClientId ? clients.find((c) => c.id === formClientId) : null,
+          clients: finalClientObj,
         },
         ...projects,
       ])
@@ -133,6 +178,9 @@ export default function ProjectsPage() {
     setFormDesc('')
     setFormCode('')
     setFormStage('Backlog')
+    setCreateNewClient(false)
+    setFormContactPerson('')
+    setError('')
     setSaving(false)
     setModalOpen(false)
   }
@@ -649,11 +697,27 @@ export default function ProjectsPage() {
       {/* New Project Modal */}
       <Modal
         open={modalOpen}
-        onClose={() => setModalOpen(false)}
+        onClose={() => {
+          setModalOpen(false)
+          setError('')
+        }}
         title="New Project"
         subtitle="Create a project, specify client details, and assign a portal access code."
       >
         <div className="flex flex-col gap-4">
+          {error && (
+            <div
+              className="p-3 text-[12.5px] rounded-xl border"
+              style={{
+                borderColor: 'var(--cp-red-border)',
+                background: 'var(--cp-red-soft)',
+                color: 'var(--cp-text)',
+              }}
+            >
+              {error}
+            </div>
+          )}
+
           <ModalInput
             label="Project Name"
             value={formName}
@@ -662,44 +726,95 @@ export default function ProjectsPage() {
             required
           />
 
-          {/* CRM Client Link Dropdown (Optional) */}
+          {/* CRM Client Link Selection or Inline Registration */}
           <div className="flex flex-col gap-2">
-            <label className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: 'var(--cp-text-muted)' }}>
-              Link to CRM Client (Optional)
-            </label>
-            <select
-              value={formClientId}
-              onChange={(e) => handleSelectClient(e.target.value)}
-              className="px-4 py-3 rounded-xl text-[13px] outline-none appearance-none cursor-pointer [&>option]:bg-[var(--cp-bg-elevated)] [&>option]:text-[var(--cp-text)]"
-              style={{
-                background: 'var(--cp-bg-soft)',
-                border: '1px solid var(--cp-border)',
-                color: 'var(--cp-text)',
-              }}
-            >
-              <option value="">— Select an existing client (optional) —</option>
-              {clients.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.company} {c.email ? ` · ${c.email}` : ''}
-                </option>
-              ))}
-            </select>
+            <div className="flex justify-between items-baseline">
+              <label className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: 'var(--cp-text-muted)' }}>
+                Client Link
+              </label>
+              <button
+                type="button"
+                onClick={() => {
+                  setCreateNewClient(!createNewClient)
+                  setFormClientId('')
+                  setFormClientName('')
+                  setFormClientEmail('')
+                  setFormContactPerson('')
+                }}
+                className="text-[11px] cursor-pointer"
+                style={{ color: 'var(--cp-cyan)', background: 'transparent', border: 'none' }}
+              >
+                {createNewClient ? '— Select Existing' : '+ Register New Client'}
+              </button>
+            </div>
+
+            {createNewClient ? (
+              <div className="flex flex-col gap-3 p-3.5 rounded-xl border border-[var(--cp-border-soft)]" style={{ background: 'var(--cp-bg-soft)' }}>
+                <ModalInput
+                  label="Client Company"
+                  value={formClientName}
+                  onChange={setFormClientName}
+                  placeholder="Acme Corp"
+                  required
+                />
+                <ModalInput
+                  label="Contact Person"
+                  value={formContactPerson}
+                  onChange={setFormContactPerson}
+                  placeholder="John Doe"
+                  required
+                />
+                <ModalInput
+                  label="Client Email"
+                  value={formClientEmail}
+                  onChange={setFormClientEmail}
+                  placeholder="contact@acme.com"
+                  type="email"
+                />
+              </div>
+            ) : (
+              clients.length === 0 ? (
+                <div
+                  className="px-4 py-3 rounded-xl text-[12.5px]"
+                  style={{
+                    background: 'var(--cp-bg-soft)',
+                    border: '1px solid var(--cp-border)',
+                    color: 'var(--cp-text-muted)',
+                  }}
+                >
+                  No clients yet —{' '}
+                  <button
+                    type="button"
+                    onClick={() => setCreateNewClient(true)}
+                    className="underline cursor-pointer"
+                    style={{ color: 'var(--cp-cyan)', background: 'transparent', border: 'none', padding: 0 }}
+                  >
+                    register a client first
+                  </button>
+                  .
+                </div>
+              ) : (
+                <select
+                  value={formClientId}
+                  onChange={(e) => handleSelectClient(e.target.value)}
+                  className="px-4 py-3 rounded-xl text-[13px] outline-none appearance-none cursor-pointer [&>option]:bg-[var(--cp-bg-elevated)] [&>option]:text-[var(--cp-text)] w-full"
+                  style={{
+                    background: 'var(--cp-bg-soft)',
+                    border: '1px solid var(--cp-border)',
+                    color: 'var(--cp-text)',
+                  }}
+                >
+                  <option value="">— Select a client —</option>
+                  {clients.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.company}
+                      {c.email ? ` · ${c.email}` : ''}
+                    </option>
+                  ))}
+                </select>
+              )
+            )}
           </div>
-
-          <ModalInput
-            label="Client Name"
-            value={formClientName}
-            onChange={setFormClientName}
-            placeholder="e.g. Nirman Industries"
-            required
-          />
-
-          <ModalInput
-            label="Client Email"
-            value={formClientEmail}
-            onChange={setFormClientEmail}
-            placeholder="e.g. contact@nirman.com"
-          />
 
           <ModalInput
             label="Access Code"

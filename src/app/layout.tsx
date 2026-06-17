@@ -105,6 +105,19 @@ const KEYWORDS = [
   'Lyptron',
 ]
 
+// Next 14+ requires viewport / themeColor to be exported separately from
+// `metadata`; bundling them there triggers a deprecation warning.
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  colorScheme: 'dark light',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#fdfaf3' },
+    { media: '(prefers-color-scheme: dark)', color: '#050505' },
+  ],
+}
+
 export const metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
@@ -238,12 +251,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" suppressHydrationWarning>
       <head>
         <script
-          // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{ __html: NO_FLASH_SCRIPT }}
         />
         <script
           type="application/ld+json"
-          // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>

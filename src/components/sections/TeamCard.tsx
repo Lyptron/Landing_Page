@@ -7,11 +7,13 @@ import Image from 'next/image'
 
 interface TeamCardProps {
   member: TeamMember
-  index: number
+  // Kept for caller compatibility (animation stagger) even when this
+  // component doesn't read it internally.
+  index?: number
   onClick: () => void
 }
 
-export default function TeamCard({ member, index, onClick }: TeamCardProps) {
+export default function TeamCard({ member, onClick }: TeamCardProps) {
   const { setCursorState } = useCursor()
   const cardRef = useRef<HTMLDivElement>(null)
 

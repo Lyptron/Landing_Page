@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { motion } from 'framer-motion'
 import { X, CheckCircle2 } from 'lucide-react'
@@ -11,28 +11,39 @@ interface ServiceDetailProps {
   onClose: () => void
 }
 
+type LenisLike = { stop: () => void; start: () => void }
+
 export default function ServiceDetail({ service, onClose }: ServiceDetailProps) {
   const { setCursorState } = useCursor()
   const [mounted, setMounted] = useState(false)
+  const titleId = useId()
+  const dialogRef = useRef<HTMLDivElement>(null)
+  const previouslyFocused = useRef<HTMLElement | null>(null)
 
   useEffect(() => {
+    // Defer portal mount until after hydration so createPortal targets
+    // the real DOM, not the SSR shadow tree.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true)
   }, [])
 
   useEffect(() => {
     if (!service) return
+    previouslyFocused.current = document.activeElement as HTMLElement | null
     document.body.style.overflow = 'hidden'
-    const lenis = (window as any).lenis
+    const lenis = (window as unknown as { lenis?: LenisLike }).lenis
     if (lenis) lenis.stop()
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
     }
     window.addEventListener('keydown', handleKeyDown)
+    // Move focus into the dialog so screen reader and keyboard users land here.
+    requestAnimationFrame(() => dialogRef.current?.focus())
     return () => {
       document.body.style.overflow = ''
       if (lenis) lenis.start()
       window.removeEventListener('keydown', handleKeyDown)
+      previouslyFocused.current?.focus?.()
     }
   }, [service, onClose])
 
@@ -42,17 +53,23 @@ export default function ServiceDetail({ service, onClose }: ServiceDetailProps) 
     <>
       {/* Backdrop */}
       <motion.div
-        className="fixed inset-0 z-40 bg-black/70 backdrop-blur-[8px]"
+        className="fixed inset-0 z-[100] bg-black/70 backdrop-blur-[8px]"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         onClick={onClose}
+        aria-hidden="true"
       />
 
       {/* Modal */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-6 overflow-hidden pointer-events-none">
+      <div className="fixed inset-0 z-[101] flex items-center justify-center p-4 md:p-6 overflow-hidden pointer-events-none">
         <motion.div
-          className="w-full max-w-[920px] pointer-events-auto"
+          ref={dialogRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={titleId}
+          tabIndex={-1}
+          className="w-full max-w-[920px] pointer-events-auto focus:outline-none"
           initial={{ opacity: 0, scale: 0.95, y: 12, filter: 'blur(8px)' }}
           animate={{ opacity: 1, scale: 1, y: 0, filter: 'blur(0px)' }}
           exit={{ opacity: 0, scale: 0.95, y: 12, filter: 'blur(8px)' }}
@@ -73,19 +90,21 @@ export default function ServiceDetail({ service, onClose }: ServiceDetailProps) 
                 {service.number} &bull; Capability Details
               </span>
               <button
+                type="button"
                 onClick={onClose}
-                className="p-2.5 rounded-full border border-white/[0.07] hover:border-white/15 hover:bg-white/[0.03] text-white/60 hover:text-white transition-all duration-300 cursor-none"
+                aria-label="Close service details"
+                className="p-2.5 rounded-full border border-white/[0.07] hover:border-white/15 hover:bg-white/[0.03] text-white/60 hover:text-white transition-all duration-300 cursor-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/40"
                 onMouseEnter={() => setCursorState('hover')}
                 onMouseLeave={() => setCursorState('default')}
               >
-                <X className="w-5 h-5" />
+                <X className="w-5 h-5" aria-hidden="true" />
               </button>
             </div>
 
             {/* Title */}
             <div className="flex items-center gap-4 mb-4">
-              <span className="text-4xl md:text-5xl drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]">{service.icon}</span>
-              <h2 className="font-display font-bold text-3xl md:text-4xl lg:text-5xl text-white/90 tracking-[-0.03em]">
+              <span className="text-4xl md:text-5xl drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]" aria-hidden="true">{service.icon}</span>
+              <h2 id={titleId} className="font-display font-bold text-3xl md:text-4xl lg:text-5xl text-white/90 tracking-[-0.03em]">
                 {service.name}
               </h2>
             </div>
@@ -102,11 +121,11 @@ export default function ServiceDetail({ service, onClose }: ServiceDetailProps) 
                   <div className="w-[6px] h-[6px] rounded-full bg-white/6" />
                 </div>
                 <div className="ml-3 h-[18px] flex-1 max-w-[160px] rounded bg-white/[0.03] flex items-center px-2">
-                  <span className="font-mono text-[7px] text-white/12">{service.id}.lyptron.com</span>
+                  <span className="font-mono text-[7px] text-white/12" aria-hidden="true">lyptron.com/services/{service.id}</span>
                 </div>
               </div>
               {/* Blank content area */}
-              <div className="flex-1 flex items-center justify-center h-[calc(100%-36px)]">
+              <div className="flex-1 flex items-center justify-center h-[calc(100%-36px)]" aria-hidden="true">
                 <span className="font-mono text-[10px] text-white/10 uppercase tracking-widest">Preview</span>
               </div>
             </div>

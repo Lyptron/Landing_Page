@@ -1,5 +1,5 @@
 'use client'
-import { ReactNode } from 'react'
+import { ReactNode, useEffect, useId, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X } from 'lucide-react'
 
@@ -13,6 +13,32 @@ interface ModalProps {
 }
 
 export default function Modal({ open, onClose, title, subtitle, children, width = 'max-w-lg' }: ModalProps) {
+  const titleId = useId()
+  const descId = useId()
+  const dialogRef = useRef<HTMLDivElement>(null)
+  const previouslyFocused = useRef<HTMLElement | null>(null)
+
+  // Capture focus on open, restore on close, and bind Escape.
+  useEffect(() => {
+    if (!open) return
+    previouslyFocused.current = document.activeElement as HTMLElement | null
+    const dialog = dialogRef.current
+    if (dialog) {
+      const focusable = dialog.querySelector<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      )
+      ;(focusable || dialog).focus()
+    }
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      previouslyFocused.current?.focus?.()
+    }
+  }, [open, onClose])
+
   return (
     <AnimatePresence>
       {open && (
@@ -23,13 +49,20 @@ export default function Modal({ open, onClose, title, subtitle, children, width 
             exit={{ opacity: 0 }}
             onClick={onClose}
             className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[100]"
+            aria-hidden="true"
           />
           <motion.div
+            ref={dialogRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={titleId}
+            aria-describedby={subtitle ? descId : undefined}
+            tabIndex={-1}
             initial={{ opacity: 0, scale: 0.96, y: -10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: -10 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className={`fixed top-[50%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-full ${width} mx-4 z-[101] overflow-hidden`}
+            className={`fixed top-[50%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-full ${width} mx-4 z-[101] overflow-hidden focus:outline-none`}
             style={{
               background: 'var(--cp-surface, #FFFFFF)',
               border: '1px solid var(--cp-border, rgba(0,0,0,0.08))',
@@ -40,17 +73,19 @@ export default function Modal({ open, onClose, title, subtitle, children, width 
             {/* Header */}
             <div className="flex items-start justify-between p-6 border-b" style={{ borderColor: 'var(--cp-border-soft, rgba(0,0,0,0.05))' }}>
               <div>
-                <h2 className="font-display text-xl font-bold" style={{ color: 'var(--cp-text, #18181B)' }}>{title}</h2>
-                {subtitle && <p className="text-[13px] mt-1" style={{ color: 'var(--cp-text-muted, rgba(24,24,27,0.45))' }}>{subtitle}</p>}
+                <h2 id={titleId} className="font-display text-xl font-bold" style={{ color: 'var(--cp-text, #18181B)' }}>{title}</h2>
+                {subtitle && <p id={descId} className="text-[13px] mt-1" style={{ color: 'var(--cp-text-muted, rgba(24,24,27,0.45))' }}>{subtitle}</p>}
               </div>
               <button
+                type="button"
                 onClick={onClose}
+                aria-label="Close dialog"
                 className="p-1.5 rounded-lg transition-all"
                 style={{ color: 'var(--cp-text-muted, rgba(24,24,27,0.45))' }}
                 onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--cp-text, #18181B)'; e.currentTarget.style.background = 'var(--cp-surface-strong, #F4F4F5)' }}
                 onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--cp-text-muted, rgba(24,24,27,0.45))'; e.currentTarget.style.background = 'transparent' }}
               >
-                <X className="w-4 h-4" />
+                <X className="w-4 h-4" aria-hidden="true" />
               </button>
             </div>
 
@@ -81,13 +116,16 @@ export function ModalInput({
   type?: string
   required?: boolean
 }) {
+  const id = useId()
   return (
     <div className="flex flex-col gap-2">
-      <label className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: 'var(--cp-text-muted, rgba(24,24,27,0.45))' }}>
+      <label htmlFor={id} className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: 'var(--cp-text-muted, rgba(24,24,27,0.45))' }}>
         {label} {required && <span style={{ color: 'var(--cp-red, #DC2626)' }}>*</span>}
       </label>
       <input
+        id={id}
         type={type}
+        required={required}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
@@ -111,10 +149,12 @@ export function ModalSelect({
   onChange: (v: string) => void
   options: { value: string; label: string }[]
 }) {
+  const id = useId()
   return (
     <div className="flex flex-col gap-2">
-      <label className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: 'var(--cp-text-muted, rgba(24,24,27,0.45))' }}>{label}</label>
+      <label htmlFor={id} className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: 'var(--cp-text-muted, rgba(24,24,27,0.45))' }}>{label}</label>
       <select
+        id={id}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className="px-4 py-3 rounded-xl text-[13px] outline-none transition-all appearance-none cursor-pointer [&>option]:bg-[var(--cp-bg-elevated)] [&>option]:text-[var(--cp-text)]"

@@ -99,7 +99,12 @@ function describeReason(mode: ThemeMode, strategy: AutoStrategy, resolved: Resol
 
   if (strategy === 'sunset' && sunTimes && !Number.isNaN(sunTimes.sunrise.getTime()) && !Number.isNaN(sunTimes.sunset.getTime())) {
     if (resolved === 'dark') {
-      const next = now < sunTimes.sunrise ? sunTimes.sunrise : sunTimes.sunrise
+      // If today's sunrise is still ahead use it; otherwise it's already
+      // passed and we're in the post-sunset window, so the next sunrise
+      // is roughly 24h later.
+      const next = now < sunTimes.sunrise
+        ? sunTimes.sunrise
+        : new Date(sunTimes.sunrise.getTime() + 24 * 60 * 60 * 1000)
       return `Auto · dark until sunrise ${formatTime(next)}`
     }
     return `Auto · light until sunset ${formatTime(sunTimes.sunset)}`

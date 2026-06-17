@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useMemo, useState } from 'react'
+import Link from 'next/link'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { motion } from 'framer-motion'
 import {
@@ -13,15 +14,6 @@ import {
 } from '@/lib/db'
 import Modal, { ModalInput, ModalSelect } from '@/components/ui/Modal'
 import { useChartTheme, tooltipContentStyle, tooltipLabelStyle, tooltipItemStyle } from '@/lib/theme/chartTheme'
-
-const REVENUE_DATA = [
-  { name: 'Jan', revenue: 125000 },
-  { name: 'Feb', revenue: 180000 },
-  { name: 'Mar', revenue: 150000 },
-  { name: 'Apr', revenue: 265000 },
-  { name: 'May', revenue: 375000 },
-  { name: 'Jun', revenue: 430000 },
-]
 
 const ROADMAP_TYPES = [
   { value: 'roadmap', label: 'Roadmap' },
@@ -165,7 +157,10 @@ export default function FounderHub() {
   // ── Department performance ──
   const onTrackCount = projects.filter(p => p.health === 'on-track' || !p.health).length
   const activeCampaigns = campaigns.filter(c => c.status === 'active').length
-  const wonLeads = leads.filter(l => l.stage === 'Won').length
+  // CRM pipeline migrated 'Won' → 'Converted' (see Phase B in
+   // supabase-schema.sql). Match both for backwards compatibility
+  // until any pre-migration rows have aged out.
+  const wonLeads = leads.filter(l => l.stage === 'Converted' || l.stage === 'Won').length
 
   // ── Subscription snapshot ──
   const subTotals = useMemo(() => {
@@ -178,8 +173,16 @@ export default function FounderHub() {
 
   // ── Approvals ──
   async function handleApproval(id: string, status: 'approved' | 'rejected') {
+    const snapshot = approvals
     setApprovals(approvals.filter(a => a.id !== id))
-    await updateApproval(id, status)
+    const { error } = await updateApproval(id, status)
+    if (error) {
+      // Roll back the optimistic removal so the user can retry.
+      setApprovals(snapshot)
+      if (process.env.NODE_ENV !== 'production') {
+        console.error('Approval update failed:', error.message)
+      }
+    }
   }
 
   // ── Roadmap ──
@@ -342,7 +345,7 @@ export default function FounderHub() {
             { label: 'Marketing', icon: Megaphone, primary: String(activeCampaigns), sub: 'active campaigns', href: '/admin/marketing' },
             { label: 'Sales / CRM', icon: Target, primary: `${wonLeads}/${leads.length}`, sub: 'leads won', href: '/admin/crm' },
           ].map((dept, i) => (
-            <a key={i} href={dept.href} className="p-4 rounded-2xl flex flex-col justify-between hover:bg-[var(--cp-surface-strong)] transition-colors group" style={{ background: 'var(--cp-surface)', border: '1px solid var(--cp-border-soft)' }}>
+            <Link key={i} href={dept.href} className="p-4 rounded-2xl flex flex-col justify-between hover:bg-[var(--cp-surface-strong)] transition-colors group" style={{ background: 'var(--cp-surface)', border: '1px solid var(--cp-border-soft)' }}>
               <div className="flex items-center justify-between mb-4">
                 <dept.icon className="w-4 h-4 text-[var(--cp-text-faint)]" />
                 <ArrowRight className="w-3.5 h-3.5 text-[var(--cp-text-faint)] group-hover:text-[var(--cp-text-muted)] group-hover:translate-x-0.5 transition-all" />
@@ -352,11 +355,11 @@ export default function FounderHub() {
                 <p className="text-[10px] text-[var(--cp-text-faint)] mt-0.5">{dept.sub}</p>
                 <p className="text-[9px] font-mono uppercase tracking-[0.15em] text-[var(--cp-text-faint)] mt-2">{dept.label}</p>
               </div>
-            </a>
+            </Link>
           ))}
 
           {/* Subscription Snapshot */}
-          <a href="/admin/subscriptions" className="sm:col-span-3 p-4 rounded-2xl flex items-center justify-between hover:bg-[var(--cp-surface-strong)] transition-colors group" style={{ background: 'var(--cp-surface)', border: '1px solid var(--cp-border-soft)' }}>
+          <Link href="/admin/subscriptions" className="sm:col-span-3 p-4 rounded-2xl flex items-center justify-between hover:bg-[var(--cp-surface-strong)] transition-colors group" style={{ background: 'var(--cp-surface)', border: '1px solid var(--cp-border-soft)' }}>
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: 'var(--cp-surface-strong)' }}>
                 <CreditCard className="w-4 h-4 text-[var(--cp-text-muted)]" />
@@ -370,7 +373,7 @@ export default function FounderHub() {
               <p className="text-[18px] font-display font-bold text-[var(--cp-text)] tracking-tight">₹{subTotals.monthly.toLocaleString('en-IN')}<span className="text-[10px] text-[var(--cp-text-faint)] font-sans">/mo</span></p>
               <ArrowRight className="w-3.5 h-3.5 text-[var(--cp-text-faint)] group-hover:text-[var(--cp-text-muted)] group-hover:translate-x-0.5 transition-all" />
             </div>
-          </a>
+          </Link>
         </div>
       </div>
 

@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   LayoutDashboard,
@@ -17,7 +17,6 @@ import {
   Users,
   Menu,
   X,
-  ChevronRight,
   LogOut,
 } from 'lucide-react'
 import { fetchProjectByAccessCode } from '@/lib/db'
@@ -65,16 +64,17 @@ interface SidebarContentProps {
   groups: any[]
   pathname: string
   onNavigate?: () => void
+  onExit?: (e: React.MouseEvent) => void
 }
 
-function SidebarContent({ project, groups, pathname, onNavigate }: SidebarContentProps) {
+function SidebarContent({ project, groups, pathname, onNavigate, onExit }: SidebarContentProps) {
   return (
     <>
       {/* Brand + Project header */}
       <div className="p-5 border-b" style={{ borderColor: 'var(--cp-border-soft)' }}>
-        <Link href="/client" className="block">
+        <div className="block">
           <LyptronLogo subtitle={project?.name || 'Client Portal'} textClassName="text-[15px]" />
-        </Link>
+        </div>
       </div>
 
       {/* Navigation */}
@@ -115,15 +115,14 @@ function SidebarContent({ project, groups, pathname, onNavigate }: SidebarConten
 
       {/* Footer */}
       <div className="p-4 border-t" style={{ borderColor: 'var(--cp-border-soft)' }}>
-        <Link href="/client">
-          <div
-            className="flex items-center gap-3 px-3 py-2 rounded-[8px] text-[13px] font-medium transition-colors hover:text-[var(--cp-text)]"
-            style={{ color: 'var(--cp-text-muted)' }}
-          >
-            <LogOut className="w-4 h-4" />
-            <span>Exit Portal</span>
-          </div>
-        </Link>
+        <button
+          onClick={onExit}
+          className="flex items-center gap-3 px-3 py-2 rounded-[8px] text-[13px] font-medium transition-colors hover:text-[var(--cp-text)] w-full text-left bg-transparent border-0 cursor-pointer"
+          style={{ color: 'var(--cp-text-muted)' }}
+        >
+          <LogOut className="w-4 h-4" />
+          <span>Exit Portal</span>
+        </button>
       </div>
     </>
   )
@@ -140,10 +139,32 @@ export default function ClientPortalLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [project, setProject] = useState<ProjectSummary | null>(null)
+  const [authorized, setAuthorized] = useState<boolean | null>(null)
+
+  const handleExit = (e: React.MouseEvent) => {
+    e.preventDefault()
+    if (typeof window !== 'undefined') {
+      sessionStorage.removeItem('client_access_code')
+      window.location.replace('/client')
+    }
+  }
 
   const groups = NAV_GROUPS(projectCode)
   const allItems = groups.flatMap((g) => g.items)
   const currentPage = allItems.find((m) => pathname === m.path)?.name || 'Dashboard'
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedCode = sessionStorage.getItem('client_access_code')
+      if (savedCode !== projectCode) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setAuthorized(false)
+        window.location.replace('/client')
+      } else {
+        setAuthorized(true)
+      }
+    }
+  }, [projectCode])
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 12)
@@ -152,8 +173,11 @@ export default function ClientPortalLayout({
   }, [])
 
   useEffect(() => {
+    if (!authorized) return
+    let cancelled = false
     async function loadProject() {
       const { data } = await fetchProjectByAccessCode(projectCode)
+      if (cancelled) return
       if (data) {
         setProject({
           name: data.name || '',
@@ -164,9 +188,12 @@ export default function ClientPortalLayout({
       }
     }
     loadProject()
-  }, [projectCode])
+    return () => {
+      cancelled = true
+    }
+  }, [projectCode, authorized])
 
-  if (!project) {
+  if (!authorized || !project) {
     return <FullPageSplash />
   }
 
@@ -177,7 +204,7 @@ export default function ClientPortalLayout({
         className="relative z-20 h-screen w-[260px] flex-shrink-0 hidden lg:flex flex-col sticky top-0"
         style={{ background: 'var(--cp-bg-elevated)', borderRight: '1px solid var(--cp-border-soft)' }}
       >
-        <SidebarContent project={project} groups={groups} pathname={pathname} />
+        <SidebarContent project={project} groups={groups} pathname={pathname} onExit={handleExit} />
       </aside>
 
       {/* Mobile Sidebar */}
@@ -208,7 +235,7 @@ export default function ClientPortalLayout({
                   <X className="w-5 h-5" />
                 </button>
               </div>
-              <SidebarContent project={project} groups={groups} pathname={pathname} onNavigate={() => setSidebarOpen(false)} />
+              <SidebarContent project={project} groups={groups} pathname={pathname} onNavigate={() => setSidebarOpen(false)} onExit={handleExit} />
             </motion.aside>
           </>
         )}
@@ -234,9 +261,9 @@ export default function ClientPortalLayout({
             >
               <Menu className="w-5 h-5" />
             </button>
-            <Link href="/client" className="lg:hidden shrink-0">
+            <div className="lg:hidden shrink-0">
               <LyptronMark size={28} />
-            </Link>
+            </div>
             <div className="flex flex-col justify-center min-w-0 leading-tight">
               <span className="hidden sm:block text-[10.5px] font-semibold uppercase tracking-[0.12em] truncate mb-0.5" style={{ color: 'var(--cp-text-faint)' }}>
                 {project?.name || 'Portal'}

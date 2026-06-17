@@ -159,9 +159,20 @@ export default function EnterpriseAdminLayout({ children }: { children: React.Re
     [user?.role]
   )
 
-  const currentPage =
-    ALL_ITEMS.find((m) => pathname === m.path || (m.path === '/admin/dashboard' && pathname === '/admin'))?.name ||
-    'Overview'
+  const currentPage = useMemo(() => {
+    const match = ALL_ITEMS.find(
+      (m) => pathname === m.path || (m.path === '/admin/dashboard' && pathname === '/admin')
+    )?.name
+    if (match) return match
+    // Per-project sub-pages live under /admin/projects/[id]/…; render
+    // a readable fallback instead of the literal "Overview" so the title
+    // bar doesn't lie on those routes.
+    if (pathname.startsWith('/admin/projects/')) {
+      const last = pathname.split('/').filter(Boolean).pop() || 'project'
+      return last.charAt(0).toUpperCase() + last.slice(1)
+    }
+    return 'Overview'
+  }, [pathname])
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20)
@@ -314,11 +325,13 @@ export default function EnterpriseAdminLayout({ children }: { children: React.Re
         >
           <div className="flex items-center gap-3">
             <button
+              type="button"
+              aria-label="Open menu"
               className="md:hidden hover:text-[var(--cp-text)] transition-colors"
               style={{ color: 'var(--cp-text-muted)' }}
               onClick={() => setMobileMenuOpen(true)}
             >
-              <Menu className="w-5 h-5" />
+              <Menu className="w-5 h-5" aria-hidden="true" />
             </button>
             <div className="hidden md:flex items-center gap-2 text-[13px] font-medium">
               <span style={{ color: 'var(--cp-text-faint)' }}>Admin</span>

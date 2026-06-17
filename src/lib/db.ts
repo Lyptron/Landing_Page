@@ -683,83 +683,75 @@ export async function resetAllClientData(clientId: string) {
   return { error: null }
 }
 
-// Hard-deletes the client, every project they own, and every row
-// in any per-project table tied to those projects.
-export async function deleteClientCascade(clientId: string) {
-  const { data: clientProjects, error: projErr } = await supabase
-    .from('projects')
-    .select('id')
-    .eq('client_id', clientId)
-  if (projErr) return { error: projErr }
-  const projectIds = (clientProjects ?? []).map((p) => p.id)
+// ─── Agency-wide Danger Zone ─────────────────────────────────
+//
+// These wipe-the-database operations now route through
+// /api/admin/danger (see src/app/api/admin/danger/route.ts). The
+// endpoint verifies the caller's JWT, checks the admin_users role
+// table, and performs the destructive work with the service-role key
+// — so the browser anon key can never trigger these directly even if
+// RLS is misconfigured.
 
-  if (projectIds.length > 0) {
-    const reset = await resetAllClientData(clientId)
-    if (reset.error) return reset
-    const { error: delProj } = await supabase.from('projects').delete().in('id', projectIds)
-    if (delProj) return { error: delProj }
+type DangerAction =
+  | { type: 'reset_all_finance' }
+  | { type: 'reset_all_projects_data' }
+  | { type: 'reset_all_leads' }
+  | { type: 'factory_reset_agency' }
+  | { type: 'delete_client_cascade'; clientId: string }
+
+async function callDangerEndpoint(action: DangerAction): Promise<{ error: unknown }> {
+  const { data: { session }, error: sessionErr } = await supabase.auth.getSession()
+  if (sessionErr || !session?.access_token) {
+    return { error: 'Not signed in' }
   }
-  return supabase.from('clients').delete().eq('id', clientId)
+  try {
+    const res = await fetch('/api/admin/danger', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify(action),
+    })
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({ error: res.statusText }))
+      return { error: body.error || res.statusText }
+    }
+    return { error: null }
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : 'Network error' }
+  }
 }
 
-// ─── Agency-wide Danger Zone (Settings page) ─────────────────
-// Per-project tables that should be wiped during a "data reset"
-// (everything except the project/client rows themselves).
-const PROJECT_CHILD_TABLES = [
-  'payments',
-  'milestones',
-  'approvals',
-  'activities',
-  'deployments',
-  'documents',
-  'meetings',
-  'feedback',
-  'gallery',
-  'announcements',
-  'project_team',
-] as const
-
-// Truncate every row in a list of tables, no filter. Used by the
-// agency-wide danger actions. Returns first error if any.
-async function wipeTables(tables: readonly string[]) {
-  const results = await Promise.all(
-    tables.map((table) =>
-      supabase.from(table).delete().not('id', 'is', null)
-    )
-  )
-  const failed = results
-    .map((r, i) => ({ table: tables[i], error: r.error }))
-    .filter((r) => r.error)
-  if (failed.length > 0) return { error: failed }
-  return { error: null }
+// Hard-deletes the client, every project they own, and every row
+// in any per-project table tied to those projects. Server-side; the
+// browser never sees the service-role key.
+export async function deleteClientCascade(clientId: string) {
+  return callDangerEndpoint({ type: 'delete_client_cascade', clientId })
 }
 
 // Deletes every payment row across the entire agency.
 export async function resetAllFinance() {
-  return wipeTables(['payments', 'expenses', 'subscriptions'])
+  return callDangerEndpoint({ type: 'reset_all_finance' })
 }
 
 // Wipes every per-project record across the agency. Projects and
 // clients stay; everything attached to projects goes.
 export async function resetAllProjectsData() {
-  return wipeTables(PROJECT_CHILD_TABLES)
+  return callDangerEndpoint({ type: 'reset_all_projects_data' })
 }
 
 // Nukes inquiries + leads (lead funnel reset). Useful when seeded
 // or test data is polluting the CRM.
 export async function resetAllLeads() {
-  return wipeTables(['inquiries', 'leads', 'campaigns', 'marketing_tasks'])
+  return callDangerEndpoint({ type: 'reset_all_leads' })
 }
 
 // Factory reset — clients, projects, every per-project child
 // table, plus leads/inquiries. Keeps admin_users, agency_settings,
 // team_members. The "scorched-earth" option.
 export async function factoryResetAgency() {
-  const step1 = await wipeTables(PROJECT_CHILD_TABLES)
-  if (step1.error) return step1
-  const step2 = await wipeTables(['projects', 'inquiries', 'leads', 'campaigns', 'marketing_tasks', 'tasks', 'roadmap_items', 'expenses', 'subscriptions'])
-  if (step2.error) return step2
-  return wipeTables(['clients'])
+  return callDangerEndpoint({ type: 'factory_reset_agency' })
 }
 
 // ─── Generic helper ──────────────────────────────────────────

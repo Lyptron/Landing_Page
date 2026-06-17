@@ -18,23 +18,24 @@ export default function AdminAuthGate({ children }: { children: React.ReactNode 
   useEffect(() => {
     if (loading) return
 
+    // Reset on every dependency change so a previously-authorized
+    // page can't briefly render after navigating to a forbidden one.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setAuthorized(false)
+
     if (!user && !isLoginPage) {
       router.push('/admin/login')
       return
     }
 
     if (user && !isLoginPage) {
-      if (!user.role) {
-        // We handle this below by rendering an Access Denied screen
-        return
-      }
+      if (!user.role) return // handled below by the "Access Denied" screen
 
       if (!canAccessRoute(user.role, pathname)) {
         router.push(getFallbackRoute(user.role))
         return
       }
 
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setAuthorized(true)
     }
   }, [loading, user, isLoginPage, pathname, router])

@@ -39,10 +39,21 @@ function ProcessCard({ step, idx }: { step: typeof processSteps[0]; idx: number 
   const [borderPerimeter, setBorderPerimeter] = useState(0)
 
   useEffect(() => {
-    if (borderRef.current) {
-      const rect = borderRef.current
-      setBorderPerimeter(2 * (rect.width.baseVal.value + rect.height.baseVal.value))
+    const el = borderRef.current
+    if (!el) return
+    const measure = () => {
+      try {
+        setBorderPerimeter(2 * (el.width.baseVal.value + el.height.baseVal.value))
+      } catch {
+        // baseVal not available — leave the fallback dasharray in place.
+      }
     }
+    measure()
+    // Recompute on resize so the dash animation stays in sync with the
+    // actual SVG bounding box.
+    const ro = new ResizeObserver(() => measure())
+    ro.observe(el)
+    return () => ro.disconnect()
   }, [])
 
   return (

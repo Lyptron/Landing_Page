@@ -97,9 +97,12 @@ export default function TasksPage() {
   const handleDrop = async (e: React.DragEvent, status: string) => {
     e.preventDefault()
     if (!draggedTask) return
-    setTasks(tasks.map(t => t.id === draggedTask ? { ...t, status } : t))
+    const id = draggedTask
+    const snapshot = tasks
+    setTasks(tasks.map(t => t.id === id ? { ...t, status } : t))
     setDraggedTask(null)
-    await updateTask(draggedTask, { status })
+    const { error } = await updateTask(id, { status })
+    if (error) setTasks(snapshot)
   }
 
   function openAddModal() {

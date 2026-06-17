@@ -88,9 +88,12 @@ export default function CRMPipelinePage() {
   const handleDrop = async (e: React.DragEvent, stage: string) => {
     e.preventDefault()
     if (!draggedLead) return
-    setLeads(leads.map(l => l.id === draggedLead ? { ...l, stage } : l))
+    const id = draggedLead
+    const snapshot = leads
+    setLeads(leads.map(l => l.id === id ? { ...l, stage } : l))
     setDraggedLead(null)
-    await updateLead(draggedLead, { stage })
+    const { error } = await updateLead(id, { stage })
+    if (error) setLeads(snapshot)
   }
 
   const addLead = async () => {

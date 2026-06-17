@@ -548,3 +548,18 @@ html[data-theme="dark"] .client-shell {
   background: var(--cp-text-faint);
 }
 
+/* Cursor safety net — many CTAs use `cursor-none` so the custom
+   <Cursor /> can stand in. On touch devices, with reduced motion, or
+   if the custom cursor fails to mount, fall back to the native pointer
+   so users never see an invisible-cursor button. */
+@media (hover: none), (prefers-reduced-motion: reduce), (pointer: coarse) {
+  .cursor-none,
+  .cursor-none * {
+    cursor: auto !important;
+  }
+  button.cursor-none,
+  a.cursor-none {
+    cursor: pointer !important;
+  }
+}
+

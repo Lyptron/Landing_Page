@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { TeamMember } from '@/types'
@@ -9,30 +9,42 @@ import Image from 'next/image'
 
 interface TeamModalProps {
   member: TeamMember
-  index: number
+  // Caller may pass an index for animation purposes; kept optional so
+  // the prop contract doesn't break, but unused inside the modal.
+  index?: number
   onClose: () => void
 }
 
-export default function TeamModal({ member, index, onClose }: TeamModalProps) {
+type LenisLike = { stop: () => void; start: () => void }
+
+export default function TeamModal({ member, onClose }: TeamModalProps) {
   const { setCursorState } = useCursor()
   const [mounted, setMounted] = useState(false)
+  const titleId = useId()
+  const dialogRef = useRef<HTMLDivElement>(null)
+  const previouslyFocused = useRef<HTMLElement | null>(null)
 
   useEffect(() => {
+    // Defer portal mount until after hydration so createPortal targets
+    // the real DOM, not the SSR shadow tree.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true)
+    previouslyFocused.current = document.activeElement as HTMLElement | null
     document.body.style.overflow = 'hidden'
-    const lenis = (window as any).lenis
+    const lenis = (window as unknown as { lenis?: LenisLike }).lenis
     if (lenis) lenis.stop()
 
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
     }
     window.addEventListener('keydown', handleKey)
+    requestAnimationFrame(() => dialogRef.current?.focus())
 
     return () => {
       document.body.style.overflow = ''
       if (lenis) lenis.start()
       window.removeEventListener('keydown', handleKey)
+      previouslyFocused.current?.focus?.()
     }
   }, [onClose])
 
@@ -49,12 +61,18 @@ export default function TeamModal({ member, index, onClose }: TeamModalProps) {
         exit={{ opacity: 0 }}
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         onClick={onClose}
+        aria-hidden="true"
       />
 
       {/* Modal */}
       <div key="modal-content" className="fixed inset-0 z-[101] flex items-center justify-center pointer-events-none p-4 sm:p-8">
         <motion.div
-          className="pointer-events-auto w-full max-w-[900px] overflow-hidden flex flex-col md:flex-row h-auto md:h-[560px] rounded-[16px] relative cursor-none"
+          ref={dialogRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={titleId}
+          tabIndex={-1}
+          className="pointer-events-auto w-full max-w-[900px] overflow-hidden flex flex-col md:flex-row h-auto md:h-[560px] rounded-[16px] relative cursor-none focus:outline-none"
           style={{
             background: 'linear-gradient(160deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)',
             border: '1px solid rgba(255,255,255,0.07)',
@@ -95,12 +113,14 @@ export default function TeamModal({ member, index, onClose }: TeamModalProps) {
 
             {/* Close */}
             <button
+              type="button"
               onClick={onClose}
-              className="absolute top-5 right-5 w-9 h-9 rounded-full flex items-center justify-center bg-white/[0.02] hover:bg-white/[0.05] border border-white/[0.06] hover:border-white/[0.12] transition-all duration-300 group z-10 cursor-none"
+              aria-label={`Close ${member.name} profile`}
+              className="absolute top-5 right-5 w-9 h-9 rounded-full flex items-center justify-center bg-white/[0.02] hover:bg-white/[0.05] border border-white/[0.06] hover:border-white/[0.12] transition-all duration-300 group z-10 cursor-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/40"
               onMouseEnter={() => setCursorState('cta')}
               onMouseLeave={() => setCursorState('default')}
             >
-              <X className="w-4 h-4 text-white/50 group-hover:text-white/80 transition-colors" />
+              <X className="w-4 h-4 text-white/50 group-hover:text-white/80 transition-colors" aria-hidden="true" />
             </button>
 
             {/* Name */}
@@ -112,7 +132,7 @@ export default function TeamModal({ member, index, onClose }: TeamModalProps) {
               <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-white/35 mb-4 block">
                 {member.role}
               </span>
-              <h2 className="font-display font-bold text-3xl md:text-4xl text-white/90 tracking-[-0.03em] leading-none mb-8">
+              <h2 id={titleId} className="font-display font-bold text-3xl md:text-4xl text-white/90 tracking-[-0.03em] leading-none mb-8">
                 {member.name}
               </h2>
             </motion.div>

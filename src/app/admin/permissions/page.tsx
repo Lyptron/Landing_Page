@@ -14,6 +14,7 @@ const ROLES: { value: AdminRole; label: string }[] = [
 ]
 
 const emptyForm = { email: '', role: 'admin' }
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 
 export default function PermissionsPage() {
   const { user } = useAdminAuth()
@@ -22,6 +23,8 @@ export default function PermissionsPage() {
   const [modalOpen, setModalOpen] = useState(false)
   const [form, setForm] = useState(emptyForm)
   const [saving, setSaving] = useState(false)
+  const [inviteError, setInviteError] = useState<string | null>(null)
+  const [pendingDelete, setPendingDelete] = useState<{ id: string; email: string } | null>(null)
 
   useEffect(() => {
     async function load() {
@@ -33,9 +36,20 @@ export default function PermissionsPage() {
   }, [])
 
   async function handleInvite() {
-    if (!form.email) return
+    setInviteError(null)
+    const email = form.email.toLowerCase().trim()
+    if (!email) return
+    if (!EMAIL_REGEX.test(email)) {
+      setInviteError('Please enter a valid email address.')
+      return
+    }
     setSaving(true)
-    const { data } = await insertAdminUser({ email: form.email.toLowerCase().trim(), role: form.role })
+    const { data, error } = await insertAdminUser({ email, role: form.role })
+    if (error) {
+      setSaving(false)
+      setInviteError(error.message)
+      return
+    }
     if (data) setUsers([...users, data])
     setForm(emptyForm)
     setSaving(false)
@@ -43,14 +57,20 @@ export default function PermissionsPage() {
   }
 
   async function handleRoleChange(id: string, role: string) {
+    const snapshot = users
     setUsers(users.map(u => u.id === id ? { ...u, role } : u))
-    await updateAdminUserRole(id, role)
+    const { error } = await updateAdminUserRole(id, role)
+    if (error) setUsers(snapshot)
   }
 
-  async function handleDelete(id: string, email: string) {
-    if (!confirm(`Revoke admin access for ${email}?`)) return
+  async function confirmDelete() {
+    if (!pendingDelete) return
+    const id = pendingDelete.id
+    const snapshot = users
     setUsers(users.filter(u => u.id !== id))
-    await deleteAdminUser(id)
+    setPendingDelete(null)
+    const { error } = await deleteAdminUser(id)
+    if (error) setUsers(snapshot)
   }
 
   const counts = ROLES.map(r => ({ ...r, count: users.filter(u => u.role === r.value).length }))
@@ -126,11 +146,13 @@ export default function PermissionsPage() {
                     <td className="px-4 py-3 text-[12px] font-mono whitespace-nowrap" style={{ color: 'var(--cp-text-muted)' }}>{u.created_at ? new Date(u.created_at).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' }) : '-'}</td>
                     <td className="px-4 py-3 whitespace-nowrap text-right">
                       <button
-                        onClick={() => handleDelete(u.id, u.email)}
+                        type="button"
+                        onClick={() => setPendingDelete({ id: u.id, email: u.email })}
                         disabled={u.email === user?.email}
-                        className="p-1.5 rounded-lg transition-all opacity-0 group-hover:opacity-100 disabled:opacity-0 text-[var(--cp-text-faint)] hover:text-[var(--cp-red)] hover:bg-[var(--cp-red-soft)]"
+                        aria-label={`Revoke admin access for ${u.email}`}
+                        className="p-1.5 rounded-lg transition-all opacity-0 group-hover:opacity-100 focus-visible:opacity-100 disabled:opacity-0 text-[var(--cp-text-faint)] hover:text-[var(--cp-red)] hover:bg-[var(--cp-red-soft)]"
                       >
-                        <Trash2 className="w-3.5 h-3.5" />
+                        <Trash2 className="w-3.5 h-3.5" aria-hidden="true" />
                       </button>
                     </td>
                   </tr>
@@ -178,14 +200,35 @@ export default function PermissionsPage() {
       </div>
 
       {/* Invite Admin Modal */}
-      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title="Invite Admin" subtitle="Grant dashboard access to a new team member.">
+      <Modal open={modalOpen} onClose={() => { setModalOpen(false); setInviteError(null) }} title="Invite Admin" subtitle="Grant dashboard access to a new team member.">
         <div className="flex flex-col gap-4">
           <ModalInput label="Email" value={form.email} onChange={(v) => setForm({ ...form, email: v })} placeholder="name@lyptron.com" type="email" required />
           <ModalSelect label="Role" value={form.role} onChange={(v) => setForm({ ...form, role: v })} options={ROLES} />
+          {inviteError && <p role="alert" className="text-[12px]" style={{ color: 'var(--cp-red)' }}>{inviteError}</p>}
           <div className="flex justify-end gap-3 pt-4 border-t" style={{ borderColor: 'var(--cp-border-soft)' }}>
-            <button onClick={() => setModalOpen(false)} className="px-4 py-2 rounded-xl text-[12px] font-medium transition-colors text-[var(--cp-text-muted)] hover:text-[var(--cp-text)]">Cancel</button>
-            <button onClick={handleInvite} disabled={saving || !form.email} className="cp-btn-primary px-5 py-2 text-[12px]">
+            <button type="button" onClick={() => { setModalOpen(false); setInviteError(null) }} className="px-4 py-2 rounded-xl text-[12px] font-medium transition-colors text-[var(--cp-text-muted)] hover:text-[var(--cp-text)]">Cancel</button>
+            <button type="button" onClick={handleInvite} disabled={saving || !form.email} className="cp-btn-primary px-5 py-2 text-[12px]">
               {saving ? 'Inviting...' : 'Invite'}
+            </button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Revoke confirmation modal — replaces the blocking native confirm() */}
+      <Modal
+        open={!!pendingDelete}
+        onClose={() => setPendingDelete(null)}
+        title="Revoke admin access"
+        subtitle={pendingDelete ? `Remove ${pendingDelete.email} from the admin team.` : undefined}
+      >
+        <div className="flex flex-col gap-4">
+          <p className="text-[13px]" style={{ color: 'var(--cp-text-muted)' }}>
+            They will lose dashboard access immediately. Their auth account is not deleted.
+          </p>
+          <div className="flex justify-end gap-3 pt-4 border-t" style={{ borderColor: 'var(--cp-border-soft)' }}>
+            <button type="button" onClick={() => setPendingDelete(null)} className="px-4 py-2 rounded-xl text-[12px] font-medium transition-colors text-[var(--cp-text-muted)] hover:text-[var(--cp-text)]">Cancel</button>
+            <button type="button" onClick={confirmDelete} className="cp-btn-primary px-5 py-2 text-[12px]" style={{ background: 'var(--cp-red)' }}>
+              Revoke access
             </button>
           </div>
         </div>

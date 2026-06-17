@@ -1,6 +1,5 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { ChapterID } from '@/types'
 
 export function useChapterProgress(chapterIds: readonly string[]) {
   const [activeChapter, setActiveChapter] = useState<string>(chapterIds[0])

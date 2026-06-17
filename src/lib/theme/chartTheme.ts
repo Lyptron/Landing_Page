@@ -36,7 +36,10 @@ const FALLBACK: ChartTheme = {
 
 function readChartTheme(): ChartTheme {
   if (typeof window === 'undefined') return FALLBACK
-  const el = document.querySelector('.admin-shell')
+  // Either shell exposes the same `--cp-*` palette — the client portal
+  // uses `.client-shell`. Without this fallback, client-side charts
+  // always rendered with the hard-coded FALLBACK palette.
+  const el = document.querySelector('.admin-shell, .client-shell')
   if (!el) return FALLBACK
   const styles = getComputedStyle(el)
   const read = (name: string, fallback: string) => styles.getPropertyValue(name).trim() || fallback

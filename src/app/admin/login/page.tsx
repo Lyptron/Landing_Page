@@ -3,8 +3,10 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react'
-import { signInWithPassword, signInWithGoogle, signUpWithPassword } from '@/lib/supabase'
+import { signInWithPassword, signInWithGoogle } from '@/lib/supabase'
 import { LyptronMark } from '@/components/ui/LyptronLogo'
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 
 export default function AdminLoginPage() {
   const router = useRouter()
@@ -13,27 +15,16 @@ export default function AdminLoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [mode, setMode] = useState<'login' | 'signup'>('login')
-  const [success, setSuccess] = useState('')
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!email || !password) return
-    setLoading(true)
-    setError('')
-    setSuccess('')
-
-    if (mode === 'signup') {
-      const { error: err } = await signUpWithPassword(email, password)
-      if (err) {
-        setError(err.message)
-      } else {
-        setSuccess('Account created! Check your email for confirmation, then log in.')
-        setMode('login')
-      }
-      setLoading(false)
+    if (!EMAIL_REGEX.test(email)) {
+      setError('Please enter a valid email address.')
       return
     }
+    setLoading(true)
+    setError('')
 
     const { error: err } = await signInWithPassword(email, password)
     if (err) {
@@ -41,7 +32,7 @@ export default function AdminLoginPage() {
       setLoading(false)
       return
     }
-    router.push('/admin/dashboard')
+    router.push('/admin')
   }
 
   const handleGoogleLogin = async () => {
@@ -78,7 +69,7 @@ export default function AdminLoginPage() {
             <span style={{ color: 'var(--cp-cyan)' }}>Panel</span>
           </h2>
           <p className="text-[13px] mb-8 leading-relaxed" style={{ color: 'var(--cp-text-muted)' }}>
-            {mode === 'login' ? 'Sign in to manage your agency dashboard.' : 'Create your admin account.'}
+            Sign in to manage your agency dashboard.
           </p>
 
           {/* Google OAuth Button */}
@@ -105,9 +96,13 @@ export default function AdminLoginPage() {
           {/* Email/Password Form */}
           <form onSubmit={handleEmailLogin} className="flex flex-col gap-4">
             <div className="relative">
-              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--cp-text-faint)' }} />
+              <label htmlFor="admin-email" className="sr-only">Email</label>
+              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--cp-text-faint)' }} aria-hidden="true" />
               <input
+                id="admin-email"
+                name="email"
                 type="email"
+                autoComplete="email"
                 placeholder="admin@lyptron.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -119,9 +114,13 @@ export default function AdminLoginPage() {
             </div>
 
             <div className="relative">
-              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--cp-text-faint)' }} />
+              <label htmlFor="admin-password" className="sr-only">Password</label>
+              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--cp-text-faint)' }} aria-hidden="true" />
               <input
+                id="admin-password"
+                name="password"
                 type={showPassword ? 'text' : 'password'}
+                autoComplete="current-password"
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -132,6 +131,7 @@ export default function AdminLoginPage() {
               />
               <button
                 type="button"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-4 top-1/2 -translate-y-1/2 transition-colors"
                 style={{ color: 'var(--cp-text-faint)' }}
@@ -142,25 +142,19 @@ export default function AdminLoginPage() {
               </button>
             </div>
 
-            {error && <p className="text-[12px] text-center" style={{ color: 'var(--cp-red)' }}>{error}</p>}
-            {success && <p className="text-[12px] text-center" style={{ color: 'var(--cp-emerald)' }}>{success}</p>}
+            {error && <p role="alert" className="text-[12px] text-center" style={{ color: 'var(--cp-red)' }}>{error}</p>}
 
             <button
               type="submit"
               disabled={loading || !email || !password}
               className="cp-btn-primary w-full py-4 text-[13px] mt-2"
             >
-              {loading ? 'Please wait...' : mode === 'login' ? 'Sign In' : 'Create Account'}
+              {loading ? 'Please wait...' : 'Sign In'}
             </button>
           </form>
 
-          {/* Toggle login/signup */}
-          <p className="text-center text-[12px] mt-6" style={{ color: 'var(--cp-text-muted)' }}>
-            {mode === 'login' ? (
-              <>No account? <button onClick={() => { setMode('signup'); setError('') }} className="hover:underline" style={{ color: 'var(--cp-cyan)' }}>Create one</button></>
-            ) : (
-              <>Already have an account? <button onClick={() => { setMode('login'); setError('') }} className="hover:underline" style={{ color: 'var(--cp-cyan)' }}>Sign in</button></>
-            )}
+          <p className="text-center text-[11px] mt-6 leading-relaxed" style={{ color: 'var(--cp-text-faint)' }}>
+            Accounts are invite-only. Contact a Lyptron founder if you need access.
           </p>
         </div>
       </motion.div>

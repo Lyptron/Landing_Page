@@ -1,5 +1,6 @@
 'use client'
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
+import type { User as SupabaseUser } from '@supabase/supabase-js'
 import { supabase, getSession, onAuthStateChange, signOut } from './supabase'
 
 import { AdminRole } from './adminRoles'
@@ -29,45 +30,53 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const fetchUserRole = async (u: any) => {
-      console.log('Trying to fetch role for email:', u.email)
-      const { data, error } = await supabase.from('admin_users').select('role').ilike('email', u.email).maybeSingle()
-      if (error) {
-        console.error('Error fetching user role:', JSON.stringify(error))
+    let cancelled = false
+
+    const fetchUserRole = async (u: SupabaseUser) => {
+      const email = (u.email || '').toLowerCase()
+      if (!email) return undefined
+      const { data, error } = await supabase
+        .from('admin_users')
+        .select('role')
+        .eq('email', email)
+        .maybeSingle()
+      if (error && process.env.NODE_ENV !== 'production') {
+        console.error('Error fetching user role:', error.message)
       }
-      console.log('Fetched role for', u.email, ':', data?.role)
       return data?.role as AdminRole | undefined
     }
 
-    // Check existing session
-    getSession().then(async ({ data }) => {
-      if (data.session?.user) {
-        const u = data.session.user
-        const role = await fetchUserRole(u)
-        setUser({
-          id: u.id,
-          email: u.email || '',
-          name: u.user_metadata?.full_name || u.user_metadata?.name || u.email?.split('@')[0],
-          avatar_url: u.user_metadata?.avatar_url,
-          role,
-        })
-      }
-      setLoading(false)
+    const buildUser = (u: SupabaseUser, role: AdminRole | undefined): User => ({
+      id: u.id,
+      email: u.email || '',
+      name: u.user_metadata?.full_name || u.user_metadata?.name || u.email?.split('@')[0],
+      avatar_url: u.user_metadata?.avatar_url,
+      role,
     })
+
+    // Check existing session
+    getSession()
+      .then(async ({ data }) => {
+        if (cancelled) return
+        if (data.session?.user) {
+          const role = await fetchUserRole(data.session.user)
+          if (cancelled) return
+          setUser(buildUser(data.session.user, role))
+        }
+        setLoading(false)
+      })
+      .catch(() => {
+        if (!cancelled) setLoading(false)
+      })
 
     // Listen for auth changes
     const { data: { subscription } } = onAuthStateChange(async (_event, session) => {
+      if (cancelled) return
       if (session?.user) {
         setLoading(true)
-        const u = session.user
-        const role = await fetchUserRole(u)
-        setUser({
-          id: u.id,
-          email: u.email || '',
-          name: u.user_metadata?.full_name || u.user_metadata?.name || u.email?.split('@')[0],
-          avatar_url: u.user_metadata?.avatar_url,
-          role,
-        })
+        const role = await fetchUserRole(session.user)
+        if (cancelled) return
+        setUser(buildUser(session.user, role))
         setLoading(false)
       } else {
         setUser(null)
@@ -75,7 +84,10 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
       }
     })
 
-    return () => subscription.unsubscribe()
+    return () => {
+      cancelled = true
+      subscription.unsubscribe()
+    }
   }, [])
 
   const logout = async () => {

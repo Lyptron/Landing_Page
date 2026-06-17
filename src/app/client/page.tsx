@@ -1,11 +1,13 @@
 'use client'
-import { useState, Suspense } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { ArrowRight, ShieldCheck } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { LyptronLogo, LyptronMark } from '@/components/ui/LyptronLogo'
 import { LogoProvider } from '@/lib/LogoContext'
+
+const EMAIL_HELP = 'hello@lyptron.com'
 
 const EASE_OUT: [number, number, number, number] = [0.16, 1, 0.3, 1]
 
@@ -15,17 +17,28 @@ function ClientLoginGate() {
   const [error, setError] = useState('')
   const router = useRouter()
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const stored = sessionStorage.getItem('client_access_code')
+    if (stored) router.replace(`/client/${stored}/dashboard`)
+  }, [router])
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     const code = accessCode.trim().toUpperCase()
     if (!code) return
     setLoading(true)
     setError('')
-    const { data, error: err } = await supabase.from('projects').select('id').eq('access_code', code).single()
+    // SECURITY DEFINER RPC — see supabase-schema.sql get_project_by_access_code.
+    // Falls back to a direct select if the RPC isn't deployed yet.
+    const { data, error: err } = await supabase.rpc('get_project_by_access_code', { p_code: code })
     if (err || !data) {
       setError("We couldn't find a project for that code. Please check it and try again.")
       setLoading(false)
       return
+    }
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('client_access_code', code)
     }
     router.push(`/client/${code}/dashboard`)
   }
@@ -198,8 +211,8 @@ function ClientLoginGate() {
             {/* Help line */}
             <p className="text-[12px] text-center mt-6 leading-relaxed" style={{ color: 'var(--cp-text-faint)' }}>
               Lost your code? Email{' '}
-              <a href="mailto:hello@lyptron.com" className="transition-colors hover:text-[var(--cp-text-secondary)]" style={{ color: 'var(--cp-text-muted)' }}>
-                hello@lyptron.com
+              <a href={`mailto:${EMAIL_HELP}`} className="transition-colors hover:text-[var(--cp-text-secondary)]" style={{ color: 'var(--cp-text-muted)' }}>
+                {EMAIL_HELP}
               </a>
               {' '}and we&apos;ll resend it.
             </p>
@@ -222,8 +235,6 @@ function ClientLoginGate() {
     </div>
   )
 }
-
-// ... remaining code (ClientLoginGate) ...
 
 function FullPageSplash() {
   return (

@@ -7,6 +7,7 @@ import {
   insertMilestone,
   updateProject,
   updateMilestone,
+  insertClient,
 } from '@/lib/db'
 import { Plus, FolderKanban, ArrowUpRight } from 'lucide-react'
 import { motion } from 'framer-motion'
@@ -40,6 +41,10 @@ export default function AdminDashboard() {
   const [formCode, setFormCode] = useState('')
   const [formMilestoneName, setFormMilestoneName] = useState('')
   const [saving, setSaving] = useState(false)
+  const [createNewClient, setCreateNewClient] = useState(false)
+  const [formClientCompany, setFormClientCompany] = useState('')
+  const [formContactPerson, setFormContactPerson] = useState('')
+  const [formClientEmailText, setFormClientEmailText] = useState('')
 
   useEffect(() => {
     async function loadData() {
@@ -66,19 +71,21 @@ export default function AdminDashboard() {
 
   const toggleMilestone = async (projectId: string, milestoneId: string, currentStatus: string) => {
     const newStatus = currentStatus === 'completed' ? 'upcoming' : 'completed'
+    const snapshot = projects
     setProjects(
       projects.map((p) =>
         p.id === projectId
           ? {
               ...p,
-              milestones: p.milestones.map((m: any) =>
+              milestones: (p.milestones || []).map((m: any) =>
                 m.id === milestoneId ? { ...m, status: newStatus } : m
               ),
             }
           : p
       )
     )
-    await updateMilestone(milestoneId, { status: newStatus })
+    const { error } = await updateMilestone(milestoneId, { status: newStatus })
+    if (error) setProjects(snapshot)
   }
 
   const addMilestoneHandler = async () => {
@@ -106,23 +113,46 @@ export default function AdminDashboard() {
   }
 
   const updateProgressHandler = async (projectId: string, progress: number) => {
+    const snapshot = projects
     setProjects(projects.map((p) => (p.id === projectId ? { ...p, progress } : p)))
-    await updateProject(projectId, { progress })
+    const { error } = await updateProject(projectId, { progress })
+    if (error) setProjects(snapshot)
   }
 
   const updateStatusHandler = async (projectId: string, status: string) => {
+    const snapshot = projects
     setProjects(projects.map((p) => (p.id === projectId ? { ...p, status } : p)))
-    await updateProject(projectId, { status })
+    const { error } = await updateProject(projectId, { status })
+    if (error) setProjects(snapshot)
   }
 
   const addProjectHandler = async () => {
-    if (!formProjectName || !formClientId) return
+    if (!formProjectName || (!formClientId && !createNewClient)) return
     setSaving(true)
-    const client = clients.find((c) => c.id === formClientId) || null
+
+    let targetClientId = formClientId || null
+    let clientEmail = null
+
+    if (createNewClient && !targetClientId) {
+      const { data: newClient, error: clientError } = await insertClient({
+        company: formClientCompany,
+        contact: formContactPerson || 'Primary Contact',
+        email: formClientEmailText,
+      })
+      if (!clientError && newClient) {
+        targetClientId = newClient.id
+        clientEmail = newClient.email
+        setClients((prev) => [newClient, ...prev])
+      }
+    } else if (targetClientId) {
+      const client = clients.find((c) => c.id === targetClientId) || null
+      clientEmail = client?.email
+    }
+
     const { data } = await insertProject({
       name: formProjectName,
-      client_id: formClientId,
-      client_email: client?.email,
+      client_id: targetClientId,
+      client_email: clientEmail || undefined,
       status: 'starting',
       progress: 0,
       access_code: formCode || slugifyAccessCode(formProjectName),
@@ -134,8 +164,8 @@ export default function AdminDashboard() {
       : {
           id: Math.random().toString(),
           name: formProjectName,
-          client_id: formClientId,
-          client_email: client?.email,
+          client_id: targetClientId,
+          client_email: clientEmail || undefined,
           status: 'starting',
           progress: 0,
           milestones: [],
@@ -146,6 +176,10 @@ export default function AdminDashboard() {
     setFormClientId('')
     setFormCode('')
     setFormStage('Backlog')
+    setCreateNewClient(false)
+    setFormClientCompany('')
+    setFormContactPerson('')
+    setFormClientEmailText('')
     setSaving(false)
     setProjectModalOpen(false)
   }
@@ -476,43 +510,87 @@ export default function AdminDashboard() {
             required
           />
           <div className="flex flex-col gap-2">
-            <label className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: 'var(--cp-text-muted)' }}>
-              Client <span style={{ color: 'var(--cp-red)' }}>*</span>
-            </label>
-            {clients.length === 0 ? (
-              <div
-                className="px-4 py-3 rounded-xl text-[12.5px]"
-                style={{
-                  background: 'var(--cp-bg-soft)',
-                  border: '1px solid var(--cp-border)',
-                  color: 'var(--cp-text-muted)',
+            <div className="flex justify-between items-center">
+              <label className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: 'var(--cp-text-muted)' }}>
+                Client <span style={{ color: 'var(--cp-red)' }}>*</span>
+              </label>
+              <button
+                type="button"
+                onClick={() => {
+                  setCreateNewClient(!createNewClient)
+                  setFormClientId('')
                 }}
+                className="text-[11px] cursor-pointer"
+                style={{ color: 'var(--cp-cyan)', background: 'transparent', border: 'none' }}
               >
-                No clients yet —{' '}
-                <Link href="/admin/clients" className="underline" style={{ color: 'var(--cp-cyan)' }}>
-                  add a client first
-                </Link>
-                .
+                {createNewClient ? '— Select Existing' : '+ Register New Client'}
+              </button>
+            </div>
+
+            {createNewClient ? (
+              <div className="flex flex-col gap-3 p-3.5 rounded-xl border border-[var(--cp-border-soft)]" style={{ background: 'var(--cp-bg-soft)' }}>
+                <ModalInput
+                  label="Client Company"
+                  value={formClientCompany}
+                  onChange={setFormClientCompany}
+                  placeholder="Acme Corp"
+                  required
+                />
+                <ModalInput
+                  label="Contact Person"
+                  value={formContactPerson}
+                  onChange={setFormContactPerson}
+                  placeholder="John Doe"
+                  required
+                />
+                <ModalInput
+                  label="Client Email"
+                  value={formClientEmailText}
+                  onChange={setFormClientEmailText}
+                  placeholder="contact@acme.com"
+                />
               </div>
             ) : (
-              <select
-                value={formClientId}
-                onChange={(e) => setFormClientId(e.target.value)}
-                className="px-4 py-3 rounded-xl text-[13px] outline-none appearance-none cursor-pointer [&>option]:bg-[var(--cp-bg-elevated)] [&>option]:text-[var(--cp-text)]"
-                style={{
-                  background: 'var(--cp-bg-soft)',
-                  border: '1px solid var(--cp-border)',
-                  color: 'var(--cp-text)',
-                }}
-              >
-                <option value="">— Select a client —</option>
-                {clients.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.company}
-                    {c.email ? ` · ${c.email}` : ''}
-                  </option>
-                ))}
-              </select>
+              clients.length === 0 ? (
+                <div
+                  className="px-4 py-3 rounded-xl text-[12.5px]"
+                  style={{
+                    background: 'var(--cp-bg-soft)',
+                    border: '1px solid var(--cp-border)',
+                    color: 'var(--cp-text-muted)',
+                  }}
+                >
+                  No clients yet —{' '}
+                  <button
+                    type="button"
+                    onClick={() => setCreateNewClient(true)}
+                    className="underline cursor-pointer"
+                    style={{ color: 'var(--cp-cyan)', background: 'transparent', border: 'none', padding: 0 }}
+                  >
+                    register a client first
+                  </button>
+                  .
+                </div>
+              ) : (
+                <select
+                  value={formClientId}
+                  onChange={(e) => setFormClientId(e.target.value)}
+                  className="px-4 py-3 rounded-xl text-[13px] outline-none appearance-none cursor-pointer [&>option]:bg-[var(--cp-bg-elevated)] [&>option]:text-[var(--cp-text)] w-full"
+                  style={{
+                    background: 'var(--cp-bg-soft)',
+                    border: '1px solid var(--cp-border)',
+                    color: 'var(--cp-text)',
+                  }}
+                >
+                  <option value="">— Select a client —</option>
+                  {clients.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.company}
+                      {c.email ? ` · ${c.email}` : ''}
+                    </option>
+                  ))}
+                </select>
+              )
             )}
           </div>
           <ModalInput
@@ -540,8 +618,8 @@ export default function AdminDashboard() {
             </button>
             <button
               onClick={addProjectHandler}
-              disabled={saving || !formProjectName || !formClientId}
-              className="px-5 py-2 font-medium text-[12px] rounded-xl transition-colors disabled:opacity-30"
+              disabled={saving || !formProjectName || (!formClientId && !createNewClient) || (createNewClient && (!formClientCompany || !formContactPerson))}
+              className="px-5 py-2 font-medium text-[12px] rounded-xl transition-colors disabled:opacity-30 cursor-pointer"
               style={{
                 background: 'var(--cp-cyan-soft)',
                 color: 'var(--cp-cyan)',

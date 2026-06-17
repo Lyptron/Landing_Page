@@ -79,8 +79,10 @@ export default function CampaignsPage() {
   // ── Campaign actions ──
   const cycleCampaignStatus = async (campaign: any) => {
     const status = nextStatus(CAMPAIGN_STATUSES, campaign.status)
+    const snapshot = campaigns
     setCampaigns(campaigns.map(c => c.id === campaign.id ? { ...c, status } : c))
-    await updateCampaign(campaign.id, { status })
+    const { error } = await updateCampaign(campaign.id, { status })
+    if (error) setCampaigns(snapshot)
   }
 
   const addCampaign = async () => {
@@ -103,15 +105,19 @@ export default function CampaignsPage() {
   }
 
   const removeCampaign = async (id: string) => {
+    const snapshot = campaigns
     setCampaigns(campaigns.filter(c => c.id !== id))
-    await deleteCampaign(id)
+    const { error } = await deleteCampaign(id)
+    if (error) setCampaigns(snapshot)
   }
 
   // ── Content calendar actions ──
   const cycleTaskStatus = async (task: any) => {
     const status = nextStatus(TASK_STATUSES, task.status)
+    const snapshot = tasks
     setTasks(tasks.map(t => t.id === task.id ? { ...t, status } : t))
-    await updateMarketingTask(task.id, { status })
+    const { error } = await updateMarketingTask(task.id, { status })
+    if (error) setTasks(snapshot)
   }
 
   const addTask = async () => {
@@ -132,8 +138,10 @@ export default function CampaignsPage() {
   }
 
   const removeTask = async (id: string) => {
+    const snapshot = tasks
     setTasks(tasks.filter(t => t.id !== id))
-    await deleteMarketingTask(id)
+    const { error } = await deleteMarketingTask(id)
+    if (error) setTasks(snapshot)
   }
 
   return (

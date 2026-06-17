@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Activity, Users, TrendingUp, Clock, BarChart3 } from 'lucide-react'
+import { Activity, Users, TrendingUp, BarChart3 } from 'lucide-react'
 import { fetchProjects, fetchClients, fetchLeads, fetchTeamMembers } from '@/lib/db'
 
 export default function AnalyticsPage() {

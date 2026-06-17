@@ -1,5 +1,5 @@
 'use client'
-import { useRef, useEffect, useState } from 'react'
+import { useRef, useEffect } from 'react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { Check, ArrowRight, Sparkles } from 'lucide-react'
@@ -9,6 +9,14 @@ if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger)
 }
 
+const BOOKING_EMAIL = 'hello@lyptron.com'
+const bookCall = (subject: string) => {
+  window.location.href = `mailto:${BOOKING_EMAIL}?subject=${encodeURIComponent(subject)}`
+}
+
+// Prices are quoted in INR (Lyptron is based in India). The JSON-LD
+// `priceRange: "$$$"` in src/app/layout.tsx is a generic indicator and
+// does not need to match this currency.
 const PRICING_TIERS = [
   {
     name: 'Design & Prototyping',
@@ -42,31 +50,31 @@ const PRICING_TIERS = [
 
 export default function Pricing() {
   const sectionRef = useRef<HTMLDivElement>(null)
-  const [, setShouldAnimate] = useState(false)
   const { setCursorState } = useCursor()
 
   useEffect(() => {
     const el = sectionRef.current
     if (!el) return
 
-    const entranceTrigger = ScrollTrigger.create({
-      trigger: el,
-      start: 'top 75%',
-      once: true,
-      onEnter: () => {
-        setShouldAnimate(true)
-        gsap.fromTo('.pricing-header > *',
-          { opacity: 0, y: 24, filter: 'blur(8px)' },
-          { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.8, stagger: 0.1, ease: 'power3.out' }
-        )
-        gsap.fromTo('.pricing-card',
-          { opacity: 0, y: 80, rotationX: 6, filter: 'blur(8px)', transformPerspective: 800 },
-          { opacity: 1, y: 0, rotationX: 0, filter: 'blur(0px)', duration: 1, stagger: 0.15, ease: 'power3.out', delay: 0.25 }
-        )
-      }
-    })
+    const ctx = gsap.context(() => {
+      ScrollTrigger.create({
+        trigger: el,
+        start: 'top 75%',
+        once: true,
+        onEnter: () => {
+          gsap.fromTo('.pricing-header > *',
+            { opacity: 0, y: 24, filter: 'blur(8px)' },
+            { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.8, stagger: 0.1, ease: 'power3.out' }
+          )
+          gsap.fromTo('.pricing-card',
+            { opacity: 0, y: 80, rotationX: 6, filter: 'blur(8px)', transformPerspective: 800 },
+            { opacity: 1, y: 0, rotationX: 0, filter: 'blur(0px)', duration: 1, stagger: 0.15, ease: 'power3.out', delay: 0.25 }
+          )
+        }
+      })
+    }, el)
 
-    return () => entranceTrigger.kill()
+    return () => ctx.revert()
   }, [])
 
   return (
@@ -163,7 +171,6 @@ export default function Pricing() {
                     <span className="font-display font-bold text-[40px] text-white/85 tracking-tighter group-hover:text-white transition-colors duration-300">
                       {tier.price}
                     </span>
-                    <span className="font-mono text-[11px] text-white/25 uppercase tracking-widest">+ GST</span>
                   </div>
                 </div>
 
@@ -194,7 +201,9 @@ export default function Pricing() {
                 {/* CTA button */}
                 <div className="mt-8">
                   <button
-                    className="group/btn w-full flex items-center justify-center gap-2 py-3 rounded-lg font-body font-medium text-[13px] transition-all duration-300 cursor-none"
+                    type="button"
+                    onClick={() => bookCall(`Book a free call — ${tier.name}`)}
+                    className="group/btn w-full flex items-center justify-center gap-2 py-3 rounded-lg font-body font-medium text-[13px] transition-all duration-300 cursor-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/40"
                     style={{
                       background: tier.popular ? tier.accent : 'rgba(255,255,255,0.04)',
                       color: tier.popular ? '#050505' : 'rgba(255,255,255,0.5)',
@@ -249,7 +258,9 @@ export default function Pricing() {
               </div>
             </div>
             <button
-              className="group/btn shrink-0 flex items-center gap-2.5 px-7 py-3.5 rounded-lg font-body font-medium text-[13px] text-white/70 transition-all duration-300 cursor-none hover:text-white hover:bg-white/[0.06]"
+              type="button"
+              onClick={() => bookCall('Custom project — let\'s talk scope')}
+              className="group/btn shrink-0 flex items-center gap-2.5 px-7 py-3.5 rounded-lg font-body font-medium text-[13px] text-white/70 transition-all duration-300 cursor-none hover:text-white hover:bg-white/[0.06] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/40"
               style={{ border: '1px solid rgba(255,255,255,0.08)' }}
               onMouseEnter={() => setCursorState('hover')}
               onMouseLeave={() => setCursorState('default')}

@@ -1,6 +1,6 @@
 'use client'
 import { useState } from 'react'
-import { Calendar, Plus, Trash2 } from 'lucide-react'
+import { Plus, Trash2 } from 'lucide-react'
 import { insertMeeting } from '@/lib/db'
 import { supabase } from '@/lib/supabase'
 import Modal, { ModalInput, ModalSelect } from '@/components/ui/Modal'

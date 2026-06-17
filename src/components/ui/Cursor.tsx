@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { motion, useMotionValue, useSpring } from 'framer-motion'
+import { motion, useMotionValue } from 'framer-motion'
 import { useCursor } from '../providers/CursorProvider'
 
 export default function Cursor() {
@@ -9,11 +9,6 @@ export default function Cursor() {
 
   const cursorX = useMotionValue(-100)
   const cursorY = useMotionValue(-100)
-
-  // Smooth springs for tracking
-  const springConfig = { damping: 30, stiffness: 300, mass: 0.6 }
-  const cursorXSpring = useSpring(cursorX, springConfig)
-  const cursorYSpring = useSpring(cursorY, springConfig)
 
   useEffect(() => {
     const moveCursor = (e: MouseEvent) => {
@@ -79,14 +74,14 @@ export default function Cursor() {
       break
   }
 
-  const transition = { duration: 0.2, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }
+  const transition = { duration: 0.12, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }
 
   return (
     <motion.div
       className="fixed top-0 left-0 rounded-full pointer-events-none z-[9999] mix-blend-difference"
       style={{
-        x: cursorXSpring,
-        y: cursorYSpring,
+        x: cursorX,
+        y: cursorY,
         width: size,
         height: size,
         marginLeft: -size / 2,

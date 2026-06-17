@@ -5,6 +5,14 @@ import { projects } from '@/data/projects'
 import { ArrowUpRight, ArrowRight } from 'lucide-react'
 import { useCursor } from '../providers/CursorProvider'
 
+const scrollToCTA = () => {
+  const target = document.querySelector('#cta')
+  if (!target) return
+  const lenis = (window as unknown as { lenis?: { scrollTo: (t: Element, o: object) => void } }).lenis
+  if (lenis) lenis.scrollTo(target, { offset: -80, duration: 1.5 })
+  else target.scrollIntoView({ behavior: 'smooth' })
+}
+
 const EASE = [0.22, 1, 0.36, 1] as const
 
 const projectStats: Record<string, { label: string; value: string }[]> = {
@@ -89,7 +97,7 @@ function DeviceMockup({ project }: { project: typeof projects[0] }) {
             <div className="w-[6px] h-[6px] rounded-full bg-white/6" />
           </div>
           <div className="ml-3 h-[18px] flex-1 max-w-[140px] rounded bg-white/[0.03] flex items-center px-2">
-            <span className="font-mono text-[7px] text-white/12">{project.id}.lyptron.com</span>
+            <span className="font-mono text-[7px] text-white/12" aria-hidden="true">lyptron.com/{project.id}</span>
           </div>
         </div>
         <div className="flex-1 w-full bg-[#0f0f11] flex items-center justify-center">
@@ -283,9 +291,12 @@ function ProjectRow({ project, index }: { project: typeof projects[0]; index: nu
             transition={{ duration: 0.6, delay: 0.7, ease: EASE }}
           >
             <button
+              type="button"
+              onClick={scrollToCTA}
+              aria-label={`Discuss a project like ${project.name}`}
               onMouseEnter={() => setCursorState('cta')}
               onMouseLeave={() => setCursorState('default')}
-              className="group/link self-start cursor-none flex items-center gap-3 text-white/30 hover:text-white/70 transition-colors duration-300"
+              className="group/link self-start cursor-none flex items-center gap-3 text-white/30 hover:text-white/70 transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/40"
             >
               <span className="font-mono text-xs tracking-wider uppercase">View case study</span>
               <div className="w-8 h-8 rounded-full border border-white/[0.08] flex items-center justify-center group-hover/link:border-white/[0.18] transition-all duration-300">
@@ -401,12 +412,14 @@ export default function Work() {
             </div>
 
             <button
+              type="button"
+              onClick={scrollToCTA}
               onMouseEnter={() => setCursorState('cta')}
               onMouseLeave={() => setCursorState('default')}
-              className="group/btn cursor-none flex items-center gap-3 px-7 py-3 rounded-full border border-white/[0.07] hover:border-white/[0.15] hover:bg-white/[0.02] transition-all duration-300"
+              className="group/btn cursor-none flex items-center gap-3 px-7 py-3 rounded-full border border-white/[0.07] hover:border-white/[0.15] hover:bg-white/[0.02] transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/40"
             >
               <span className="font-mono text-[13px] text-white/35 group-hover/btn:text-white/60 tracking-[0.02em] transition-colors duration-300">
-                View all projects
+                Discuss your project
               </span>
               <ArrowRight className="w-3.5 h-3.5 text-white/25 group-hover/btn:text-white/50 group-hover/btn:translate-x-0.5 transition-all duration-300" />
             </button>
