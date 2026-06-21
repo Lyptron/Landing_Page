@@ -2,9 +2,17 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { motion } from 'framer-motion'
+import Link from 'next/link'
 import { X, CheckCircle2 } from 'lucide-react'
 import { Service } from '@/types'
 import { useCursor } from '../providers/CursorProvider'
+
+const SERVICE_PAGE_SLUGS: Record<string, string> = {
+  'web-dev': '/web-development',
+  'ai-automation': '/ai-automation',
+  'ui-ux-design': '/ui-ux-design',
+  'brand-strategy': '/seo-services',
+}
 
 interface ServiceDetailProps {
   service: Service | null
@@ -48,6 +56,8 @@ export default function ServiceDetail({ service, onClose }: ServiceDetailProps) 
   }, [service, onClose])
 
   if (!service || !mounted) return null
+
+  const pageHref = SERVICE_PAGE_SLUGS[service.id]
 
   return createPortal(
     <>
@@ -130,9 +140,18 @@ export default function ServiceDetail({ service, onClose }: ServiceDetailProps) 
               </div>
             </div>
 
-            <p className="font-body text-[15px] text-white/30 leading-relaxed mb-8 border-b border-white/[0.04] pb-6">
+            <p className="font-body text-[15px] text-white/30 leading-relaxed mb-4 border-b border-white/[0.04] pb-6">
               {service.desc}
             </p>
+
+            {pageHref && (
+              <Link
+                href={pageHref}
+                className="inline-flex items-center gap-1.5 mb-8 font-mono text-[11px] text-white/40 hover:text-white/70 uppercase tracking-wider transition-colors"
+              >
+                View full {service.name} page &rarr;
+              </Link>
+            )}
 
             {/* Two column details */}
             <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-10 text-left">

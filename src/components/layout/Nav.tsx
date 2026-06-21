@@ -33,58 +33,52 @@ const STYLES: LetterStyle[] = [
   { target: 'N', pool: ALPHA + KATAKANA,  inSpeed: 65, inTicks: 11, outSpeed: 50, outTicks: 8  },
 ]
 
-function SlotLetter({ s, idx, className }: { s: LetterStyle; idx: number; className?: string }) {
+function SlotLetter({ s, idx, trigger, className }: { s: LetterStyle; idx: number; trigger: number; className?: string }) {
   const [char, setChar] = useState(' ')
-  const [settled, setSettled] = useState(false)
   const [phase, setPhase] = useState<'idle' | 'in' | 'settled' | 'out'>('idle')
 
   const pick = useCallback(() => s.pool[Math.floor(Math.random() * s.pool.length)], [s.pool])
 
-  const scrambleIn = useCallback(() => {
-    setPhase('in')
-    setSettled(false)
-    let t = 0
-    const iv = setInterval(() => {
-      t++
-      if (t >= s.inTicks) {
-        clearInterval(iv)
-        setChar(s.target)
-        setSettled(true)
-        setPhase('settled')
-      } else {
-        setChar(pick())
-      }
-    }, s.inSpeed)
-    return iv
-  }, [s, pick])
-
-  const spinOut = useCallback(() => {
-    setPhase('out')
-    let t = 0
-    const iv = setInterval(() => {
-      t++
-      if (t >= s.outTicks) {
-        clearInterval(iv)
-        setChar(' ')
-        setPhase('idle')
-        setTimeout(() => scrambleIn(), 300 + idx * 120)
-      } else {
-        setChar(pick())
-      }
-    }, s.outSpeed)
-    return iv
-  }, [s, pick, idx, scrambleIn])
-
   useEffect(() => {
-    const t = setTimeout(() => scrambleIn(), 200 + idx * 180)
-    return () => clearTimeout(t)
-  }, [idx, scrambleIn])
+    let activeInterval: NodeJS.Timeout | null = null
+    let activeInInterval: NodeJS.Timeout | null = null
 
-  useEffect(() => {
-    if (!settled) return
-    const t = setTimeout(() => spinOut(), 4000 + idx * 80)
-    return () => clearTimeout(t)
-  }, [settled, spinOut, idx])
+    const timer = setTimeout(() => {
+      setPhase('out')
+      let t = 0
+      activeInterval = setInterval(() => {
+        t++
+        if (t >= s.outTicks) {
+          clearInterval(activeInterval!)
+          setChar(' ')
+          setPhase('idle')
+
+          // Start scramble-in
+          setPhase('in')
+          let t2 = 0
+          activeInInterval = setInterval(() => {
+            t2++
+            if (t2 >= s.inTicks) {
+              clearInterval(activeInInterval!)
+              setChar(s.target)
+              setPhase('settled')
+            } else {
+              setChar(pick())
+            }
+          }, s.inSpeed)
+
+        } else {
+          setChar(pick())
+        }
+      }, s.outSpeed)
+    }, idx * 60)
+
+    return () => {
+      clearTimeout(timer)
+      if (activeInterval) clearInterval(activeInterval)
+      if (activeInInterval) clearInterval(activeInInterval)
+    }
+  }, [trigger, idx, pick, s.outTicks, s.outSpeed, s.inTicks, s.inSpeed, s.target])
 
   return (
     <span
@@ -105,11 +99,11 @@ function SlotLetter({ s, idx, className }: { s: LetterStyle; idx: number; classN
   )
 }
 
-function LyptronLogo() {
+function LyptronLogo({ trigger }: { trigger: number }) {
   return (
     <span className="flex items-center text-[18px] sm:text-[26px] tracking-[0.2em] sm:tracking-[0.35em] select-none overflow-hidden">
       {STYLES.map((s, i) => (
-        <SlotLetter key={i} s={s} idx={i} className={i === 5 ? 'mr-[3px]' : ''} />
+        <SlotLetter key={i} s={s} idx={i} trigger={trigger} className={i === 5 ? 'mr-[3px]' : ''} />
       ))}
       <span className="text-blue font-display font-black ml-[3px]">.</span>
     </span>
@@ -120,6 +114,7 @@ export default function Nav() {
   const pathname = usePathname()
   const [scrolled, setScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [logoScrambleTrigger, setLogoScrambleTrigger] = useState(0)
   const { setCursorState } = useCursor()
 
   useEffect(() => {
@@ -172,7 +167,10 @@ export default function Nav() {
           <button
             onClick={(e) => handleScrollTo(e, '#hero')}
             className="flex items-center gap-4 bg-transparent border-none p-0 cursor-none"
-            onMouseEnter={() => setCursorState('hover')}
+            onMouseEnter={() => {
+              setCursorState('hover')
+              setLogoScrambleTrigger(prev => prev + 1)
+            }}
             onMouseLeave={() => setCursorState('default')}
           >
             <Image
@@ -184,7 +182,7 @@ export default function Nav() {
               style={{ width: 'auto', height: '38px' }}
               className="rounded-lg"
             />
-            <LyptronLogo />
+            <LyptronLogo trigger={logoScrambleTrigger} />
           </button>
 
           {/* Desktop nav — centered */}

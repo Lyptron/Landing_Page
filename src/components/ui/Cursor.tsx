@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState, useRef } from 'react'
-import { motion, useMotionValue } from 'framer-motion'
+import { motion, useMotionValue, useSpring } from 'framer-motion'
 import { useCursor } from '../providers/CursorProvider'
 
 export default function Cursor() {
@@ -11,6 +11,10 @@ export default function Cursor() {
 
   const cursorX = useMotionValue(-100)
   const cursorY = useMotionValue(-100)
+
+  const springConfig = { stiffness: 220, damping: 28, mass: 0.8 }
+  const springX = useSpring(cursorX, springConfig)
+  const springY = useSpring(cursorY, springConfig)
 
   useEffect(() => {
     setIsDesktop(window.innerWidth > 768)
@@ -82,8 +86,8 @@ export default function Cursor() {
     <motion.div
       className="fixed top-0 left-0 rounded-full pointer-events-none z-[9999] mix-blend-difference"
       style={{
-        x: cursorX,
-        y: cursorY,
+        x: springX,
+        y: springY,
         width: size,
         height: size,
         marginLeft: -size / 2,

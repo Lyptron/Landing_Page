@@ -98,6 +98,7 @@ function PrincipleCard({ principle, index }: { principle: typeof PRINCIPLES[0]; 
 
 export default function WhoWeAre() {
   const sectionRef = useRef<HTMLDivElement>(null)
+  const sectionInView = useInView(sectionRef, { margin: '300px' })
   const principlesRef = useRef<HTMLDivElement>(null)
   const principlesDividerInView = useInView(principlesRef, { once: true, margin: '-60px' })
   const statsRef = useRef<HTMLDivElement>(null)
@@ -108,7 +109,7 @@ export default function WhoWeAre() {
     offset: ['start end', 'end start'],
   })
 
-  const globeScale = useTransform(scrollYProgress, [0, 0.3, 0.7], [0.5, 1.1, 1.3])
+  // const globeScale = useTransform(scrollYProgress, [0, 0.3, 0.7], [0.5, 1.1, 1.3])
 
   const headlineRef = useRef<HTMLDivElement>(null)
   const headlineInView = useInView(headlineRef, { once: true, margin: '-80px' })
@@ -125,15 +126,15 @@ export default function WhoWeAre() {
       className="relative w-full overflow-hidden py-16 md:py-40 select-none z-10"
       style={{ background: '#050505' }}
     >
-      {/* 3D Globe — parallax zoom */}
+      {/* 3D Globe — static scale, no scroll-linked zoom */}
       <motion.div
         className="absolute top-0 right-0 translate-x-[30%] -translate-y-[20%] w-[800px] h-[800px] md:translate-x-[25%] md:-translate-y-[15%] md:w-[1100px] md:h-[1100px] pointer-events-none z-0"
         style={{ 
-          scale: globeScale, 
+          scale: 1.1, 
           opacity: useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0.05, 0.15, 0.15, 0.05])
         }}
       >
-        <WhoWeAreCanvas />
+        {sectionInView && <WhoWeAreCanvas />}
       </motion.div>
 
       {/* Warm spotlight */}
