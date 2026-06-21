@@ -76,7 +76,7 @@ export default function ServiceDetail({ service, onClose }: ServiceDetailProps) 
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
         >
           <div
-            className="w-full max-h-[85vh] p-8 md:p-12 flex flex-col overflow-y-auto no-scrollbar rounded-[20px] relative"
+            className="w-full max-h-[85vh] p-5 md:p-12 flex flex-col overflow-y-auto no-scrollbar rounded-[20px] relative"
             style={{
               background: 'linear-gradient(160deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)',
               border: '1px solid rgba(255,255,255,0.08)',

@@ -1,11 +1,21 @@
 'use client'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useCursor } from '../providers/CursorProvider'
 
-const CONTACT_EMAIL = 'hello@lyptron.com'
+const EMAIL_USER = 'hello'
+const EMAIL_DOMAIN = 'lyptron.com'
 
 export default function Footer() {
   const { setCursorState } = useCursor()
+  const [mailHref, setMailHref] = useState('#')
+  const [mailLabel, setMailLabel] = useState('hello [at] lyptron [dot] com')
+
+  useEffect(() => {
+    const addr = `${EMAIL_USER}@${EMAIL_DOMAIN}`
+    setMailHref(`mailto:${addr}`)
+    setMailLabel(addr)
+  }, [])
 
   return (
     <footer
@@ -16,14 +26,15 @@ export default function Footer() {
         <div className="tracking-wider uppercase">
           &copy; {new Date().getFullYear()} Lyptron. All rights reserved.
         </div>
-        <address className="not-italic flex gap-4 md:gap-6 items-center">
+        <address className="not-italic flex flex-wrap justify-center gap-x-4 gap-y-2 md:gap-6 items-center">
           <a
-            href={`mailto:${CONTACT_EMAIL}`}
+            href={mailHref}
+            rel="nofollow"
             className="hover:text-white/60 transition-colors duration-300 cursor-none tracking-wider"
             onMouseEnter={() => setCursorState('hover')}
             onMouseLeave={() => setCursorState('default')}
           >
-            {CONTACT_EMAIL}
+            {mailLabel}
           </a>
           <span className="text-white/10" aria-hidden="true">/</span>
           <Link
@@ -42,6 +53,18 @@ export default function Footer() {
           >
             Terms
           </Link>
+          <span className="text-white/10" aria-hidden="true">/</span>
+          <a
+            href="https://www.linkedin.com/company/lyptron"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Lyptron on LinkedIn"
+            className="hover:text-white/60 transition-colors duration-300 cursor-none tracking-wider uppercase"
+            onMouseEnter={() => setCursorState('hover')}
+            onMouseLeave={() => setCursorState('default')}
+          >
+            LinkedIn
+          </a>
         </address>
       </div>
     </footer>

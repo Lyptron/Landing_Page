@@ -1,52 +1,54 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { motion, useMotionValue } from 'framer-motion'
 import { useCursor } from '../providers/CursorProvider'
 
 export default function Cursor() {
   const { cursorState } = useCursor()
   const [isVisible, setIsVisible] = useState(false)
+  const [isDesktop, setIsDesktop] = useState(false)
+  const isVisibleRef = useRef(false)
 
   const cursorX = useMotionValue(-100)
   const cursorY = useMotionValue(-100)
 
   useEffect(() => {
+    setIsDesktop(window.innerWidth > 768)
+  }, [])
+
+  useEffect(() => {
+    if (!isDesktop) return
+
     const moveCursor = (e: MouseEvent) => {
       cursorX.set(e.clientX)
       cursorY.set(e.clientY)
-      if (!isVisible) setIsVisible(true)
+      if (!isVisibleRef.current) {
+        isVisibleRef.current = true
+        setIsVisible(true)
+      }
     }
 
     const handleMouseLeave = () => {
+      isVisibleRef.current = false
       setIsVisible(false)
     }
 
-    window.addEventListener('mousemove', moveCursor)
+    window.addEventListener('mousemove', moveCursor, { passive: true })
     document.addEventListener('mouseleave', handleMouseLeave)
-    
+
     return () => {
       window.removeEventListener('mousemove', moveCursor)
       document.removeEventListener('mouseleave', handleMouseLeave)
     }
-  }, [cursorX, cursorY, isVisible])
+  }, [cursorX, cursorY, isDesktop])
 
   useEffect(() => {
-    // Hide default cursor on desktop
-    if (typeof window !== 'undefined' && window.innerWidth > 768) {
-      document.body.style.cursor = 'none'
-    }
-    return () => {
-      if (typeof window !== 'undefined') {
-        document.body.style.cursor = 'auto'
-      }
-    }
-  }, [])
+    if (!isDesktop) return
+    document.body.style.cursor = 'none'
+    return () => { document.body.style.cursor = 'auto' }
+  }, [isDesktop])
 
-  if (typeof window !== 'undefined' && window.innerWidth <= 768) {
-    return null
-  }
-
-  if (!isVisible) return null
+  if (!isDesktop || !isVisible) return null
 
   // Dimension details based on CursorState
   let size = 5

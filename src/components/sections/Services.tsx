@@ -81,7 +81,7 @@ export default function Services() {
       </div>
 
       {/* Story chapters — stacked sticky cards */}
-      <div className="relative z-10">
+      <div className="relative z-10 flex flex-row overflow-x-auto snap-x snap-mandatory scrollbar-none pb-6 px-6 md:px-0 md:flex-col md:overflow-visible gap-5 md:gap-0">
         {services.map((service, idx) => (
           <ServiceCard
             key={service.id}
@@ -95,7 +95,7 @@ export default function Services() {
       {/* Bottom stats bar */}
       <div className="relative z-10 w-full px-6 md:px-12 lg:px-[120px] py-12 md:py-20">
         <div className="flex flex-col md:flex-row items-center justify-between gap-8 pt-8 border-t border-white/[0.06]">
-          <div className="flex gap-10 md:gap-16">
+          <div className="flex flex-wrap justify-center sm:justify-start gap-6 sm:gap-10 md:gap-16">
             {[
               { label: 'Shipped', value: '50+' },
               { label: 'Uptime', value: '99.99%' },

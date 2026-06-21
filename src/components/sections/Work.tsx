@@ -1,5 +1,5 @@
 'use client'
-import { useRef } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { motion, useScroll, useTransform, useInView, type Variants } from 'framer-motion'
 import { projects } from '@/data/projects'
 import { ArrowUpRight, ArrowRight } from 'lucide-react'
@@ -149,12 +149,20 @@ function ProjectRow({ project, index }: { project: typeof projects[0]; index: nu
   const infoRef = useRef<HTMLDivElement>(null)
   const infoInView = useInView(infoRef, { once: true, margin: '-60px' })
 
+  const [isMobile, setIsMobile] = useState(false)
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768)
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
   const { scrollYProgress } = useScroll({
     target: rowRef,
     offset: ['start end', 'end start'],
   })
 
-  const mockupY = useTransform(scrollYProgress, [0, 1], [60, -40])
+  const mockupY = useTransform(scrollYProgress, [0, 1], [isMobile ? 0 : 60, isMobile ? 0 : -40])
 
   return (
     <div ref={rowRef} className="relative">
@@ -236,7 +244,7 @@ function ProjectRow({ project, index }: { project: typeof projects[0]; index: nu
 
           {/* Stats — camera focus bounce */}
           <motion.div
-            className="grid grid-cols-3 gap-3 mb-6"
+            className="hidden sm:grid grid-cols-3 gap-3 mb-6"
             initial="hidden"
             animate={infoInView ? 'visible' : 'hidden'}
             variants={stagger(0.4, 0.1)}
@@ -398,7 +406,7 @@ export default function Work() {
           transition={{ duration: 0.8, ease: EASE }}
         >
           <div className="flex flex-col md:flex-row items-center justify-between gap-8 pt-8 border-t border-white/[0.06]">
-            <div className="flex gap-10 md:gap-16">
+            <div className="flex flex-wrap justify-center md:justify-start gap-6 sm:gap-10 md:gap-16">
               {[
                 { label: 'Shipped', value: '50+' },
                 { label: 'Uptime', value: '99.99%' },

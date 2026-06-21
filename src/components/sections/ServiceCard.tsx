@@ -1,5 +1,5 @@
 'use client'
-import { useRef } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { motion, useInView, useScroll, useTransform } from 'framer-motion'
 import { Service } from '@/types'
 import { useCursor } from '../providers/CursorProvider'
@@ -84,23 +84,32 @@ export default function ServiceCard({ service, index, onDetailClick }: ServiceCa
   const titleRef = useRef<HTMLDivElement>(null)
   const titleInView = useInView(titleRef, { once: true, margin: '-80px' })
 
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768)
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
   const { scrollYProgress } = useScroll({
     target: wrapperRef,
     offset: ['start start', 'end start']
   })
 
-  const scale = useTransform(scrollYProgress, [0, 1], [1, 0.92])
-  const opacity = useTransform(scrollYProgress, [0, 1], [1, 0.3])
-  const yOffset = useTransform(scrollYProgress, [0, 1], [0, -30])
-  const bgNumberY = useTransform(scrollYProgress, [0, 1], ['0%', '-20%'])
+  const scale = useTransform(scrollYProgress, [0, 1], [1, isMobile ? 1 : 0.92])
+  const opacity = useTransform(scrollYProgress, [0, 1], [1, isMobile ? 1 : 0.3])
+  const yOffset = useTransform(scrollYProgress, [0, 1], [0, isMobile ? 0 : -30])
+  const bgNumberY = useTransform(scrollYProgress, [0, 1], ['0%', isMobile ? '0%' : '-20%'])
 
   return (
     <div
       ref={wrapperRef}
-      className="sticky top-0 w-full min-h-[70vh] flex items-center justify-center overflow-hidden py-12"
+      className="md:sticky md:top-0 w-[85vw] sm:w-[360px] md:w-full shrink-0 snap-center min-h-fit md:min-h-[70vh] flex items-center justify-center overflow-hidden py-8 md:py-16 rounded-2xl md:rounded-none border border-white/[0.04] md:border-none bg-surface/30 md:bg-transparent"
       style={{
         backgroundColor: '#050505',
-        borderTop: '1px solid rgba(255,255,255,0.04)',
+        borderTop: isMobile ? 'none' : '1px solid rgba(255,255,255,0.04)',
         zIndex: index
       }}
     >

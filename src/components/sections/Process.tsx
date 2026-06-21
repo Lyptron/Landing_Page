@@ -59,7 +59,7 @@ function ProcessCard({ step, idx }: { step: typeof processSteps[0]; idx: number 
   return (
     <motion.div
       ref={ref}
-      className={`relative w-full md:w-[52%] ${isLeft ? 'md:mr-auto' : 'md:ml-auto'}`}
+      className={`relative w-[82vw] sm:w-[320px] md:w-[52%] ${isLeft ? 'md:mr-auto' : 'md:ml-auto'}`}
       initial={{ opacity: 0, y: 60, x: isLeft ? -50 : 50 }}
       animate={inView ? { opacity: 1, y: 0, x: 0 } : {}}
       transition={{ duration: 1, ease: EASE }}
@@ -407,9 +407,9 @@ export default function Process() {
         </div>
 
         {/* Zigzag cards with scroll-linked S-connectors */}
-        <div className="flex flex-col">
+        <div className="flex flex-row overflow-x-auto snap-x snap-mandatory scrollbar-none gap-5 pb-6 px-6 md:px-0 md:flex-col">
           {processSteps.map((step, idx) => (
-            <div key={step.number}>
+            <div key={step.number} className="shrink-0 snap-center w-auto md:w-full">
               <ProcessCard step={step} idx={idx} />
               {idx < processSteps.length - 1 && (
                 <StepConnector fromIdx={idx} />

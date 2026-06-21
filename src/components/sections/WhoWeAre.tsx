@@ -218,7 +218,7 @@ export default function WhoWeAre() {
             </motion.p>
             <motion.p
               ref={paraRightRef}
-              className="font-body text-[15px] md:text-[17px] text-white/30 leading-[1.7] max-w-[520px]"
+              className="font-body text-[15px] md:text-[17px] text-white/30 leading-[1.7] max-w-[520px] hidden md:block"
               initial={{ opacity: 0, x: 40, filter: 'blur(6px)' }}
               animate={paraRightInView ? { opacity: 1, x: 0, filter: 'blur(0px)' } : {}}
               transition={{ duration: 1, delay: 0.2, ease: EASE }}
@@ -228,7 +228,7 @@ export default function WhoWeAre() {
           </div>
 
           {/* Principles — cards fan out from stacked */}
-          <div ref={principlesRef}>
+          <div ref={principlesRef} className="hidden md:block">
             <motion.div
               className="h-px w-full mb-12"
               style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.06) 15%, rgba(255,255,255,0.06) 85%, transparent)' }}

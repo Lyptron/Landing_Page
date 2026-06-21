@@ -607,31 +607,7 @@ export async function resetProjectFinance(projectId: string) {
 // tables. The project row itself stays — only its contents are
 // cleared. Used by the "Reset all data" danger action.
 export async function resetAllProjectData(projectId: string) {
-  const tables = [
-    'payments',
-    'milestones',
-    'approvals',
-    'activities',
-    'deployments',
-    'documents',
-    'meetings',
-    'feedback',
-    'gallery',
-    'announcements',
-  ] as const
-
-  const results = await Promise.all(
-    tables.map((table) => supabase.from(table).delete().eq('project_id', projectId))
-  )
-
-  const failed = results
-    .map((r, i) => ({ table: tables[i], error: r.error }))
-    .filter((r) => r.error)
-
-  if (failed.length > 0) {
-    return { error: failed }
-  }
-  return { error: null }
+  return supabase.rpc('reset_project_data', { p_project_id: projectId })
 }
 
 // ─── Client-level reset/delete (admin Clients page) ──────────
@@ -652,35 +628,7 @@ export async function resetClientFinance(clientId: string) {
 // meetings, etc.) for every project this client owns. Projects
 // themselves and the client record stay intact.
 export async function resetAllClientData(clientId: string) {
-  const { data: clientProjects, error: projErr } = await supabase
-    .from('projects')
-    .select('id')
-    .eq('client_id', clientId)
-  if (projErr) return { error: projErr }
-  const projectIds = (clientProjects ?? []).map((p) => p.id)
-  if (projectIds.length === 0) return { error: null }
-
-  const tables = [
-    'payments',
-    'milestones',
-    'approvals',
-    'activities',
-    'deployments',
-    'documents',
-    'meetings',
-    'feedback',
-    'gallery',
-    'announcements',
-  ] as const
-
-  const results = await Promise.all(
-    tables.map((table) => supabase.from(table).delete().in('project_id', projectIds))
-  )
-  const failed = results
-    .map((r, i) => ({ table: tables[i], error: r.error }))
-    .filter((r) => r.error)
-  if (failed.length > 0) return { error: failed }
-  return { error: null }
+  return supabase.rpc('reset_client_data', { p_client_id: clientId })
 }
 
 // ─── Agency-wide Danger Zone ─────────────────────────────────

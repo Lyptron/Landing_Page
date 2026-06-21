@@ -1,6 +1,53 @@
 @import "tailwindcss";
 @import "../styles/animations.css";
-@config "../../tailwind.config.ts";
+
+@theme {
+  --color-bg: #050505;
+  --color-surface: #111113;
+  --color-blue: #1d7ef5;
+  --color-silver: #c0c0cc;
+  --color-green: #22c55e;
+  --color-ivory: #F5F2EB;
+  --color-gold: #D6B370;
+  --color-slate: #8A8A8A;
+
+  --font-display: var(--font-satoshi);
+  --font-body: var(--font-inter);
+  --font-mono: var(--font-ibm-plex-mono);
+
+  --font-size-hero: clamp(64px, 8.5vw, 96px);
+  --font-size-hero--line-height: 0.94;
+  --font-size-hero--letter-spacing: -0.045em;
+
+  --font-size-h2: clamp(40px, 5vw, 64px);
+  --font-size-h2--line-height: 1.05;
+  --font-size-h2--letter-spacing: -0.035em;
+
+  --font-size-h3: clamp(22px, 2.5vw, 32px);
+  --font-size-h3--line-height: 1.1;
+  --font-size-h3--letter-spacing: -0.02em;
+
+  --animate-live-pulse: livePulse 2s ease-out infinite;
+  --animate-gradient-shift: gradientShift 6s ease infinite;
+  --animate-border-sweep: borderSweep 1.5s linear infinite;
+  --animate-float-slow: floatSlow 8s ease-in-out infinite;
+  --animate-float-medium: floatMedium 6s ease-in-out infinite;
+  --animate-float-fast: floatFast 5s ease-in-out infinite;
+  --animate-shimmer: shimmer 2.5s ease-in-out infinite;
+  --animate-orb-pulse: orbPulse 8s ease-in-out infinite;
+  --animate-dash-flow: dashFlow 1.5s linear infinite;
+
+  --blur-glass: 32px;
+  --blur-nav: 28px;
+  --blur-pill: 20px;
+
+  --shadow-glass: inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -1px 0 rgba(0,0,0,0.2), 0 32px 64px rgba(0,0,0,0.4);
+  --shadow-glass-hover: inset 0 1px 0 rgba(255,255,255,0.12), inset 0 -1px 0 rgba(0,0,0,0.25), 0 48px 80px rgba(0,0,0,0.5);
+  --shadow-blue-glow: 0 0 32px rgba(29,126,245,0.25);
+  --shadow-progress: 0 0 8px rgba(29,126,245,0.6);
+}
+
+@variant dark (&:where([data-theme="dark"], [data-theme="dark"] *, .admin-shell[data-theme="dark"] &, .client-shell[data-theme="dark"] &));
 
 :root {
   color-scheme: dark;
@@ -60,11 +107,13 @@
   --g-brand-strategy:rgba(192, 192, 204, 0.15);
 }
 
+html,
 body {
   background-color: var(--bg);
   color: var(--text-primary);
   font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, sans-serif;
   overflow-x: hidden;
+  width: 100%;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -229,7 +278,7 @@ h1 {
   opacity: 0.018;
   pointer-events: none;
   z-index: 0;
-  background-image: url("/");
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
 
 /* Premium card — base */

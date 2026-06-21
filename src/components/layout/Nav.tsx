@@ -107,7 +107,7 @@ function SlotLetter({ s, idx, className }: { s: LetterStyle; idx: number; classN
 
 function LyptronLogo() {
   return (
-    <span className="flex items-center text-[26px] tracking-[0.35em] select-none overflow-hidden">
+    <span className="flex items-center text-[18px] sm:text-[26px] tracking-[0.2em] sm:tracking-[0.35em] select-none overflow-hidden">
       {STYLES.map((s, i) => (
         <SlotLetter key={i} s={s} idx={i} className={i === 5 ? 'mr-[3px]' : ''} />
       ))}

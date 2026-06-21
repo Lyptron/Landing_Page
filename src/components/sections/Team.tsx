@@ -200,7 +200,7 @@ export default function Team() {
         <div className="absolute left-0 top-0 bottom-0 w-32 md:w-48 bg-gradient-to-r from-[#050505] to-transparent z-20 pointer-events-none" aria-hidden="true" />
         <div className="absolute right-0 top-0 bottom-0 w-32 md:w-48 bg-gradient-to-l from-[#050505] to-transparent z-20 pointer-events-none" aria-hidden="true" />
 
-        <div ref={trackRef} className="flex flex-col md:flex-row gap-6 w-full md:w-max py-4 items-center md:items-stretch">
+        <div ref={trackRef} className="flex flex-row overflow-x-auto snap-x snap-mandatory scrollbar-none gap-6 w-full md:w-max py-4 px-6 md:px-0 items-center md:items-stretch">
           {tripled.map((member, i) => {
             // Only the first set is the real, focusable list. The other two
             // exist purely so the marquee can wrap visually; hide them from
@@ -209,9 +209,8 @@ export default function Team() {
             return (
               <div
                 key={`${member.id}-${i}`}
-                className={`${isClone ? 'hidden md:block' : ''} w-full md:w-auto flex justify-center`}
+                className={`${isClone ? 'hidden md:block' : ''} w-auto shrink-0 snap-center flex justify-center`}
                 aria-hidden={isClone || undefined}
-                inert={isClone}
               >
                 <TeamCard
                   member={member}

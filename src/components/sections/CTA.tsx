@@ -3,7 +3,6 @@ import { useRef, useState } from 'react'
 import { motion, useInView } from 'framer-motion'
 import MagneticButton from '../ui/MagneticButton'
 import { useCursor } from '../providers/CursorProvider'
-import { supabase } from '@/lib/supabase'
 import { Clock, MessageCircle, Shield } from 'lucide-react'
 
 const BOOKING_EMAIL = 'hello@lyptron.com'
@@ -47,6 +46,7 @@ export default function CTA() {
     }
 
     setIsSubmitting(true)
+    const { supabase } = await import('@/lib/supabase')
     const { error } = await supabase.from('inquiries').insert([{
       first_name: formData.firstName.trim(),
       last_name: formData.lastName.trim(),

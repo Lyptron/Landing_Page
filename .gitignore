@@ -114,3 +114,5 @@ implementation_plan.md
 walkthrough.md
 audit_results.md
 security_audit_results.md
+docs/*.md
+public/llms.txt

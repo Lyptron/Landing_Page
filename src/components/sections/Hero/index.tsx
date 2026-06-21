@@ -97,8 +97,8 @@ export default function Hero() {
   const [storyStep, setStoryStep] = useState(0)
 
   useEffect(() => {
-    const timer1 = setTimeout(() => setStoryStep(1), 3000)
-    const timer2 = setTimeout(() => setStoryStep(2), 6000)
+    const timer1 = setTimeout(() => setStoryStep(1), 2400)
+    const timer2 = setTimeout(() => setStoryStep(2), 4800)
     return () => { clearTimeout(timer1); clearTimeout(timer2) }
   }, [])
 
@@ -281,7 +281,7 @@ export default function Hero() {
                 filter: storyStep === 0 ? 'blur(0px)' : 'blur(10px)',
                 y: storyStep === 0 ? 0 : -6,
               }}
-              transition={{ duration: 1.6, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
               className="absolute inset-0 font-display font-medium text-[clamp(24px,4.5vw,58px)] md:text-[58px] text-white/50 tracking-[-0.02em] leading-tight flex items-center pointer-events-none z-20"
             >
               You have an ambitious vision.
@@ -296,7 +296,7 @@ export default function Hero() {
                 filter: storyStep === 1 ? 'blur(0px)' : 'blur(10px)',
                 y: storyStep === 1 ? 0 : storyStep < 1 ? 8 : -6,
               }}
-              transition={{ duration: 1.6, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
               className="absolute inset-0 font-display font-medium text-[clamp(24px,4.5vw,58px)] md:text-[58px] text-white/50 tracking-[-0.02em] leading-tight flex items-center pointer-events-none z-20"
             >
               But scaling the right technology is hard.
@@ -475,9 +475,9 @@ export default function Hero() {
           {/* Tech stack / social proof */}
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                       transition={{ duration: 0.8, delay: 1.1, ease: EASE }}
-                      className="flex items-center justify-start gap-8 mb-12">
+                      className="flex flex-wrap items-center justify-start gap-4 sm:gap-8 mb-12">
             <span className="font-mono text-[9px] uppercase tracking-[0.15em] text-white/15 shrink-0">Built with</span>
-            <div className="flex items-center gap-8 md:gap-10 opacity-60 grayscale hover:grayscale-0 transition-all duration-700">
+            <div className="flex flex-wrap items-center gap-6 sm:gap-8 md:gap-10 opacity-60 grayscale hover:grayscale-0 transition-all duration-700">
               {LOGOS.map(logo => (
                 <div
                   key={logo.name}

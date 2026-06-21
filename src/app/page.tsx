@@ -1,17 +1,19 @@
 'use client'
+import dynamic from 'next/dynamic'
 import { CHAPTER_IDS } from '@/lib/constants'
 import { useChapterProgress } from '@/hooks/useChapterProgress'
 import Hero from '@/components/sections/Hero'
-import WhoWeAre from '@/components/sections/WhoWeAre'
-import Services from '@/components/sections/Services'
-import Work from '@/components/sections/Work'
-import Team from '@/components/sections/Team'
-import Process from '@/components/sections/Process'
-import Pricing from '@/components/sections/Pricing'
-import CTA from '@/components/sections/CTA'
 import SectionDivider from '@/components/ui/SectionDivider'
 import ChapterDots from '@/components/layout/ChapterDots'
-import Footer from '@/components/layout/Footer'
+
+const WhoWeAre = dynamic(() => import('@/components/sections/WhoWeAre'))
+const Services = dynamic(() => import('@/components/sections/Services'))
+const Work = dynamic(() => import('@/components/sections/Work'))
+const Team = dynamic(() => import('@/components/sections/Team'))
+const Process = dynamic(() => import('@/components/sections/Process'))
+const Pricing = dynamic(() => import('@/components/sections/Pricing'))
+const CTA = dynamic(() => import('@/components/sections/CTA'))
+const Footer = dynamic(() => import('@/components/layout/Footer'))
 
 export default function Home() {
   const chapterIds = CHAPTER_IDS.map((c) => c.id)
@@ -29,43 +31,51 @@ export default function Home() {
       <SectionDivider />
 
       {/* Chapter 2: Who We Are */}
-      <WhoWeAre />
+      <div style={{ contentVisibility: 'auto', containIntrinsicSize: 'auto 800px' }}>
+        <WhoWeAre />
+      </div>
 
-      {/* Divider */}
       <SectionDivider />
 
       {/* Chapter 3: Services */}
-      <Services />
+      <div style={{ contentVisibility: 'auto', containIntrinsicSize: 'auto 900px' }}>
+        <Services />
+      </div>
 
-      {/* Divider */}
       <SectionDivider />
 
       {/* Chapter 4: Work */}
-      <Work />
+      <div style={{ contentVisibility: 'auto', containIntrinsicSize: 'auto 1000px' }}>
+        <Work />
+      </div>
 
-      {/* Divider */}
       <SectionDivider />
 
       {/* Chapter 5: Team */}
-      <Team />
+      <div style={{ contentVisibility: 'auto', containIntrinsicSize: 'auto 800px' }}>
+        <Team />
+      </div>
 
-      {/* Divider */}
       <SectionDivider />
 
       {/* Chapter 6: Process */}
-      <Process />
+      <div style={{ contentVisibility: 'auto', containIntrinsicSize: 'auto 900px' }}>
+        <Process />
+      </div>
 
-      {/* Divider */}
       <SectionDivider />
 
       {/* Chapter 7: Pricing */}
-      <Pricing />
+      <div style={{ contentVisibility: 'auto', containIntrinsicSize: 'auto 800px' }}>
+        <Pricing />
+      </div>
 
-      {/* Divider */}
       <SectionDivider />
 
       {/* Chapter 8: CTA */}
-      <CTA />
+      <div style={{ contentVisibility: 'auto', containIntrinsicSize: 'auto 600px' }}>
+        <CTA />
+      </div>
 
       {/* Footer */}
       <Footer />

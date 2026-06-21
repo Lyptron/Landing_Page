@@ -116,11 +116,11 @@ export default function Pricing() {
         </div>
 
         {/* Cards */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        <div className="flex flex-row overflow-x-auto snap-x snap-mandatory scrollbar-none gap-5 pb-6 px-6 lg:px-0 lg:grid lg:grid-cols-3 lg:gap-5">
           {PRICING_TIERS.map((tier, idx) => (
             <div
               key={idx}
-              className={`pricing-card group relative overflow-hidden transition-all duration-500 ${tier.popular ? 'md:-mt-3 md:mb-[-12px]' : ''}`}
+              className={`pricing-card group relative overflow-hidden transition-all duration-500 shrink-0 snap-center w-[82vw] sm:w-[340px] lg:w-auto ${tier.popular ? 'lg:-mt-3 lg:mb-[-12px]' : ''}`}
               style={{
                 background: `linear-gradient(160deg, ${tier.glow} 0%, rgba(255,255,255,0.008) 100%)`,
                 border: `1px solid ${tier.popular ? `${tier.accent}25` : 'rgba(255,255,255,0.05)'}`,

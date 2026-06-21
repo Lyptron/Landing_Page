@@ -1,6 +1,7 @@
 import '@/lib/suppress-warnings'
 import { Inter, IBM_Plex_Mono } from 'next/font/google'
 import localFont from 'next/font/local'
+import { GoogleAnalytics } from '@next/third-parties/google'
 import { LenisProvider } from '@/components/providers/LenisProvider'
 import { CursorProvider } from '@/components/providers/CursorProvider'
 import Cursor from '@/components/ui/Cursor'
@@ -8,6 +9,8 @@ import ScrollProgress from '@/components/layout/ScrollProgress'
 import Nav from '@/components/layout/Nav'
 import GlowOrbs from '@/components/ui/GlowOrbs'
 import '@/app/globals.css'
+
+const GA_ID = process.env.NEXT_PUBLIC_GA_ID
 
 const satoshi = localFont({
   src: [
@@ -86,9 +89,9 @@ const NO_FLASH_SCRIPT = `(function () {
 
 const SITE_URL = 'https://lyptron.com'
 const SITE_NAME = 'Lyptron'
-const TITLE = 'Lyptron — Web Development, SaaS, AI Automation & Product Design Agency'
+const TITLE = 'Lyptron — Web, SaaS, Mobile & AI Product Studio'
 const DESCRIPTION =
-  'Lyptron is a future-grade digital product studio that designs and builds high-performance websites, SaaS platforms, mobile apps, and AI-powered automation for ambitious founders and growing companies — shipped on time, engineered to scale.'
+  'Lyptron is a product studio that designs and ships high-performance websites, SaaS platforms, mobile apps, and AI automation for ambitious founders and growing teams.'
 const KEYWORDS = [
   'digital agency',
   'web development agency',
@@ -177,7 +180,6 @@ export const metadata = {
     title: TITLE,
     description: DESCRIPTION,
     images: ['/images/web-app-manifest-512x512.png'],
-    creator: '@lyptron',
   },
   formatDetection: {
     email: false,
@@ -200,9 +202,7 @@ const jsonLd = {
       },
       description: DESCRIPTION,
       sameAs: [
-        'https://twitter.com/lyptron',
         'https://www.linkedin.com/company/lyptron',
-        'https://github.com/lyptron',
       ],
     },
     {
@@ -268,6 +268,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             {children}
           </CursorProvider>
         </LenisProvider>
+        {GA_ID && <GoogleAnalytics gaId={GA_ID} />}
       </body>
     </html>
   )
