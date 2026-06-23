@@ -147,7 +147,6 @@ export default function Team() {
   return (
     <section
       ref={containerRef}
-      id="team"
       className="relative w-full py-16 md:py-40 select-none overflow-hidden z-10"
       style={{ background: '#050505' }}
     >

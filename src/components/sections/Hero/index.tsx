@@ -123,6 +123,15 @@ export default function Hero() {
   useEffect(() => {
     const el = sectionRef.current
     if (!el) return
+    // Skip the radial-gradient mouse-follow on touch devices and
+    // reduced-motion. Tap events fire synthetic mousemoves and would
+    // otherwise trigger an expensive repaint on every interaction.
+    if (typeof window !== 'undefined') {
+      if (
+        window.matchMedia('(pointer: coarse)').matches ||
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      ) return
+    }
     el.addEventListener('mousemove', onMove, { passive: true })
     return () => {
       el.removeEventListener('mousemove', onMove)

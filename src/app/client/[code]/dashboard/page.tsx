@@ -13,13 +13,7 @@ import {
   CalendarClock,
   Calendar,
   Layers,
-  IndianRupee,
   Inbox,
-  Image as ImageIcon,
-  FileText,
-  Video,
-  MessageSquare,
-  Package,
   Sparkles,
   Users,
   Map,
@@ -34,7 +28,6 @@ import {
   EmptyState,
   Loading,
   SectionLabel,
-  QuickAction,
   getHealthInfo,
   TONE_TEXT,
   type PortalTone,
@@ -147,17 +140,6 @@ export default function ClientDashboardPage() {
   const actionsTone: PortalTone = pendingApprovals.length > 0 ? 'amber' : 'emerald'
   const currentStageIndex = Math.max(0, STAGES.indexOf(project.stage || 'Backlog'))
 
-  const quickActions: { icon: LucideIcon; label: string; href: string; tone: PortalTone }[] = [
-    { icon: ClipboardCheck, label: 'Approvals', href: `/client/${code}/approvals`, tone: 'amber' },
-    { icon: MessageSquare, label: 'Feedback', href: `/client/${code}/feedback`, tone: 'cyan' },
-    { icon: IndianRupee, label: 'Finance', href: `/client/${code}/finance`, tone: 'emerald' },
-    { icon: FileText, label: 'Documents', href: `/client/${code}/documents`, tone: 'cyan' },
-    { icon: Video, label: 'Meetings', href: `/client/${code}/meetings`, tone: 'emerald' },
-    { icon: ImageIcon, label: 'Gallery', href: `/client/${code}/gallery`, tone: isMusicClient ? 'violet' : 'emerald' },
-    { icon: Package, label: 'Deliverables', href: `/client/${code}/deliverables`, tone: 'cyan' },
-    { icon: Users, label: 'Team', href: `/client/${code}/team`, tone: 'cyan' },
-  ]
-
   return (
     <div className="flex flex-col gap-10 sm:gap-14">
       {/* Project Health */}
@@ -165,26 +147,44 @@ export default function ClientDashboardPage() {
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ ease: EASE_OUT }}
-        className="flex flex-col sm:flex-row sm:items-end justify-between gap-5 pb-8 sm:pb-10 border-b"
-        style={DIVIDER}
+        className="relative overflow-hidden rounded-[20px] flex flex-col sm:flex-row sm:items-end justify-between gap-6 p-6 sm:p-9"
+        style={{
+          background: 'var(--cp-surface)',
+          border: '1px solid var(--cp-border-soft)',
+        }}
       >
-        <div className="min-w-0 flex-1">
+        {/* Ambient tint matching project health, anchored top-right */}
+        <div
+          className="absolute -top-24 -right-24 w-[340px] h-[340px] rounded-full pointer-events-none"
+          style={{
+            background: `radial-gradient(circle, color-mix(in srgb, ${TONE_TEXT[health.tone]} 14%, transparent) 0%, transparent 70%)`,
+          }}
+        />
+
+        <div className="relative min-w-0 flex-1">
           <SectionLabel tone="cyan">{project.status || 'In Progress'}</SectionLabel>
           <h1
-            className="font-display text-[28px] sm:text-[40px] font-bold tracking-[-0.025em] mt-1.5 leading-[1.05] text-balance"
+            className="font-display text-[30px] sm:text-[44px] font-bold tracking-[-0.03em] mt-2 leading-[1.02] text-balance"
             style={{ color: 'var(--cp-text)' }}
           >
             {project.name}
           </h1>
-          <p className="text-[14px] sm:text-[15px] mt-3 max-w-xl leading-relaxed text-balance" style={{ color: 'var(--cp-text-secondary)' }}>
+          <p className="text-[14px] sm:text-[15px] mt-3.5 max-w-xl leading-relaxed text-balance" style={{ color: 'var(--cp-text-secondary)' }}>
             {health.description}
           </p>
         </div>
-        <div className="flex flex-col items-start sm:items-end gap-4 shrink-0">
-          <div className="flex items-center gap-2.5" style={{ color: TONE_TEXT[health.tone] }}>
-            <span className="inline-block w-2 h-2" style={{ background: 'currentColor' }} />
-            <health.icon className="w-4 h-4" />
-            <span className="text-[12px] font-semibold uppercase tracking-[0.16em]">{health.label}</span>
+
+        <div className="relative flex flex-col items-start sm:items-end gap-4 shrink-0">
+          <div
+            className="flex items-center gap-2 px-3 py-1.5 rounded-full"
+            style={{
+              color: TONE_TEXT[health.tone],
+              background: `color-mix(in srgb, ${TONE_TEXT[health.tone]} 12%, transparent)`,
+              border: `1px solid color-mix(in srgb, ${TONE_TEXT[health.tone]} 28%, transparent)`,
+            }}
+          >
+            <health.icon className="w-3.5 h-3.5" />
+            <span className="text-[11.5px] font-semibold uppercase tracking-[0.14em]">{health.label}</span>
           </div>
           {recentActivity[0] && (
             <span className="text-[11.5px]" style={{ color: 'var(--cp-text-faint)' }}>
@@ -235,111 +235,107 @@ export default function ClientDashboardPage() {
         </motion.div>
       )}
 
-      {/* Progress % + Current Phase */}
+      {/* Progress % + Current Phase — unified into a single card */}
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.05, ease: EASE_OUT }}
-        className="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-14 pb-10 sm:pb-14 border-b"
+        className="pb-10 sm:pb-14 border-b"
         style={DIVIDER}
       >
-        {/* Overall progress — featured */}
-        <div className={`lg:col-span-2 cp-card ${isMusicClient ? 'cp-card-accent-violet' : 'cp-card-accent'} pl-5 sm:pl-6 flex flex-col gap-7`}>
-          <div className="flex items-center gap-2.5">
-            <TrendingUp className="w-[18px] h-[18px]" style={{ color: TONE_TEXT[accentTone] }} />
-            <SectionLabel tone={accentTone}>Progress</SectionLabel>
-          </div>
+        <div className={`cp-card ${isMusicClient ? 'cp-card-accent-violet' : 'cp-card-accent'} pl-5 sm:pl-7 p-5 sm:p-7 flex flex-col gap-8`}>
 
+          {/* Top row: big % + days remaining */}
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6">
-            <div className="flex items-baseline gap-2">
-              <span
-                className="font-display font-bold tabular-nums leading-none text-[72px] sm:text-[88px] tracking-[-0.03em]"
-                style={{ color: 'var(--cp-text)' }}
-              >
-                {progress}
-              </span>
-              <span className="font-display font-bold leading-none text-[28px] sm:text-[34px]" style={{ color: 'var(--cp-text-muted)' }}>
-                %
-              </span>
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2.5">
+                <TrendingUp className="w-[18px] h-[18px]" style={{ color: TONE_TEXT[accentTone] }} />
+                <SectionLabel tone={accentTone}>Progress</SectionLabel>
+              </div>
+              <div className="flex items-baseline gap-2">
+                <span
+                  className="font-display font-bold tabular-nums leading-none text-[64px] sm:text-[80px] tracking-[-0.03em]"
+                  style={{ color: 'var(--cp-text)' }}
+                >
+                  {progress}
+                </span>
+                <span className="font-display font-bold leading-none text-[26px] sm:text-[32px]" style={{ color: 'var(--cp-text-muted)' }}>
+                  %
+                </span>
+              </div>
             </div>
-            <p className="text-[12.5px] sm:text-right" style={{ color: 'var(--cp-text-muted)' }}>
-              {daysRemaining !== null ? `${daysRemaining} day${daysRemaining === 1 ? '' : 's'} remaining` : 'Timeline to be confirmed'}
-            </p>
+            <div className="flex flex-col gap-1 sm:items-end">
+              <p className="text-[12.5px] sm:text-right" style={{ color: 'var(--cp-text-muted)' }}>
+                {daysRemaining !== null ? `${daysRemaining} day${daysRemaining === 1 ? '' : 's'} remaining` : 'Timeline to be confirmed'}
+              </p>
+              <div className="flex items-center gap-4 text-[11.5px]" style={{ color: 'var(--cp-text-faint)' }}>
+                <span className="flex items-center gap-1.5">
+                  <Calendar className="w-3.5 h-3.5" />
+                  {formatDate(project.created_at)}
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <CalendarClock className="w-3.5 h-3.5" />
+                  {formatDate(project.due_date)}
+                </span>
+              </div>
+            </div>
           </div>
 
-          <div className="w-full h-[3px]" style={{ background: 'var(--cp-surface-strong)' }}>
+          <div className="w-full h-[5px] rounded-full overflow-hidden" style={{ background: 'var(--cp-surface-strong)' }}>
             <motion.div
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
               transition={{ duration: 1, delay: 0.4, ease: EASE_OUT }}
-              className="h-full"
-              style={{ background: isMusicClient ? 'var(--cp-violet)' : 'var(--cp-cyan)' }}
+              className="h-full rounded-full"
+              style={{
+                background: isMusicClient ? 'var(--cp-violet)' : 'var(--cp-cyan)',
+                boxShadow: `0 0 12px color-mix(in srgb, ${isMusicClient ? 'var(--cp-violet)' : 'var(--cp-cyan)'} 55%, transparent)`,
+              }}
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <div className="text-[11px] font-semibold uppercase tracking-[0.12em] mb-1" style={{ color: 'var(--cp-text-muted)' }}>
-                Started
-              </div>
-              <div className="text-[13.5px] font-semibold flex items-center gap-1.5" style={{ color: 'var(--cp-text)' }}>
-                <Calendar className="w-3.5 h-3.5" style={{ color: 'var(--cp-text-muted)' }} />
-                {formatDate(project.created_at)}
-              </div>
+          {/* Horizontal stage tracker */}
+          <div>
+            <div className="flex items-center gap-2.5 mb-5">
+              <Layers className="w-[18px] h-[18px]" style={{ color: 'var(--cp-cyan)' }} />
+              <SectionLabel>Current Phase</SectionLabel>
             </div>
-            <div>
-              <div className="text-[11px] font-semibold uppercase tracking-[0.12em] mb-1" style={{ color: 'var(--cp-text-muted)' }}>
-                Target Date
-              </div>
-              <div className="text-[13.5px] font-semibold flex items-center gap-1.5" style={{ color: 'var(--cp-text)' }}>
-                <CalendarClock className="w-3.5 h-3.5" style={{ color: 'var(--cp-text-muted)' }} />
-                {formatDate(project.due_date)}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Current phase */}
-        <div className="cp-card p-5 sm:p-6 flex flex-col h-full">
-          <div className="flex items-center gap-2.5 mb-5">
-            <Layers className="w-[18px] h-[18px]" style={{ color: 'var(--cp-cyan)' }} />
-            <SectionLabel>Current Phase</SectionLabel>
-          </div>
-          <div className="flex flex-col">
-            {STAGES.map((stage, i) => {
-              const isDone = i < currentStageIndex
-              const isCurrent = i === currentStageIndex
-              const isLast = i === STAGES.length - 1
-              return (
-                <div key={stage} className="flex gap-3">
-                  <div className="flex flex-col items-center">
-                    <div
-                      className="w-[10px] h-[10px] rounded-full shrink-0"
-                      style={
-                        isDone
-                          ? { background: 'var(--cp-cyan)' }
-                          : isCurrent
-                          ? { background: 'var(--cp-surface)', border: '2px solid var(--cp-cyan)' }
-                          : { background: 'var(--cp-surface)', border: '2px solid var(--cp-border)' }
-                      }
-                    />
-                    {!isLast && (
-                      <div className="w-px flex-1" style={{ background: isDone ? 'var(--cp-cyan)' : 'var(--cp-border-soft)' }} />
-                    )}
-                  </div>
-                  <div className={isLast ? 'pb-0' : 'pb-6'}>
-                    <span className="text-[13px] font-semibold block" style={{ color: isCurrent || isDone ? 'var(--cp-text)' : 'var(--cp-text-faint)' }}>
-                      {stage}
-                    </span>
-                    {isCurrent && (
-                      <span className="text-[12px] block mt-0.5 leading-relaxed" style={{ color: 'var(--cp-text-muted)' }}>
-                        {STAGE_DESCRIPTIONS[stage]}
+            <div className="flex items-start">
+              {STAGES.map((stage, i) => {
+                const isDone = i < currentStageIndex
+                const isCurrent = i === currentStageIndex
+                const isLast = i === STAGES.length - 1
+                return (
+                  <div key={stage} className={`flex flex-col ${isLast ? '' : 'flex-1'} min-w-0`}>
+                    <div className="flex items-center w-full">
+                      <div
+                        className="w-[11px] h-[11px] rounded-full shrink-0"
+                        style={
+                          isDone
+                            ? { background: 'var(--cp-cyan)' }
+                            : isCurrent
+                            ? { background: 'var(--cp-cyan)', boxShadow: '0 0 0 4px color-mix(in srgb, var(--cp-cyan) 22%, transparent)' }
+                            : { background: 'var(--cp-surface)', border: '2px solid var(--cp-border)' }
+                        }
+                      />
+                      {!isLast && (
+                        <div className="h-px flex-1" style={{ background: isDone ? 'var(--cp-cyan)' : 'var(--cp-border-soft)' }} />
+                      )}
+                    </div>
+                    <div className="mt-2.5 pr-2">
+                      <span className="text-[12.5px] font-semibold block truncate" style={{ color: isCurrent || isDone ? 'var(--cp-text)' : 'var(--cp-text-faint)' }}>
+                        {stage}
                       </span>
-                    )}
+                      {isCurrent && (
+                        <span className="text-[11.5px] block mt-0.5 leading-relaxed" style={{ color: 'var(--cp-text-muted)' }}>
+                          {STAGE_DESCRIPTIONS[stage]}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                </div>
-              )
-            })}
+                )
+              })}
+            </div>
           </div>
         </div>
       </motion.div>
@@ -354,10 +350,7 @@ export default function ClientDashboardPage() {
       >
         {/* Pending client actions */}
         <div className="cp-card p-5 sm:p-6 flex flex-col gap-3.5 h-full">
-          <div className="flex items-center gap-2.5">
-            <ClipboardCheck className="w-[18px] h-[18px]" style={{ color: TONE_TEXT[actionsTone] }} />
-            <SectionLabel tone={actionsTone}>Pending Client Actions</SectionLabel>
-          </div>
+          <SectionLabel tone={actionsTone}>Pending Client Actions</SectionLabel>
           <div className="font-display font-bold tabular-nums leading-none text-[44px]" style={{ color: 'var(--cp-text)' }}>
             {pendingApprovals.length}
           </div>
@@ -530,24 +523,6 @@ export default function ClientDashboardPage() {
         )}
       </motion.div>
 
-      {/* Quick links */}
-      <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.26, ease: EASE_OUT }}>
-        <SectionLabel>Quick Links</SectionLabel>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-px mt-4" style={{ background: 'var(--cp-border-soft)' }}>
-          {quickActions.map((action, i) => (
-            <motion.div
-              key={action.label}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 + i * 0.04, ease: EASE_OUT }}
-              className="transition-transform duration-150 ease-[cubic-bezier(0.16,1,0.3,1)] active:scale-[0.96]"
-              style={{ background: 'var(--cp-bg)' }}
-            >
-              <QuickAction icon={action.icon} label={action.label} href={action.href} tone={action.tone} />
-            </motion.div>
-          ))}
-        </div>
-      </motion.div>
     </div>
   )
 }

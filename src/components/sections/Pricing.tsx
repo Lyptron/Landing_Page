@@ -80,7 +80,6 @@ export default function Pricing() {
   return (
     <section
       ref={sectionRef}
-      id="pricing"
       className="relative w-full py-16 md:py-36 select-none overflow-hidden z-10"
       style={{ background: '#050505' }}
     >

@@ -612,3 +612,32 @@ html[data-theme="dark"] .client-shell {
   }
 }
 
+/* Performance: on touch devices and reduced-motion users, kill the
+   continuous decorative animations. Each of these keyframes runs forever
+   on every page-load and either drives the GPU (filter/blur, glow) or
+   transforms layered overlays. On old phones the combined cost causes
+   constant jank and battery drain. The animations are visual flourish,
+   not content — disabling them does not affect usability or design intent. */
+@media (pointer: coarse), (prefers-reduced-motion: reduce) {
+  .hero-gradient-text,
+  .hero-headline-glow,
+  .hero-cta-primary::after,
+  .hero-stat-bar,
+  .hero-scroll-indicator,
+  .hero-badge-dot,
+  .hero-card-float {
+    animation: none !important;
+  }
+  /* All site-wide animation keyframes built on heavy filter/box-shadow
+     work get neutered — drift, glow, shimmer, float. Their visual loss
+     on a phone is invisible; their performance cost is large. */
+  [style*="orbDrift"],
+  [style*="floatSlow"],
+  [style*="floatMedium"],
+  [style*="floatFast"],
+  [style*="orbPulse"],
+  [style*="shimmer"] {
+    animation: none !important;
+  }
+}
+

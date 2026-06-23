@@ -78,7 +78,6 @@ export default function CTA() {
   return (
     <section
       ref={sectionRef}
-      id="cta"
       className="relative w-full min-h-[85vh] md:min-h-screen flex items-center justify-center overflow-hidden py-16 md:py-28 z-10"
       style={{ background: '#050505' }}
     >

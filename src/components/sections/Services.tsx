@@ -17,7 +17,6 @@ export default function Services() {
   return (
     <section
       ref={containerRef}
-      id="services"
       className="relative w-full select-none z-10"
       style={{ background: '#050505' }}
     >

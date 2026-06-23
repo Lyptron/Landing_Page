@@ -327,7 +327,6 @@ export default function Process() {
   return (
     <section
       ref={sectionRef}
-      id="process"
       className="relative w-full py-16 md:py-36 select-none overflow-hidden z-10"
       style={{ background: '#050505' }}
     >

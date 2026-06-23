@@ -1,7 +1,16 @@
 'use client'
 import { useRef } from 'react'
+import dynamic from 'next/dynamic'
 import { motion, useScroll, useTransform, useInView } from 'framer-motion'
-import WhoWeAreCanvas from '../canvas/WhoWeAreCanvas'
+import { useLowPerfMode } from '@/hooks/useLowPerfMode'
+
+// Three.js + R3F are ~600KB minified — only fetched and rendered on
+// desktops that can actually handle the wireframe globe. Skipped entirely
+// on phones, touch devices, and prefers-reduced-motion.
+const WhoWeAreCanvas = dynamic(() => import('../canvas/WhoWeAreCanvas'), {
+  ssr: false,
+  loading: () => null,
+})
 
 const EASE = [0.22, 1, 0.36, 1] as const
 
@@ -97,6 +106,7 @@ function PrincipleCard({ principle, index }: { principle: typeof PRINCIPLES[0]; 
 }
 
 export default function WhoWeAre() {
+  const lowPerf = useLowPerfMode()
   const sectionRef = useRef<HTMLDivElement>(null)
   const sectionInView = useInView(sectionRef, { margin: '300px' })
   const principlesRef = useRef<HTMLDivElement>(null)
@@ -122,7 +132,6 @@ export default function WhoWeAre() {
   return (
     <section
       ref={sectionRef}
-      id="about"
       className="relative w-full overflow-hidden py-16 md:py-40 select-none z-10"
       style={{ background: '#050505' }}
     >
@@ -134,7 +143,7 @@ export default function WhoWeAre() {
           opacity: useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0.05, 0.15, 0.15, 0.05])
         }}
       >
-        {sectionInView && <WhoWeAreCanvas />}
+        {sectionInView && !lowPerf && <WhoWeAreCanvas />}
       </motion.div>
 
       {/* Warm spotlight */}

@@ -154,7 +154,7 @@ export default function Nav() {
       <motion.header
         className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-500 ${
           scrolled
-            ? 'h-[64px] bg-[rgba(5,5,5,0.75)] border-b border-white/[0.05] backdrop-blur-2xl'
+            ? 'h-[64px] bg-[rgba(5,5,5,0.85)] border-b border-white/[0.05] backdrop-blur-sm'
             : 'h-[72px] bg-transparent border-b border-transparent'
         }`}
         initial={{ y: -100, opacity: 0 }}

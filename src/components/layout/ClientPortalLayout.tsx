@@ -71,8 +71,11 @@ function SidebarContent({ project, groups, pathname, onNavigate, onExit }: Sideb
   return (
     <>
       {/* Brand + Project header */}
-      <div className="p-5 border-b" style={{ borderColor: 'var(--cp-border-soft)' }}>
-        <div className="block">
+      <div className="p-5 pb-6 border-b" style={{ borderColor: 'var(--cp-border-soft)' }}>
+        <div
+          className="rounded-[14px] p-3.5 flex items-center gap-3"
+          style={{ background: 'var(--cp-surface)', border: '1px solid var(--cp-border-soft)' }}
+        >
           <LyptronLogo subtitle={project?.name || 'Client Portal'} textClassName="text-[15px]" />
         </div>
       </div>
@@ -80,35 +83,37 @@ function SidebarContent({ project, groups, pathname, onNavigate, onExit }: Sideb
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto custom-scrollbar p-3 flex flex-col gap-1">
         {groups.map((group) => (
-          <div key={group.label} className="mb-4">
-            <div className="px-3 pt-2 pb-1.5 text-[10px] font-semibold uppercase tracking-[0.12em]" style={{ color: 'var(--cp-text-faint)' }}>
+          <div key={group.label} className="mb-5">
+            <div className="px-3 pt-2 pb-2 text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ color: 'var(--cp-text-faint)' }}>
               {group.label}
             </div>
-            {group.items.map((item: any) => {
-              const isActive = pathname === item.path
-              return (
-                <Link href={item.path} key={item.name} onClick={onNavigate}>
-                  <div
-                    className="relative flex items-center gap-3 px-3 py-2 rounded-[8px] text-[13px] mb-0.5 transition-colors group"
-                    style={{ color: isActive ? 'var(--cp-text)' : 'var(--cp-text-muted)' }}
-                  >
-                    {isActive && (
-                      <motion.div
-                        layoutId="client-sidebar-active"
-                        className="absolute inset-0 rounded-[8px]"
-                        style={{ background: 'var(--cp-cyan-soft)' }}
-                        transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+            <div className="flex flex-col gap-0.5">
+              {group.items.map((item: any) => {
+                const isActive = pathname === item.path
+                return (
+                  <Link href={item.path} key={item.name} onClick={onNavigate}>
+                    <div
+                      className="relative flex items-center gap-3 px-3 py-2.5 rounded-[10px] text-[13px] transition-colors group hover:bg-[var(--cp-surface)]"
+                      style={{ color: isActive ? 'var(--cp-text)' : 'var(--cp-text-muted)' }}
+                    >
+                      {isActive && (
+                        <motion.div
+                          layoutId="client-sidebar-active"
+                          className="absolute inset-0 rounded-[10px]"
+                          style={{ background: 'var(--cp-cyan-soft)', border: '1px solid var(--cp-cyan-border)' }}
+                          transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+                        />
+                      )}
+                      <item.icon
+                        className="w-[16px] h-[16px] relative z-10 shrink-0 transition-colors"
+                        style={{ color: isActive ? 'var(--cp-cyan)' : undefined }}
                       />
-                    )}
-                    <item.icon
-                      className="w-[16px] h-[16px] relative z-10 shrink-0 transition-colors"
-                      style={{ color: isActive ? 'var(--cp-cyan)' : undefined }}
-                    />
-                    <span className="font-medium relative z-10 truncate">{item.name}</span>
-                  </div>
-                </Link>
-              )
-            })}
+                      <span className="font-medium relative z-10 truncate">{item.name}</span>
+                    </div>
+                  </Link>
+                )
+              })}
+            </div>
           </div>
         ))}
       </nav>
@@ -150,8 +155,6 @@ export default function ClientPortalLayout({
   }
 
   const groups = NAV_GROUPS(projectCode)
-  const allItems = groups.flatMap((g) => g.items)
-  const currentPage = allItems.find((m) => pathname === m.path)?.name || 'Dashboard'
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -263,14 +266,6 @@ export default function ClientPortalLayout({
             </button>
             <div className="lg:hidden shrink-0">
               <LyptronMark size={28} />
-            </div>
-            <div className="flex flex-col justify-center min-w-0 leading-tight">
-              <span className="hidden sm:block text-[10.5px] font-semibold uppercase tracking-[0.12em] truncate mb-0.5" style={{ color: 'var(--cp-text-faint)' }}>
-                {project?.name || 'Portal'}
-              </span>
-              <span className="text-[15px] sm:text-[16px] font-bold truncate" style={{ color: 'var(--cp-text)' }}>
-                {currentPage}
-              </span>
             </div>
           </div>
 

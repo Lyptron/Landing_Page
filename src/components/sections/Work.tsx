@@ -325,7 +325,6 @@ export default function Work() {
 
   return (
     <section
-      id="work"
       className="relative w-full select-none overflow-hidden z-10 py-16 md:py-36 lg:py-44"
       style={{ background: '#050505' }}
     >

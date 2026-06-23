@@ -5,6 +5,7 @@ import { useChapterProgress } from '@/hooks/useChapterProgress'
 import Hero from '@/components/sections/Hero'
 import SectionDivider from '@/components/ui/SectionDivider'
 import ChapterDots from '@/components/layout/ChapterDots'
+import LazyMount from '@/components/ui/LazyMount'
 
 const WhoWeAre = dynamic(() => import('@/components/sections/WhoWeAre'))
 const Services = dynamic(() => import('@/components/sections/Services'))
@@ -31,51 +32,51 @@ export default function Home() {
       <SectionDivider />
 
       {/* Chapter 2: Who We Are */}
-      <div style={{ contentVisibility: 'auto', containIntrinsicSize: 'auto 800px' }}>
+      <LazyMount id="about" minHeight={800}>
         <WhoWeAre />
-      </div>
+      </LazyMount>
 
       <SectionDivider />
 
       {/* Chapter 3: Services */}
-      <div style={{ contentVisibility: 'auto', containIntrinsicSize: 'auto 900px' }}>
+      <LazyMount id="services" minHeight={900}>
         <Services />
-      </div>
+      </LazyMount>
 
       <SectionDivider />
 
       {/* Chapter 4: Work */}
-      <div style={{ contentVisibility: 'auto', containIntrinsicSize: 'auto 1000px' }}>
+      <LazyMount id="work" minHeight={1000}>
         <Work />
-      </div>
+      </LazyMount>
 
       <SectionDivider />
 
       {/* Chapter 5: Team */}
-      <div style={{ contentVisibility: 'auto', containIntrinsicSize: 'auto 800px' }}>
+      <LazyMount id="team" minHeight={800}>
         <Team />
-      </div>
+      </LazyMount>
 
       <SectionDivider />
 
       {/* Chapter 6: Process */}
-      <div style={{ contentVisibility: 'auto', containIntrinsicSize: 'auto 900px' }}>
+      <LazyMount id="process" minHeight={900}>
         <Process />
-      </div>
+      </LazyMount>
 
       <SectionDivider />
 
       {/* Chapter 7: Pricing */}
-      <div style={{ contentVisibility: 'auto', containIntrinsicSize: 'auto 800px' }}>
+      <LazyMount id="pricing" minHeight={800}>
         <Pricing />
-      </div>
+      </LazyMount>
 
       <SectionDivider />
 
       {/* Chapter 8: CTA */}
-      <div style={{ contentVisibility: 'auto', containIntrinsicSize: 'auto 600px' }}>
+      <LazyMount id="cta" minHeight={600}>
         <CTA />
-      </div>
+      </LazyMount>
 
       {/* Footer */}
       <Footer />
