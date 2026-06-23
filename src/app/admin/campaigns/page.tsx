@@ -148,12 +148,12 @@ export default function CampaignsPage() {
     <>
       <div className="mb-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
-          <h1 className="font-display text-2xl font-bold tracking-tight text-[var(--cp-text)]">Campaigns</h1>
-          <p className="text-[var(--cp-text-faint)] text-[13px] mt-0.5">Plan, launch, and track marketing campaigns and content.</p>
+          <h1 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-(--cp-text)">Campaigns</h1>
+          <p className="text-(--cp-text-faint) text-[13px] mt-0.5">Plan, launch, and track marketing campaigns and content.</p>
         </div>
         <button
           onClick={() => tab === 'campaigns' ? setCampaignModalOpen(true) : setTaskModalOpen(true)}
-          className="flex items-center gap-1.5 px-4 py-2 bg-[var(--cp-cyan)] text-white font-semibold text-[12px] rounded-xl hover:bg-[var(--cp-cyan-strong)] transition-all"
+          className="flex items-center gap-1.5 px-4 py-2 bg-(--cp-cyan) text-white font-semibold text-[12px] rounded-xl hover:bg-(--cp-cyan-strong) transition-all"
           style={{ boxShadow: '0 0 12px color-mix(in srgb, var(--cp-cyan) 30%, transparent)' }}
         >
           <Plus className="w-3.5 h-3.5" /> {tab === 'campaigns' ? 'New Campaign' : 'New Content Item'}
@@ -163,9 +163,9 @@ export default function CampaignsPage() {
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
         {[
-          { label: 'Active Campaigns', value: String(activeCampaigns), icon: Megaphone, color: 'text-[var(--cp-emerald)]' },
-          { label: 'Leads Generated', value: String(totalLeadsGenerated), icon: TrendingUp, color: 'text-[var(--cp-cyan)]' },
-          { label: 'Avg Conversion', value: `${avgConversion}%`, icon: Target, color: 'text-[var(--cp-violet)]' },
+          { label: 'Active Campaigns', value: String(activeCampaigns), icon: Megaphone, color: 'text-(--cp-emerald)' },
+          { label: 'Leads Generated', value: String(totalLeadsGenerated), icon: TrendingUp, color: 'text-(--cp-cyan)' },
+          { label: 'Avg Conversion', value: `${avgConversion}%`, icon: Target, color: 'text-(--cp-violet)' },
         ].map((kpi, i) => (
           <motion.div
             key={i}
@@ -176,7 +176,7 @@ export default function CampaignsPage() {
             style={{ background: 'var(--cp-surface)', border: '1px solid var(--cp-border-soft)' }}
           >
             <div>
-              <p className="text-[9px] font-mono uppercase tracking-[0.15em] text-[var(--cp-text-faint)] mb-1">{kpi.label}</p>
+              <p className="text-[9px] font-mono uppercase tracking-[0.15em] text-(--cp-text-faint) mb-1">{kpi.label}</p>
               <p className={`text-[24px] font-display font-bold tracking-tight ${kpi.color}`}>{kpi.value}</p>
             </div>
             <kpi.icon className={`w-5 h-5 ${kpi.color} opacity-50`} />
@@ -191,10 +191,10 @@ export default function CampaignsPage() {
             style={{ background: 'var(--cp-surface)', border: '1px solid var(--cp-border-soft)' }}
           >
             <div>
-              <p className="text-[9px] font-mono uppercase tracking-[0.15em] text-[var(--cp-text-faint)] mb-1">Total Budget</p>
-              <RestrictedValue value={totalBudget} className="text-[24px] font-display font-bold tracking-tight text-[var(--cp-text)]" />
+              <p className="text-[9px] font-mono uppercase tracking-[0.15em] text-(--cp-text-faint) mb-1">Total Budget</p>
+              <RestrictedValue value={totalBudget} className="text-[24px] font-display font-bold tracking-tight text-(--cp-text)" />
             </div>
-            <Target className="w-5 h-5 text-[var(--cp-text-muted)] opacity-50" />
+            <Target className="w-5 h-5 text-(--cp-text-muted) opacity-50" />
           </motion.div>
         )}
       </div>
@@ -208,7 +208,7 @@ export default function CampaignsPage() {
           <button
             key={t.key}
             onClick={() => setTab(t.key as 'campaigns' | 'calendar')}
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-[12px] font-semibold transition-all ${tab === t.key ? 'bg-[var(--cp-cyan)] text-white' : 'text-[var(--cp-text-muted)] hover:text-[var(--cp-text-secondary)]'}`}
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-[12px] font-semibold transition-all ${tab === t.key ? 'bg-(--cp-cyan) text-white' : 'text-(--cp-text-muted) hover:text-(--cp-text-secondary)'}`}
           >
             <t.icon className="w-3.5 h-3.5" /> {t.label}
           </button>
@@ -217,42 +217,42 @@ export default function CampaignsPage() {
 
       {loading ? (
         <div className="flex items-center justify-center py-20">
-          <div className="w-5 h-5 border-2 border-[var(--cp-border)] border-t-[var(--cp-text-muted)] rounded-full animate-spin" />
+          <div className="w-5 h-5 border-2 border-(--cp-border) border-t-(--cp-text-muted) rounded-full animate-spin" />
         </div>
       ) : tab === 'campaigns' ? (
         campaigns.length === 0 ? (
-          <div className="py-16 text-center text-[var(--cp-text-faint)] text-[13px] rounded-2xl" style={{ background: 'var(--cp-surface)', border: '1px solid var(--cp-border-soft)' }}>No campaigns yet. Create your first campaign.</div>
+          <div className="py-16 text-center text-(--cp-text-faint) text-[13px] rounded-2xl" style={{ background: 'var(--cp-surface)', border: '1px solid var(--cp-border-soft)' }}>No campaigns yet. Create your first campaign.</div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {campaigns.map(c => {
               const sStyle = campaignStatusStyle(c.status)
               return (
                 <div key={c.id} className="p-5 rounded-2xl group relative" style={{ background: 'var(--cp-surface)', border: '1px solid var(--cp-border-soft)' }}>
-                  <button onClick={() => removeCampaign(c.id)} className="absolute top-4 right-4 w-6 h-6 rounded-lg flex items-center justify-center text-[var(--cp-text-faint)] hover:text-[var(--cp-red)] hover:bg-[var(--cp-red-soft)] opacity-0 group-hover:opacity-100 transition-all">
+                  <button onClick={() => removeCampaign(c.id)} className="absolute top-4 right-4 w-6 h-6 rounded-lg flex items-center justify-center text-(--cp-text-faint) hover:text-(--cp-red) hover:bg-(--cp-red-soft) opacity-0 group-hover:opacity-100 transition-all">
                     <Trash2 className="w-3 h-3" />
                   </button>
-                  <h3 className="text-[14px] font-bold text-[var(--cp-text)] pr-8">{c.name}</h3>
-                  <p className="text-[11px] text-[var(--cp-text-faint)] mt-0.5 mb-3">{c.channel || 'Other'}</p>
+                  <h3 className="text-[14px] font-bold text-(--cp-text) pr-8">{c.name}</h3>
+                  <p className="text-[11px] text-(--cp-text-faint) mt-0.5 mb-3">{c.channel || 'Other'}</p>
                   <button onClick={() => cycleCampaignStatus(c)} className="text-[9px] font-bold uppercase tracking-[0.08em] px-2 py-0.5 rounded-md mb-3 inline-block" style={{ color: sStyle.color, background: sStyle.bg, border: `1px solid ${sStyle.border}` }}>
                     {c.status}
                   </button>
                   <div className="grid grid-cols-2 gap-2 mb-3">
                     <div className="p-2.5 rounded-lg" style={{ background: 'var(--cp-surface-strong)', border: '1px solid var(--cp-border-soft)' }}>
-                      <p className="text-[9px] uppercase tracking-wider text-[var(--cp-text-faint)] mb-0.5">Leads Gen.</p>
-                      <p className="text-[14px] font-mono text-[var(--cp-text-secondary)]">{c.leads_generated || 0}</p>
+                      <p className="text-[9px] uppercase tracking-wider text-(--cp-text-faint) mb-0.5">Leads Gen.</p>
+                      <p className="text-[14px] font-mono text-(--cp-text-secondary)">{c.leads_generated || 0}</p>
                     </div>
                     <div className="p-2.5 rounded-lg" style={{ background: 'var(--cp-surface-strong)', border: '1px solid var(--cp-border-soft)' }}>
-                      <p className="text-[9px] uppercase tracking-wider text-[var(--cp-text-faint)] mb-0.5">Conversion</p>
-                      <p className="text-[14px] font-mono text-[var(--cp-text-secondary)]">{c.conversion_rate || 0}%</p>
+                      <p className="text-[9px] uppercase tracking-wider text-(--cp-text-faint) mb-0.5">Conversion</p>
+                      <p className="text-[14px] font-mono text-(--cp-text-secondary)">{c.conversion_rate || 0}%</p>
                     </div>
                   </div>
                   {isFounder && (
                     <div className="p-2.5 rounded-lg mb-3" style={{ background: 'var(--cp-surface-strong)', border: '1px solid var(--cp-border-soft)' }}>
-                      <p className="text-[9px] uppercase tracking-wider text-[var(--cp-text-faint)] mb-0.5">Budget</p>
-                      <RestrictedValue value={c.budget} className="text-[14px] font-mono text-[var(--cp-text-secondary)]" />
+                      <p className="text-[9px] uppercase tracking-wider text-(--cp-text-faint) mb-0.5">Budget</p>
+                      <RestrictedValue value={c.budget} className="text-[14px] font-mono text-(--cp-text-secondary)" />
                     </div>
                   )}
-                  <div className="flex items-center gap-1.5 text-[10px] text-[var(--cp-text-faint)] font-mono pt-2 border-t border-[var(--cp-border-soft)]">
+                  <div className="flex items-center gap-1.5 text-[10px] text-(--cp-text-faint) font-mono pt-2 border-t border-(--cp-border-soft)">
                     <Calendar className="w-3 h-3" />
                     {c.start_date ? new Date(c.start_date).toLocaleDateString('en-IN') : '—'} → {c.end_date ? new Date(c.end_date).toLocaleDateString('en-IN') : '—'}
                   </div>
@@ -263,12 +263,12 @@ export default function CampaignsPage() {
         )
       ) : (
         tasks.length === 0 ? (
-          <div className="py-16 text-center text-[var(--cp-text-faint)] text-[13px] rounded-2xl" style={{ background: 'var(--cp-surface)', border: '1px solid var(--cp-border-soft)' }}>No content items yet. Add one to your calendar.</div>
+          <div className="py-16 text-center text-(--cp-text-faint) text-[13px] rounded-2xl" style={{ background: 'var(--cp-surface)', border: '1px solid var(--cp-border-soft)' }}>No content items yet. Add one to your calendar.</div>
         ) : (
           <div className="rounded-2xl overflow-hidden" style={{ background: 'var(--cp-surface)', border: '1px solid var(--cp-border-soft)' }}>
             <table className="w-full text-[13px]">
               <thead>
-                <tr className="text-left text-[10px] uppercase tracking-wider text-[var(--cp-text-faint)] border-b border-[var(--cp-border-soft)]">
+                <tr className="text-left text-[10px] uppercase tracking-wider text-(--cp-text-faint) border-b border-(--cp-border-soft)">
                   <th className="px-4 py-3 font-medium">Title</th>
                   <th className="px-4 py-3 font-medium">Platform</th>
                   <th className="px-4 py-3 font-medium">Campaign</th>
@@ -282,19 +282,19 @@ export default function CampaignsPage() {
                 {tasks.map(t => {
                   const tStyle = taskStatusStyle(t.status)
                   return (
-                    <tr key={t.id} className="border-b border-[var(--cp-border-soft)] last:border-0 hover:bg-[var(--cp-surface-strong)]">
-                      <td className="px-4 py-3 text-[var(--cp-text)] font-medium">{t.title}</td>
-                      <td className="px-4 py-3 text-[var(--cp-text-muted)]">{t.platform || '—'}</td>
-                      <td className="px-4 py-3 text-[var(--cp-text-muted)]">{t.campaigns?.name || '—'}</td>
-                      <td className="px-4 py-3 text-[var(--cp-text-muted)]">{t.owner || '—'}</td>
-                      <td className="px-4 py-3 text-[var(--cp-text-muted)] font-mono">{t.due_date ? new Date(t.due_date).toLocaleDateString('en-IN') : '—'}</td>
+                    <tr key={t.id} className="border-b border-(--cp-border-soft) last:border-0 hover:bg-(--cp-surface-strong)">
+                      <td className="px-4 py-3 text-(--cp-text) font-medium">{t.title}</td>
+                      <td className="px-4 py-3 text-(--cp-text-muted)">{t.platform || '—'}</td>
+                      <td className="px-4 py-3 text-(--cp-text-muted)">{t.campaigns?.name || '—'}</td>
+                      <td className="px-4 py-3 text-(--cp-text-muted)">{t.owner || '—'}</td>
+                      <td className="px-4 py-3 text-(--cp-text-muted) font-mono">{t.due_date ? new Date(t.due_date).toLocaleDateString('en-IN') : '—'}</td>
                       <td className="px-4 py-3">
                         <button onClick={() => cycleTaskStatus(t)} className="text-[9px] font-bold uppercase tracking-[0.08em] px-2 py-0.5 rounded-md" style={{ color: tStyle.color, background: tStyle.bg, border: `1px solid ${tStyle.border}` }}>
                           {t.status}
                         </button>
                       </td>
                       <td className="px-4 py-3 text-right">
-                        <button onClick={() => removeTask(t.id)} className="text-[var(--cp-text-faint)] hover:text-[var(--cp-red)] transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+                        <button onClick={() => removeTask(t.id)} className="text-(--cp-text-faint) hover:text-(--cp-red) transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
                       </td>
                     </tr>
                   )
@@ -324,9 +324,9 @@ export default function CampaignsPage() {
           {isFounder && (
             <ModalInput label="Budget (₹)" value={campaignForm.budget} onChange={(v) => setCampaignForm({ ...campaignForm, budget: v })} placeholder="50000" type="number" />
           )}
-          <div className="flex justify-end gap-3 pt-4 border-t border-[var(--cp-border-soft)]">
-            <button onClick={() => setCampaignModalOpen(false)} className="px-4 py-2 rounded-xl text-[12px] font-medium text-[var(--cp-text-faint)] hover:text-[var(--cp-text-secondary)] transition-colors">Cancel</button>
-            <button onClick={addCampaign} disabled={savingCampaign || !campaignForm.name} className="px-5 py-2 bg-[var(--cp-cyan)] text-white font-semibold text-[12px] rounded-xl hover:bg-[var(--cp-cyan-strong)] transition-all disabled:opacity-30">
+          <div className="flex justify-end gap-3 pt-4 border-t border-(--cp-border-soft)">
+            <button onClick={() => setCampaignModalOpen(false)} className="px-4 py-2 rounded-xl text-[12px] font-medium text-(--cp-text-faint) hover:text-(--cp-text-secondary) transition-colors">Cancel</button>
+            <button onClick={addCampaign} disabled={savingCampaign || !campaignForm.name} className="px-5 py-2 bg-(--cp-cyan) text-white font-semibold text-[12px] rounded-xl hover:bg-(--cp-cyan-strong) transition-all disabled:opacity-30">
               {savingCampaign ? 'Adding...' : 'Add Campaign'}
             </button>
           </div>
@@ -346,9 +346,9 @@ export default function CampaignsPage() {
             <ModalInput label="Due Date" value={taskForm.due_date} onChange={(v) => setTaskForm({ ...taskForm, due_date: v })} type="date" />
           </div>
           <ModalSelect label="Campaign" value={taskForm.campaign_id} onChange={(v) => setTaskForm({ ...taskForm, campaign_id: v })} options={[{ value: '', label: 'None' }, ...campaigns.map(c => ({ value: c.id, label: c.name }))]} />
-          <div className="flex justify-end gap-3 pt-4 border-t border-[var(--cp-border-soft)]">
-            <button onClick={() => setTaskModalOpen(false)} className="px-4 py-2 rounded-xl text-[12px] font-medium text-[var(--cp-text-faint)] hover:text-[var(--cp-text-secondary)] transition-colors">Cancel</button>
-            <button onClick={addTask} disabled={savingTask || !taskForm.title} className="px-5 py-2 bg-[var(--cp-cyan)] text-white font-semibold text-[12px] rounded-xl hover:bg-[var(--cp-cyan-strong)] transition-all disabled:opacity-30">
+          <div className="flex justify-end gap-3 pt-4 border-t border-(--cp-border-soft)">
+            <button onClick={() => setTaskModalOpen(false)} className="px-4 py-2 rounded-xl text-[12px] font-medium text-(--cp-text-faint) hover:text-(--cp-text-secondary) transition-colors">Cancel</button>
+            <button onClick={addTask} disabled={savingTask || !taskForm.title} className="px-5 py-2 bg-(--cp-cyan) text-white font-semibold text-[12px] rounded-xl hover:bg-(--cp-cyan-strong) transition-all disabled:opacity-30">
               {savingTask ? 'Adding...' : 'Add Item'}
             </button>
           </div>

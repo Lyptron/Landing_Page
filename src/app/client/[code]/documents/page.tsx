@@ -1,9 +1,9 @@
 'use client'
-import { useEffect, useState } from 'react'
-import { useParams } from 'next/navigation'
+import { useState } from 'react'
 import { FileText, Search, Download, FileSignature, Receipt, FolderOpen, AlertCircle, CheckCircle2 } from 'lucide-react'
-import { fetchDocuments, fetchProjectByAccessCode } from '@/lib/db'
+import { fetchDocuments } from '@/lib/db'
 import { PageHeader, EmptyState, Loading, Badge } from '@/components/portal/PortalUI'
+import { useClientPortalProject } from '@/hooks/useClientPortalProject'
 
 const ICON_MAP: Record<string, any> = { Contract: FileSignature, Proposal: FileText, Invoice: Receipt, Requirements: FileText }
 
@@ -34,24 +34,15 @@ const ONBOARDING_DOCS = [
   },
 ]
 
-export default function DocumentsPage() {
-  const params = useParams()
-  const code = params.code as string
-  const [documents, setDocuments] = useState<any[]>([])
-  const [search, setSearch] = useState('')
-  const [loading, setLoading] = useState(true)
+async function loadProjectDocuments(projectId: string) {
+  const { data } = await fetchDocuments(projectId)
+  return { data: data ?? [] }
+}
 
-  useEffect(() => {
-    async function load() {
-      const { data: project } = await fetchProjectByAccessCode(code)
-      if (project) {
-        const { data } = await fetchDocuments(project.id)
-        if (data && data.length > 0) setDocuments(data)
-      }
-      setLoading(false)
-    }
-    load()
-  }, [code])
+export default function DocumentsPage() {
+  const { resource, loading } = useClientPortalProject<any[]>(loadProjectDocuments)
+  const documents = resource ?? []
+  const [search, setSearch] = useState('')
 
   const filtered = search
     ? documents.filter((d) => d.title?.toLowerCase().includes(search.toLowerCase()) || d.type?.toLowerCase().includes(search.toLowerCase()))
@@ -95,7 +86,7 @@ export default function DocumentsPage() {
             return (
               <div
                 key={doc.id}
-                className="flex flex-col sm:flex-row sm:items-center justify-between p-4 gap-4 transition-colors hover:bg-[var(--cp-bg-soft)]"
+                className="flex flex-col sm:flex-row sm:items-center justify-between p-4 gap-4 transition-colors hover:bg-(--cp-bg-soft)"
               >
                 {/* Info */}
                 <div className="flex items-start gap-3.5 min-w-0">
@@ -159,11 +150,11 @@ export default function DocumentsPage() {
                   target="_blank"
                   rel="noreferrer"
                   key={doc.id}
-                  className="group flex items-center justify-between p-4 transition-colors hover:bg-[var(--cp-bg-soft)]"
+                  className="group flex items-center justify-between p-4 transition-colors hover:bg-(--cp-bg-soft)"
                 >
                   <div className="flex items-center gap-3.5 min-w-0">
                     <div className="shrink-0">
-                      <DocIcon className="w-[17px] h-[17px]" style={{ color: 'var(--cp-cyan)' }} />
+                      <DocIcon className="w-4.25 h-4.25" style={{ color: 'var(--cp-cyan)' }} />
                     </div>
                     <div className="min-w-0">
                       <h3 className="text-[13.5px] font-semibold truncate" style={{ color: 'var(--cp-text)' }}>
@@ -174,7 +165,7 @@ export default function DocumentsPage() {
                       </p>
                     </div>
                   </div>
-                  <Download className="w-4 h-4 shrink-0 transition-colors mr-1 text-[var(--cp-text-faint)] group-hover:text-[var(--cp-text-muted)]" />
+                  <Download className="w-4 h-4 shrink-0 transition-colors mr-1 text-(--cp-text-faint) group-hover:text-(--cp-text-muted)" />
                 </a>
               )
             })}

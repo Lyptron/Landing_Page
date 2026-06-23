@@ -1,33 +1,22 @@
 'use client'
-import { useEffect, useState } from 'react'
-import { useParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Download, ExternalLink, FileImage, FileCode2, FileType2, PackageOpen } from 'lucide-react'
-import { fetchDocuments, fetchProjectByAccessCode } from '@/lib/db'
+import { fetchDocuments } from '@/lib/db'
 import { PageHeader, EmptyState, Loading } from '@/components/portal/PortalUI'
+import { useClientPortalProject } from '@/hooks/useClientPortalProject'
 
 const ICON_MAP: Record<string, any> = { design: FileImage, code: FileCode2, document: FileType2 }
 
-export default function DeliverablesPage() {
-  const params = useParams()
-  const code = params.code as string
-  const [deliverables, setDeliverables] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
+async function loadDeliverables(projectId: string) {
+  const { data } = await fetchDocuments(projectId)
+  if (!data?.length) return { data: [] }
+  const filtered = data.filter((d: any) => d.category === 'deliverable' || d.is_deliverable)
+  return { data: filtered.length > 0 ? filtered : data }
+}
 
-  useEffect(() => {
-    async function load() {
-      const { data: project } = await fetchProjectByAccessCode(code)
-      if (project) {
-        const { data } = await fetchDocuments(project.id)
-        if (data && data.length > 0) {
-          const filtered = data.filter((d: any) => d.category === 'deliverable' || d.is_deliverable)
-          setDeliverables(filtered.length > 0 ? filtered : data)
-        }
-      }
-      setLoading(false)
-    }
-    load()
-  }, [code])
+export default function DeliverablesPage() {
+  const { resource, loading } = useClientPortalProject(loadDeliverables)
+  const deliverables = resource ?? []
 
   if (loading) return <Loading />
 

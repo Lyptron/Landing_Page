@@ -38,16 +38,16 @@ const BILLING_CYCLES = [
 const categoryLabel = (value: string) => CATEGORIES.find(c => c.value === value)?.label || value
 
 function statusStyle(status: string) {
-  if (status === 'active') return 'bg-[var(--cp-emerald-soft)] text-[var(--cp-emerald)] border-[var(--cp-emerald-border)]'
-  if (status === 'expiring') return 'bg-[var(--cp-amber-soft)] text-[var(--cp-amber)] border-[var(--cp-amber-border)]'
-  if (status === 'cancelled') return 'bg-[var(--cp-surface)] text-[var(--cp-text-faint)] border-[var(--cp-border-soft)]'
-  return 'bg-[var(--cp-cyan-soft)] text-[var(--cp-cyan)] border-[var(--cp-cyan-border)]'
+  if (status === 'active') return 'bg-(--cp-emerald-soft) text-(--cp-emerald) border-(--cp-emerald-border)'
+  if (status === 'expiring') return 'bg-(--cp-amber-soft) text-(--cp-amber) border-(--cp-amber-border)'
+  if (status === 'cancelled') return 'bg-(--cp-surface) text-(--cp-text-faint) border-(--cp-border-soft)'
+  return 'bg-(--cp-cyan-soft) text-(--cp-cyan) border-(--cp-cyan-border)'
 }
 
 function priorityStyle(priority: string) {
-  if (priority === 'high') return 'bg-[var(--cp-red-soft)] text-[var(--cp-red)] border-[var(--cp-red-border)]'
-  if (priority === 'medium') return 'bg-[var(--cp-amber-soft)] text-[var(--cp-amber)] border-[var(--cp-amber-border)]'
-  return 'bg-[var(--cp-surface)] text-[var(--cp-text-faint)] border-[var(--cp-border-soft)]'
+  if (priority === 'high') return 'bg-(--cp-red-soft) text-(--cp-red) border-(--cp-red-border)'
+  if (priority === 'medium') return 'bg-(--cp-amber-soft) text-(--cp-amber) border-(--cp-amber-border)'
+  return 'bg-(--cp-surface) text-(--cp-text-faint) border-(--cp-border-soft)'
 }
 
 function daysUntil(dateStr: string | null) {
@@ -177,10 +177,10 @@ export default function SubscriptionPlanningPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
         <div>
-          <h1 className="font-display text-2xl font-bold tracking-tight text-[var(--cp-text)]">Subscription Planning</h1>
-          <p className="text-[var(--cp-text-faint)] text-[13px] mt-0.5">Founder-only — track tools, software, and recurring business expenses.</p>
+          <h1 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-(--cp-text)">Subscription Planning</h1>
+          <p className="text-(--cp-text-faint) text-[13px] mt-0.5">Founder-only — track tools, software, and recurring business expenses.</p>
         </div>
-        <button onClick={openAddModal} className="flex items-center gap-1.5 px-4 py-2 bg-[var(--cp-cyan)] text-white font-semibold text-[12px] rounded-xl hover:bg-[var(--cp-cyan-strong)] transition-all" style={{ boxShadow: '0 0 12px color-mix(in srgb, var(--cp-cyan) 30%, transparent)' }}>
+        <button onClick={openAddModal} className="flex items-center gap-1.5 px-4 py-2 bg-(--cp-cyan) text-white font-semibold text-[12px] rounded-xl hover:bg-(--cp-cyan-strong) transition-all" style={{ boxShadow: '0 0 12px color-mix(in srgb, var(--cp-cyan) 30%, transparent)' }}>
           <Plus className="w-3.5 h-3.5" /> Add Subscription
         </button>
       </div>
@@ -188,10 +188,10 @@ export default function SubscriptionPlanningPage() {
       {/* KPI Row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
         {[
-          { label: 'Monthly Spend', value: `₹${totals.monthly.toLocaleString('en-IN')}`, icon: Wallet, color: 'text-[var(--cp-text)]' },
-          { label: 'Yearly Spend', value: `₹${totals.yearly.toLocaleString('en-IN')}`, icon: CreditCard, color: 'text-[var(--cp-text)]' },
-          { label: 'Renewals Due (30d)', value: String(totals.renewalsSoon), icon: AlertTriangle, color: totals.renewalsSoon > 0 ? 'text-[var(--cp-amber)]' : 'text-[var(--cp-text)]' },
-          { label: 'Active Tools', value: String(totals.activeCount), icon: Boxes, color: 'text-[var(--cp-emerald)]' },
+          { label: 'Monthly Spend', value: `₹${totals.monthly.toLocaleString('en-IN')}`, icon: Wallet, color: 'text-(--cp-text)' },
+          { label: 'Yearly Spend', value: `₹${totals.yearly.toLocaleString('en-IN')}`, icon: CreditCard, color: 'text-(--cp-text)' },
+          { label: 'Renewals Due (30d)', value: String(totals.renewalsSoon), icon: AlertTriangle, color: totals.renewalsSoon > 0 ? 'text-(--cp-amber)' : 'text-(--cp-text)' },
+          { label: 'Active Tools', value: String(totals.activeCount), icon: Boxes, color: 'text-(--cp-emerald)' },
         ].map((kpi, i) => (
           <motion.div
             key={i}
@@ -202,7 +202,7 @@ export default function SubscriptionPlanningPage() {
             style={{ background: 'var(--cp-surface)', border: '1px solid var(--cp-border-soft)' }}
           >
             <div>
-              <p className="text-[9px] font-mono uppercase tracking-[0.15em] text-[var(--cp-text-faint)] mb-1">{kpi.label}</p>
+              <p className="text-[9px] font-mono uppercase tracking-[0.15em] text-(--cp-text-faint) mb-1">{kpi.label}</p>
               <p className={`text-[22px] font-display font-bold tracking-tight ${kpi.color}`}>{kpi.value}</p>
             </div>
             <kpi.icon className={`w-5 h-5 ${kpi.color} opacity-50`} />
@@ -213,23 +213,23 @@ export default function SubscriptionPlanningPage() {
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3 mb-4">
         <div className="flex-1 flex items-center gap-2 px-4 py-2.5 rounded-xl" style={{ background: 'var(--cp-surface)', border: '1px solid var(--cp-border-soft)' }}>
-          <Search className="w-3.5 h-3.5 text-[var(--cp-text-faint)] shrink-0" />
+          <Search className="w-3.5 h-3.5 text-(--cp-text-faint) shrink-0" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by tool or owner..."
-            className="w-full bg-transparent border-none outline-none text-[13px] text-[var(--cp-text)] placeholder:text-[var(--cp-text-faint)]"
+            className="w-full bg-transparent border-none outline-none text-[13px] text-(--cp-text) placeholder:text-(--cp-text-faint)"
           />
         </div>
-        <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)} className="px-4 py-2.5 rounded-xl text-[12px] text-[var(--cp-text-secondary)] outline-none cursor-pointer" style={{ background: 'var(--cp-surface)', border: '1px solid var(--cp-border-soft)' }}>
+        <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)} className="px-4 py-2.5 rounded-xl text-[12px] text-(--cp-text-secondary) outline-none cursor-pointer" style={{ background: 'var(--cp-surface)', border: '1px solid var(--cp-border-soft)' }}>
           <option value="all">All Categories</option>
           {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
         </select>
-        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="px-4 py-2.5 rounded-xl text-[12px] text-[var(--cp-text-secondary)] outline-none cursor-pointer" style={{ background: 'var(--cp-surface)', border: '1px solid var(--cp-border-soft)' }}>
+        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="px-4 py-2.5 rounded-xl text-[12px] text-(--cp-text-secondary) outline-none cursor-pointer" style={{ background: 'var(--cp-surface)', border: '1px solid var(--cp-border-soft)' }}>
           <option value="all">All Statuses</option>
           {STATUSES.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
         </select>
-        <select value={priorityFilter} onChange={(e) => setPriorityFilter(e.target.value)} className="px-4 py-2.5 rounded-xl text-[12px] text-[var(--cp-text-secondary)] outline-none cursor-pointer" style={{ background: 'var(--cp-surface)', border: '1px solid var(--cp-border-soft)' }}>
+        <select value={priorityFilter} onChange={(e) => setPriorityFilter(e.target.value)} className="px-4 py-2.5 rounded-xl text-[12px] text-(--cp-text-secondary) outline-none cursor-pointer" style={{ background: 'var(--cp-surface)', border: '1px solid var(--cp-border-soft)' }}>
           <option value="all">All Priorities</option>
           {PRIORITIES.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
         </select>
@@ -239,20 +239,20 @@ export default function SubscriptionPlanningPage() {
       <div className="rounded-2xl overflow-hidden" style={{ background: 'var(--cp-surface)', border: '1px solid var(--cp-border-soft)' }}>
         {loading ? (
           <div className="flex items-center justify-center py-16">
-            <div className="w-5 h-5 border-2 border-[var(--cp-border)] border-t-[var(--cp-text-muted)] rounded-full animate-spin" />
+            <div className="w-5 h-5 border-2 border-(--cp-border) border-t-(--cp-text-muted) rounded-full animate-spin" />
           </div>
         ) : filtered.length === 0 ? (
           <div className="py-16 text-center">
-            <CreditCard className="w-8 h-8 text-[var(--cp-text-faint)] mx-auto mb-3" />
-            <p className="text-[var(--cp-text-faint)] text-[13px]">No subscriptions found.</p>
+            <CreditCard className="w-8 h-8 text-(--cp-text-faint) mx-auto mb-3" />
+            <p className="text-(--cp-text-faint) text-[13px]">No subscriptions found.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
-                <tr className="border-b border-[var(--cp-border-soft)]">
+                <tr className="border-b border-(--cp-border-soft)">
                   {['Tool', 'Category', 'Monthly', 'Yearly', 'Renewal', 'Owner', 'Billed Ledger', 'Status', 'Priority', ''].map((h) => (
-                    <th key={h} className="px-4 py-3 text-[9px] font-mono uppercase tracking-[0.15em] text-[var(--cp-text-faint)] whitespace-nowrap">{h}</th>
+                    <th key={h} className="px-4 py-3 text-[9px] font-mono uppercase tracking-[0.15em] text-(--cp-text-faint) whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -262,21 +262,21 @@ export default function SubscriptionPlanningPage() {
                   const linkedExps = expenses.filter(e => e.subscription_id === s.id)
                   const totalBilled = linkedExps.reduce((sum, e) => sum + (Number(e.amount) || 0), 0)
                   return (
-                    <tr key={s.id} className="border-b border-[var(--cp-border-soft)] hover:bg-[var(--cp-surface-strong)] transition-colors group">
-                      <td className="px-4 py-3 text-[13px] font-medium text-[var(--cp-text)] whitespace-nowrap">{s.name}</td>
-                      <td className="px-4 py-3 text-[12px] text-[var(--cp-text-muted)] whitespace-nowrap">{categoryLabel(s.category)}</td>
-                      <td className="px-4 py-3 text-[12px] font-mono text-[var(--cp-text-secondary)] whitespace-nowrap">₹{Number(s.monthly_cost || 0).toLocaleString('en-IN')}</td>
-                      <td className="px-4 py-3 text-[12px] font-mono text-[var(--cp-text-secondary)] whitespace-nowrap">₹{Number(s.yearly_cost || 0).toLocaleString('en-IN')}</td>
+                    <tr key={s.id} className="border-b border-(--cp-border-soft) hover:bg-(--cp-surface-strong) transition-colors group">
+                      <td className="px-4 py-3 text-[13px] font-medium text-(--cp-text) whitespace-nowrap">{s.name}</td>
+                      <td className="px-4 py-3 text-[12px] text-(--cp-text-muted) whitespace-nowrap">{categoryLabel(s.category)}</td>
+                      <td className="px-4 py-3 text-[12px] font-mono text-(--cp-text-secondary) whitespace-nowrap">₹{Number(s.monthly_cost || 0).toLocaleString('en-IN')}</td>
+                      <td className="px-4 py-3 text-[12px] font-mono text-(--cp-text-secondary) whitespace-nowrap">₹{Number(s.yearly_cost || 0).toLocaleString('en-IN')}</td>
                       <td className="px-4 py-3 text-[12px] font-mono whitespace-nowrap">
-                        <span className={days !== null && days <= 30 && days >= 0 ? 'text-[var(--cp-amber)]' : 'text-[var(--cp-text-muted)]'}>
+                        <span className={days !== null && days <= 30 && days >= 0 ? 'text-(--cp-amber)' : 'text-(--cp-text-muted)'}>
                           {s.renewal_date || '-'}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-[12px] text-[var(--cp-text-muted)] whitespace-nowrap">{s.owner || '-'}</td>
+                      <td className="px-4 py-3 text-[12px] text-(--cp-text-muted) whitespace-nowrap">{s.owner || '-'}</td>
                       <td className="px-4 py-3 text-[12px] font-mono whitespace-nowrap">
                         <div className="flex flex-col leading-tight">
-                          <span className="text-[var(--cp-text-secondary)] font-semibold">₹{totalBilled.toLocaleString('en-IN')}</span>
-                          <span className="text-[9.5px] text-[var(--cp-text-faint)]">{linkedExps.length} {linkedExps.length === 1 ? 'charge' : 'charges'}</span>
+                          <span className="text-(--cp-text-secondary) font-semibold">₹{totalBilled.toLocaleString('en-IN')}</span>
+                          <span className="text-[9.5px] text-(--cp-text-faint)">{linkedExps.length} {linkedExps.length === 1 ? 'charge' : 'charges'}</span>
                         </div>
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap">
@@ -287,8 +287,8 @@ export default function SubscriptionPlanningPage() {
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap">
                         <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button onClick={() => openEditModal(s)} className="p-1.5 rounded-lg text-[var(--cp-text-faint)] hover:text-[var(--cp-text-secondary)] hover:bg-[var(--cp-surface-strong)] transition-all"><Pencil className="w-3.5 h-3.5" /></button>
-                          <button onClick={() => handleDelete(s.id)} className="p-1.5 rounded-lg text-[var(--cp-text-faint)] hover:text-[var(--cp-red)] hover:bg-[var(--cp-red-soft)] transition-all"><Trash2 className="w-3.5 h-3.5" /></button>
+                          <button onClick={() => openEditModal(s)} className="p-1.5 rounded-lg text-(--cp-text-faint) hover:text-(--cp-text-secondary) hover:bg-(--cp-surface-strong) transition-all"><Pencil className="w-3.5 h-3.5" /></button>
+                          <button onClick={() => handleDelete(s.id)} className="p-1.5 rounded-lg text-(--cp-text-faint) hover:text-(--cp-red) hover:bg-(--cp-red-soft) transition-all"><Trash2 className="w-3.5 h-3.5" /></button>
                         </div>
                       </td>
                     </tr>
@@ -322,9 +322,9 @@ export default function SubscriptionPlanningPage() {
           </div>
           <ModalInput label="Notes" value={form.notes} onChange={(v) => setForm({ ...form, notes: v })} placeholder="Optional notes (renewal terms, future plans, etc.)" />
 
-          <div className="flex justify-end gap-3 pt-4 border-t border-[var(--cp-border-soft)]">
-            <button onClick={() => setModalOpen(false)} className="px-4 py-2 rounded-xl text-[12px] font-medium text-[var(--cp-text-faint)] hover:text-[var(--cp-text-secondary)] transition-colors">Cancel</button>
-            <button onClick={handleSave} disabled={saving || !form.name} className="px-5 py-2 bg-[var(--cp-cyan)] text-white font-semibold text-[12px] rounded-xl hover:bg-[var(--cp-cyan-strong)] transition-all disabled:opacity-30">
+          <div className="flex justify-end gap-3 pt-4 border-t border-(--cp-border-soft)">
+            <button onClick={() => setModalOpen(false)} className="px-4 py-2 rounded-xl text-[12px] font-medium text-(--cp-text-faint) hover:text-(--cp-text-secondary) transition-colors">Cancel</button>
+            <button onClick={handleSave} disabled={saving || !form.name} className="px-5 py-2 bg-(--cp-cyan) text-white font-semibold text-[12px] rounded-xl hover:bg-(--cp-cyan-strong) transition-all disabled:opacity-30">
               {saving ? 'Saving...' : editingId ? 'Save Changes' : 'Add Subscription'}
             </button>
           </div>

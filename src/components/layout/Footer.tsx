@@ -12,7 +12,9 @@ export default function Footer() {
   const [mailLabel, setMailLabel] = useState('hello [at] lyptron [dot] com')
 
   useEffect(() => {
+    // Client-only de-obfuscation so scrapers see the placeholder string in SSR.
     const addr = `${EMAIL_USER}@${EMAIL_DOMAIN}`
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMailHref(`mailto:${addr}`)
     setMailLabel(addr)
   }, [])

@@ -38,32 +38,32 @@ export default function ProjectMeetingsPage() {
   return (
     <div className="cp-card p-5">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-[13px] font-bold text-[var(--cp-text-secondary)]">Meetings & Syncs</h3>
-        <span className="text-[10px] font-mono text-[var(--cp-text-faint)]">{meetings.length} total</span>
+        <h3 className="text-[13px] font-bold text-(--cp-text-secondary)">Meetings & Syncs</h3>
+        <span className="text-[10px] font-mono text-(--cp-text-faint)">{meetings.length} total</span>
       </div>
       <div className="flex flex-col gap-2">
         {meetings.map(m => (
-          <div key={m.id} className="flex items-center justify-between p-3 rounded-xl bg-[var(--cp-bg-soft)] border border-[var(--cp-border-soft)]">
+          <div key={m.id} className="flex items-center justify-between p-3 rounded-xl bg-(--cp-bg-soft) border border-(--cp-border-soft)">
             <div>
-              <span className="text-[13px] block font-semibold text-[var(--cp-text)]">{m.title}</span>
-              <span className="text-[10px] text-[var(--cp-text-faint)]">
+              <span className="text-[13px] block font-semibold text-(--cp-text)">{m.title}</span>
+              <span className="text-[10px] text-(--cp-text-faint)">
                 {new Date(m.meeting_date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
                 {m.meeting_time && ` at ${m.meeting_time}`}
               </span>
             </div>
             <div className="flex items-center gap-2">
               {m.link && (
-                <a href={m.link} target="_blank" rel="noreferrer" className="text-[11.5px] text-[var(--cp-cyan)] hover:underline">
+                <a href={m.link} target="_blank" rel="noreferrer" className="text-[11.5px] text-(--cp-cyan) hover:underline">
                   Join Call
                 </a>
               )}
-              <button onClick={() => handleDelete(m.id)} className="p-1.5 text-[var(--cp-text-faint)] hover:text-[var(--cp-red)] transition-colors cursor-pointer">
+              <button onClick={() => handleDelete(m.id)} className="p-1.5 text-(--cp-text-faint) hover:text-(--cp-red) transition-colors cursor-pointer">
                 <Trash2 className="w-3.5 h-3.5" />
               </button>
             </div>
           </div>
         ))}
-        <button onClick={() => setModalOpen(true)} className="flex items-center gap-1.5 p-3 rounded-xl text-[11px] text-[var(--cp-text-faint)] hover:text-[var(--cp-text-muted)] hover:bg-[var(--cp-bg-soft)] transition-colors border border-dashed border-[var(--cp-border)] cursor-pointer justify-center">
+        <button onClick={() => setModalOpen(true)} className="flex items-center gap-1.5 p-3 rounded-xl text-[11px] text-(--cp-text-faint) hover:text-(--cp-text-muted) hover:bg-(--cp-bg-soft) transition-colors border border-dashed border-(--cp-border) cursor-pointer justify-center">
           <Plus className="w-3.5 h-3.5" /> Schedule Sync
         </button>
       </div>
@@ -78,7 +78,7 @@ export default function ProjectMeetingsPage() {
           <ModalSelect label="Type" value={form.type} onChange={v => setForm({ ...form, type: v })} options={[{ value: 'Video Call', label: 'Video Call' }, { value: 'In Person', label: 'In Person' }, { value: 'Phone Call', label: 'Phone Call' }]} />
           <ModalInput label="Meeting Link" value={form.link} onChange={v => setForm({ ...form, link: v })} placeholder="https://meet.google.com/..." />
           <div className="flex justify-end gap-3 pt-4 border-t" style={{ borderColor: 'var(--cp-border-soft)' }}>
-            <button onClick={() => setModalOpen(false)} className="px-4 py-2 rounded-xl text-[12px] font-medium text-[var(--cp-text-muted)] hover:text-[var(--cp-text)]">Cancel</button>
+            <button onClick={() => setModalOpen(false)} className="px-4 py-2 rounded-xl text-[12px] font-medium text-(--cp-text-muted) hover:text-(--cp-text)">Cancel</button>
             <button onClick={handleAdd} disabled={saving || !form.title || !form.meeting_date} className="cp-btn-primary px-5 py-2 text-[12px] cursor-pointer">
               {saving ? 'Scheduling...' : 'Schedule'}
             </button>

@@ -1,13 +1,14 @@
-'use client'
 import { useCursor } from '../providers/CursorProvider'
+import { useChapterProgress } from '@/hooks/useChapterProgress'
 
 interface ChapterDotsProps {
-  activeChapter: string
   chapterIds: readonly { readonly id: string; readonly name: string }[]
 }
 
-export default function ChapterDots({ activeChapter, chapterIds }: ChapterDotsProps) {
+export default function ChapterDots({ chapterIds }: ChapterDotsProps) {
   const { setCursorState } = useCursor()
+  const chapterIdsArray = chapterIds.map((c) => c.id)
+  const activeChapter = useChapterProgress(chapterIdsArray)
 
   const handleScrollTo = (id: string) => {
     const target = document.getElementById(id)

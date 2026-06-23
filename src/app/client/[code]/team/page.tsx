@@ -1,28 +1,18 @@
 'use client'
-import { useEffect, useState } from 'react'
-import { useParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Mail, Phone, UsersRound } from 'lucide-react'
-import { fetchProjectTeam, fetchProjectByAccessCode } from '@/lib/db'
+import { fetchProjectTeam } from '@/lib/db'
 import { PageHeader, EmptyState, Loading } from '@/components/portal/PortalUI'
+import { useClientPortalProject } from '@/hooks/useClientPortalProject'
+
+async function loadTeam(projectId: string) {
+  const { data } = await fetchProjectTeam(projectId)
+  return { data: data?.length ? data.map((pt: any) => pt.team_members) : [] }
+}
 
 export default function TeamPage() {
-  const params = useParams()
-  const code = params.code as string
-  const [team, setTeam] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    async function load() {
-      const { data: project } = await fetchProjectByAccessCode(code)
-      if (project) {
-        const { data } = await fetchProjectTeam(project.id)
-        if (data && data.length > 0) setTeam(data.map((pt: any) => pt.team_members))
-      }
-      setLoading(false)
-    }
-    load()
-  }, [code])
+  const { resource, loading } = useClientPortalProject(loadTeam)
+  const team = resource ?? []
 
   if (loading) return <Loading />
 

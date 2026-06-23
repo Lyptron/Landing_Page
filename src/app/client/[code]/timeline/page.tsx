@@ -1,36 +1,12 @@
 'use client'
-import { useEffect, useState } from 'react'
-import { useParams } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { CheckCircle2, Circle, Clock, FileText, Map } from 'lucide-react'
-import { fetchProjectByAccessCode } from '@/lib/db'
-import { PageHeader, EmptyState, Loading, SectionLabel, Badge } from '@/components/portal/PortalUI'
+import { CheckCircle2, FileText, Map } from 'lucide-react'
+import { PageHeader, EmptyState, Loading, SectionLabel, Badge, getMilestoneStatusInfo } from '@/components/portal/PortalUI'
+import { useClientPortalProject } from '@/hooks/useClientPortalProject'
 
 export default function ClientTimelinePage() {
-  const params = useParams()
-  const code = params.code as string
-  const [milestones, setMilestones] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    async function load() {
-      const { data, error } = await fetchProjectByAccessCode(code)
-      if (!error && data?.milestones?.length > 0) setMilestones(data.milestones)
-      setLoading(false)
-    }
-    load()
-  }, [code])
-
-  const getStatusConfig = (status: string) => {
-    switch (status) {
-      case 'completed':
-        return { icon: CheckCircle2, color: 'var(--cp-emerald)' }
-      case 'in-progress':
-        return { icon: Clock, color: 'var(--cp-cyan)' }
-      default:
-        return { icon: Circle, color: 'var(--cp-text-faint)' }
-    }
-  }
+  const { project, loading } = useClientPortalProject()
+  const milestones = project?.milestones ?? []
 
   if (loading) return <Loading />
 
@@ -47,11 +23,11 @@ export default function ClientTimelinePage() {
       ) : (
         <div className="relative">
           {/* Vertical line */}
-          <div className="absolute left-[7px] top-2 bottom-2 w-px" style={{ background: 'var(--cp-border-soft)' }} />
+          <div className="absolute left-1.75 top-2 bottom-2 w-px" style={{ background: 'var(--cp-border-soft)' }} />
 
           <div className="flex flex-col gap-8">
             {milestones.map((milestone, idx) => {
-              const config = getStatusConfig(milestone.status)
+              const config = getMilestoneStatusInfo(milestone.status)
               const isActive = milestone.status === 'in-progress'
               return (
                 <motion.div
@@ -89,13 +65,13 @@ export default function ClientTimelinePage() {
                     </div>
 
                     {milestone.description && (
-                      <p className="text-[13.5px] leading-relaxed mb-4 pl-[26px]" style={{ color: 'var(--cp-text-secondary)' }}>
+                      <p className="text-[13.5px] leading-relaxed mb-4 pl-6.5" style={{ color: 'var(--cp-text-secondary)' }}>
                         {milestone.description}
                       </p>
                     )}
 
                     {milestone.deliverables && milestone.deliverables.length > 0 && (
-                      <div className="flex flex-wrap gap-x-5 gap-y-2 pl-[26px]">
+                      <div className="flex flex-wrap gap-x-5 gap-y-2 pl-6.5">
                         {milestone.deliverables.map((item: string, i: number) => (
                           <Badge key={i} tone={milestone.status === 'completed' ? 'emerald' : 'neutral'} icon={milestone.status === 'completed' ? CheckCircle2 : FileText}>
                             {item}

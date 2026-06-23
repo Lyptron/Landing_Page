@@ -64,13 +64,13 @@ export default function MagneticButton({
       'hover:bg-gray-200',
     ],
     variant === 'ghost' && [
-      'border border-[var(--glass-border)]',
+      'border border-(--glass-border)',
       'text-[--text-secondary]',
       'hover:border-white/20 hover:text-[--text-primary]',
       'backdrop-blur-pill',
     ],
     variant === 'glass' && [
-      'bg-[var(--blue-glass)] border border-[rgba(29,126,245,0.25)]',
+      'bg-(--blue-glass) border border-[rgba(29,126,245,0.25)]',
       'text-[--blue]',
       'backdrop-blur-pill',
       'hover:bg-[rgba(29,126,245,0.15)]',

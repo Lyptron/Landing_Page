@@ -1,31 +1,20 @@
 'use client'
-import { useEffect, useState } from 'react'
-import { useParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Video, Clock, ExternalLink, PlayCircle, CalendarOff } from 'lucide-react'
-import { fetchMeetings, fetchProjectByAccessCode } from '@/lib/db'
+import { fetchMeetings } from '@/lib/db'
 import { PageHeader, EmptyState, Loading, SectionLabel } from '@/components/portal/PortalUI'
+import { useClientPortalProject } from '@/hooks/useClientPortalProject'
+
+async function loadMeetings(projectId: string) {
+  const { data } = await fetchMeetings(projectId)
+  return { data: data ?? [] }
+}
 
 export default function MeetingsPage() {
-  const params = useParams()
-  const code = params.code as string
-  const [meetings, setMeetings] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    async function load() {
-      const { data: project } = await fetchProjectByAccessCode(code)
-      if (project) {
-        const { data } = await fetchMeetings(project.id)
-        if (data && data.length > 0) setMeetings(data)
-      }
-      setLoading(false)
-    }
-    load()
-  }, [code])
-
-  const upcoming = meetings.filter((m) => m.type === 'upcoming')
-  const past = meetings.filter((m) => m.type === 'past')
+  const { resource, loading } = useClientPortalProject(loadMeetings)
+  const meetings = resource ?? []
+  const upcoming = meetings.filter((m: any) => m.type === 'upcoming')
+  const past = meetings.filter((m: any) => m.type === 'past')
 
   if (loading) return <Loading />
 

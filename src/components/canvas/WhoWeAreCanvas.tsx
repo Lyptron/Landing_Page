@@ -1,10 +1,10 @@
 'use client'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { useRef } from 'react'
-import * as THREE from 'three'
+import type { Mesh } from 'three'
 
 function IcosahedronMesh() {
-  const meshRef = useRef<THREE.Mesh>(null)
+  const meshRef = useRef<Mesh>(null)
   
   useFrame(() => {
     if (meshRef.current) {

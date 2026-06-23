@@ -1,15 +1,30 @@
 'use client'
-import React, { createContext, useContext, useEffect, useState } from 'react'
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import { useParams, useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Save, Trash2, CheckCircle2, AlertTriangle } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { updateProject, deleteProject, fetchTeamMembers } from '@/lib/db'
 import Modal from '@/components/ui/Modal'
+import type {
+  ProjectRow,
+  ProjectChildRow,
+  MilestoneRow,
+  PaymentRow,
+  ApprovalRow,
+  GalleryItemRow,
+  DocumentRow,
+  MeetingRow,
+  DeploymentRow,
+  ActivityRow,
+  AnnouncementRow,
+  FeedbackRow,
+  TeamMemberRow,
+  AssignedTeamMember,
+} from '@/lib/db-types'
 
-// Define Context
 interface ProjectContextType {
-  project: any
+  project: ProjectRow | null
   loading: boolean
   loadProject: () => Promise<void>
   saving: boolean
@@ -29,30 +44,31 @@ interface ProjectContextType {
   setAccessCode: (c: string | null) => void
   saveProject: () => Promise<void>
   projectId: string
-  teamAssigned: any[]
-  setTeamAssigned: React.Dispatch<React.SetStateAction<any[]>>
-  allTeamMembers: any[]
-  milestones: any[]
-  setMilestones: React.Dispatch<React.SetStateAction<any[]>>
-  payments: any[]
-  setPayments: React.Dispatch<React.SetStateAction<any[]>>
-  approvals: any[]
-  setApprovals: React.Dispatch<React.SetStateAction<any[]>>
-  gallery: any[]
-  setGallery: React.Dispatch<React.SetStateAction<any[]>>
-  documents: any[]
-  setDocuments: React.Dispatch<React.SetStateAction<any[]>>
-  meetings: any[]
-  setMeetings: React.Dispatch<React.SetStateAction<any[]>>
-  deployments: any[]
-  setDeployments: React.Dispatch<React.SetStateAction<any[]>>
-  activities: any[]
-  setActivities: React.Dispatch<React.SetStateAction<any[]>>
-  announcements: any[]
-  setAnnouncements: React.Dispatch<React.SetStateAction<any[]>>
-  feedback: any[]
-  setFeedback: React.Dispatch<React.SetStateAction<any[]>>
+  teamAssigned: AssignedTeamMember[]
+  setTeamAssigned: React.Dispatch<React.SetStateAction<AssignedTeamMember[]>>
+  allTeamMembers: TeamMemberRow[]
+  milestones: MilestoneRow[]
+  setMilestones: React.Dispatch<React.SetStateAction<MilestoneRow[]>>
+  payments: PaymentRow[]
+  setPayments: React.Dispatch<React.SetStateAction<PaymentRow[]>>
+  approvals: ApprovalRow[]
+  setApprovals: React.Dispatch<React.SetStateAction<ApprovalRow[]>>
+  gallery: GalleryItemRow[]
+  setGallery: React.Dispatch<React.SetStateAction<GalleryItemRow[]>>
+  documents: DocumentRow[]
+  setDocuments: React.Dispatch<React.SetStateAction<DocumentRow[]>>
+  meetings: MeetingRow[]
+  setMeetings: React.Dispatch<React.SetStateAction<MeetingRow[]>>
+  deployments: DeploymentRow[]
+  setDeployments: React.Dispatch<React.SetStateAction<DeploymentRow[]>>
+  activities: ActivityRow[]
+  setActivities: React.Dispatch<React.SetStateAction<ActivityRow[]>>
+  announcements: AnnouncementRow[]
+  setAnnouncements: React.Dispatch<React.SetStateAction<AnnouncementRow[]>>
+  feedback: FeedbackRow[]
+  setFeedback: React.Dispatch<React.SetStateAction<FeedbackRow[]>>
 }
+
 
 const ProjectContext = createContext<ProjectContextType | undefined>(undefined)
 
@@ -81,7 +97,7 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
   const pathname = usePathname()
   const projectId = params.id as string
 
-  const [project, setProject] = useState<any>(null)
+  const [project, setProject] = useState<ProjectRow | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
@@ -99,30 +115,26 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
   const [accessCode, setAccessCode] = useState<string | null>(null)
 
   // Related data lists
-  const [milestones, setMilestones] = useState<any[]>([])
-  const [payments, setPayments] = useState<any[]>([])
-  const [approvals, setApprovals] = useState<any[]>([])
-  const [gallery, setGallery] = useState<any[]>([])
-  const [documents, setDocuments] = useState<any[]>([])
-  const [meetings, setMeetings] = useState<any[]>([])
-  const [deployments, setDeployments] = useState<any[]>([])
-  const [activities, setActivities] = useState<any[]>([])
-  const [announcements, setAnnouncements] = useState<any[]>([])
-  const [feedback, setFeedback] = useState<any[]>([])
-  const [teamAssigned, setTeamAssigned] = useState<any[]>([])
-  const [allTeamMembers, setAllTeamMembers] = useState<any[]>([])
+  const [milestones, setMilestones] = useState<MilestoneRow[]>([])
+  const [payments, setPayments] = useState<PaymentRow[]>([])
+  const [approvals, setApprovals] = useState<ApprovalRow[]>([])
+  const [gallery, setGallery] = useState<GalleryItemRow[]>([])
+  const [documents, setDocuments] = useState<DocumentRow[]>([])
+  const [meetings, setMeetings] = useState<MeetingRow[]>([])
+  const [deployments, setDeployments] = useState<DeploymentRow[]>([])
+  const [activities, setActivities] = useState<ActivityRow[]>([])
+  const [announcements, setAnnouncements] = useState<AnnouncementRow[]>([])
+  const [feedback, setFeedback] = useState<FeedbackRow[]>([])
+  const [teamAssigned, setTeamAssigned] = useState<AssignedTeamMember[]>([])
+  const [allTeamMembers, setAllTeamMembers] = useState<TeamMemberRow[]>([])
 
-  useEffect(() => {
-    loadProject()
-  }, [projectId])
-
-  async function loadProject() {
+  const loadProject = useCallback(async () => {
     setLoading(true)
     const { data, error } = await supabase
       .from('projects')
       .select('*, milestones(*), payments(*), approvals(*), gallery(*), documents(*), meetings(*), deployments(*), activities(*), announcements(*), feedback(*), project_team(*, team_members(*))')
       .eq('id', projectId)
-      .single()
+      .single<ProjectRow>()
 
     if (error || !data) {
       setLoading(false)
@@ -137,7 +149,7 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
     setStage(data.stage || 'Backlog')
     setProgress(data.progress || 0)
     setAccessCode(data.access_code || null)
-    
+
     setMilestones(data.milestones || [])
     setPayments(data.payments || [])
     setApprovals(data.approvals || [])
@@ -146,18 +158,29 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
     setMeetings(data.meetings || [])
     setDeployments(data.deployments || [])
     setFeedback(data.feedback || [])
-    setActivities((data.activities || []).sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()))
-    setAnnouncements((data.announcements || []).sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()))
-    const members = (data.project_team || []).map((pt: any) => {
+    const byCreatedDesc = (a: ProjectChildRow, b: ProjectChildRow) =>
+      new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
+    setActivities([...(data.activities || [])].sort(byCreatedDesc))
+    setAnnouncements([...(data.announcements || [])].sort(byCreatedDesc))
+    const members: AssignedTeamMember[] = []
+    for (const pt of data.project_team || []) {
       const tm = Array.isArray(pt.team_members) ? pt.team_members[0] : pt.team_members
-      return tm ? { ...tm, assignment_id: pt.id, role_on_project: pt.role_on_project } : null
-    }).filter(Boolean)
+      if (!tm) continue
+      members.push({ ...tm, assignment_id: pt.id, role_on_project: pt.role_on_project })
+    }
     setTeamAssigned(members)
 
     const { data: team } = await fetchTeamMembers()
-    if (team) setAllTeamMembers(team)
+    if (team) setAllTeamMembers(team as TeamMemberRow[])
     setLoading(false)
-  }
+  }, [projectId])
+
+  useEffect(() => {
+    // Data fetch on mount + when projectId changes — fires setLoading synchronously,
+    // which is the established codebase pattern for initial-load effects.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadProject()
+  }, [loadProject])
 
   async function saveProject() {
     setSaving(true)
@@ -190,7 +213,7 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-32">
-        <div className="w-5 h-5 border-2 border-[var(--cp-border)] border-t-[var(--cp-text-muted)] rounded-full animate-spin" />
+        <div className="w-5 h-5 border-2 border-(--cp-border) border-t-(--cp-text-muted) rounded-full animate-spin" />
       </div>
     )
   }
@@ -262,27 +285,27 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
             borderBottom: '1px solid var(--cp-border-soft)',
           }}
         >
-          <div className="max-w-[1400px] mx-auto flex items-center justify-between">
+          <div className="max-w-350 mx-auto flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Link href="/admin/projects" className="p-2 rounded-xl transition-colors hover:bg-[var(--cp-bg-soft)]" style={{ color: 'var(--cp-text-muted)' }}>
+              <Link href="/admin/projects" className="p-2 rounded-xl transition-colors hover:bg-(--cp-bg-soft)" style={{ color: 'var(--cp-text-muted)' }}>
                 <ArrowLeft className="w-4 h-4" />
               </Link>
               <div>
-                <h1 className="font-display text-lg font-bold tracking-tight text-[var(--cp-text)]">{name || 'Untitled'}</h1>
-                <p className="text-[10px] font-mono text-[var(--cp-text-faint)]">{clientEmail}</p>
+                <h1 className="font-display text-lg font-bold tracking-tight text-(--cp-text)">{name || 'Untitled'}</h1>
+                <p className="text-[10px] font-mono text-(--cp-text-faint)">{clientEmail}</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
               {saved && (
-                <span className="text-[11px] font-medium flex items-center gap-1 text-[var(--cp-emerald)]">
+                <span className="text-[11px] font-medium flex items-center gap-1 text-(--cp-emerald)">
                   <CheckCircle2 className="w-3 h-3" /> Saved
                 </span>
               )}
-              {saveError && <span className="text-[11px] font-medium text-[var(--cp-red)]">{saveError}</span>}
+              {saveError && <span className="text-[11px] font-medium text-(--cp-red)">{saveError}</span>}
               <button
                 onClick={() => setConfirmDeleteOpen(true)}
                 disabled={deleting}
-                className="p-2 rounded-xl transition-colors hover:text-[var(--cp-red)] hover:bg-[var(--cp-red-soft)] cursor-pointer"
+                className="p-2 rounded-xl transition-colors hover:text-(--cp-red) hover:bg-(--cp-red-soft) cursor-pointer"
                 style={{ color: 'var(--cp-text-faint)' }}
               >
                 <Trash2 className="w-3.5 h-3.5" />
@@ -295,7 +318,7 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
         </div>
 
         {/* Sub Navigation Tabs */}
-        <div className="flex items-center gap-1.5 border-b border-[var(--cp-border-soft)] mb-6 overflow-x-auto pb-px no-scrollbar">
+        <div className="flex items-center gap-1.5 border-b border-(--cp-border-soft) mb-6 overflow-x-auto pb-px no-scrollbar">
           {TABS(projectId).map((tab) => {
             const isActive = pathname === tab.path
             return (
@@ -303,8 +326,8 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
                 <div
                   className={`px-4 py-2 text-[12.5px] font-semibold border-b-2 transition-colors whitespace-nowrap cursor-pointer ${
                     isActive
-                      ? 'border-[var(--cp-cyan)] text-[var(--cp-cyan)]'
-                      : 'border-transparent text-[var(--cp-text-muted)] hover:text-[var(--cp-text)]'
+                      ? 'border-(--cp-cyan) text-(--cp-cyan)'
+                      : 'border-transparent text-(--cp-text-muted) hover:text-(--cp-text)'
                   }`}
                 >
                   {tab.name}
@@ -315,7 +338,7 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
         </div>
 
         {/* Sub-page Render children */}
-        <div className="max-w-[1400px] mx-auto">
+        <div className="max-w-350 mx-auto">
           {children}
         </div>
       </div>

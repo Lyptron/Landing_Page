@@ -25,6 +25,8 @@ export function useLowPerfMode() {
       return reducedMotion || isSmall || isTouch || lowMemory || lowCores
     }
 
+    // Resolves on the client only — SSR can't measure perf characteristics.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLow(evaluate())
 
     const mql = window.matchMedia('(prefers-reduced-motion: reduce)')

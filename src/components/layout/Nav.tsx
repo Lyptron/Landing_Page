@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X, ArrowRight } from 'lucide-react'
 import { useCursor } from '../providers/CursorProvider'
 import { usePathname } from 'next/navigation'
+import { toLogicalPathname } from '@/lib/portalPath'
 import Image from 'next/image'
 
 /* ── Per-letter spin config — each letter has a unique character pool & timing ── */
@@ -103,28 +104,30 @@ function LyptronLogo({ trigger }: { trigger: number }) {
   return (
     <span className="flex items-center text-[18px] sm:text-[26px] tracking-[0.2em] sm:tracking-[0.35em] select-none overflow-hidden">
       {STYLES.map((s, i) => (
-        <SlotLetter key={i} s={s} idx={i} trigger={trigger} className={i === 5 ? 'mr-[3px]' : ''} />
+        <SlotLetter key={i} s={s} idx={i} trigger={trigger} className={i === 5 ? 'mr-0.75' : ''} />
       ))}
-      <span className="text-blue font-display font-black ml-[3px]">.</span>
+      <span className="text-blue font-display font-black ml-0.75">.</span>
     </span>
   )
 }
 
 export default function Nav() {
   const pathname = usePathname()
+  const logicalPathname = toLogicalPathname(pathname)
+  const isPortalRoute = logicalPathname.startsWith('/admin') || logicalPathname.startsWith('/client')
   const [scrolled, setScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [logoScrambleTrigger, setLogoScrambleTrigger] = useState(0)
   const { setCursorState } = useCursor()
 
   useEffect(() => {
-    if (pathname?.startsWith('/admin') || pathname?.startsWith('/client')) return
+    if (isPortalRoute) return
     const handleScroll = () => setScrolled(window.scrollY > 60)
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
-  }, [pathname])
+  }, [isPortalRoute])
 
-  if (pathname?.startsWith('/admin') || pathname?.startsWith('/client')) {
+  if (isPortalRoute) {
     return null
   }
 
@@ -152,16 +155,16 @@ export default function Nav() {
   return (
     <>
       <motion.header
-        className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-500 ${
+        className={`fixed top-0 left-0 right-0 z-100 transition-all duration-500 ${
           scrolled
-            ? 'h-[64px] bg-[rgba(5,5,5,0.85)] border-b border-white/[0.05] backdrop-blur-sm'
-            : 'h-[72px] bg-transparent border-b border-transparent'
+            ? 'h-16 bg-[rgba(5,5,5,0.85)] border-b border-white/5 backdrop-blur-sm'
+            : 'h-18 bg-transparent border-b border-transparent'
         }`}
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
       >
-        <div className="w-full h-full px-6 lg:px-[40px] flex items-center justify-between">
+        <div className="w-full h-full px-6 lg:px-10 flex items-center justify-between">
 
           {/* Logo — GIF + animated text */}
           <button
@@ -192,7 +195,7 @@ export default function Nav() {
                 key={item.name}
                 href={item.href}
                 onClick={(e) => handleScrollTo(e, item.href)}
-                className="relative px-4 py-2 font-body text-[13px] text-white/40 hover:text-white/80 uppercase tracking-[0.05em] transition-colors duration-300 select-none cursor-none rounded-lg hover:bg-white/[0.04]"
+                className="relative px-4 py-2 font-body text-[13px] text-white/40 hover:text-white/80 uppercase tracking-wider transition-colors duration-300 select-none cursor-none rounded-lg hover:bg-white/4"
                 onMouseEnter={() => setCursorState('hover')}
                 onMouseLeave={() => setCursorState('default')}
               >
@@ -205,7 +208,7 @@ export default function Nav() {
           <div className="hidden sm:flex items-center gap-3">
             <button
               onClick={(e) => handleScrollTo(e, '#cta')}
-              className="group relative overflow-hidden inline-flex items-center justify-center font-body font-medium text-[13px] text-[#050505] bg-white hover:bg-white/90 rounded-full py-[10px] px-[24px] transition-all duration-300 cursor-none"
+              className="group relative overflow-hidden inline-flex items-center justify-center font-body font-medium text-[13px] text-bg bg-white hover:bg-white/90 rounded-full py-2.5 px-6 transition-all duration-300 cursor-none"
               onMouseEnter={() => setCursorState('hover')}
               onMouseLeave={() => setCursorState('default')}
             >
@@ -236,13 +239,13 @@ export default function Nav() {
             role="dialog"
             aria-modal="true"
             aria-label="Main navigation"
-            className="fixed inset-0 z-[101] bg-[#050505] flex flex-col justify-center px-8 md:hidden"
+            className="fixed inset-0 z-101 bg-bg flex flex-col justify-center px-8 md:hidden"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.35 }}
           >
-            <div className="absolute top-0 left-0 right-0 h-[72px] flex items-center justify-end px-6">
+            <div className="absolute top-0 left-0 right-0 h-18 flex items-center justify-end px-6">
               <button
                 onClick={() => setMobileMenuOpen(false)}
                 className="p-2 text-white/60 hover:text-white"
@@ -276,7 +279,7 @@ export default function Nav() {
             >
               <button
                 onClick={(e) => handleScrollTo(e, '#cta')}
-                className="w-full flex items-center justify-between p-4 rounded-xl bg-white text-[#050505] font-display font-bold text-lg"
+                className="w-full flex items-center justify-between p-4 rounded-xl bg-white text-bg font-display font-bold text-lg"
               >
                 Start a Project
                 <ArrowRight className="w-5 h-5" />

@@ -1,4 +1,3 @@
-import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 const ADMIN_HOST = 'admin.lyptron.com'
@@ -49,49 +48,7 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  let response = rewriteUrl ? NextResponse.rewrite(rewriteUrl, { request }) : NextResponse.next({ request })
-
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-  if (!supabaseUrl || !supabaseAnonKey) {
-    return response
-  }
-
-  // The Supabase session refresh + admin auth gate is only relevant for
-  // admin routes — skip the extra round-trip for marketing/client traffic.
-  if (!effectivePathname.startsWith('/admin')) {
-    return response
-  }
-
-  const supabase = createServerClient(
-    supabaseUrl,
-    supabaseAnonKey,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll()
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
-          response = rewriteUrl ? NextResponse.rewrite(rewriteUrl, { request }) : NextResponse.next({ request })
-          cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options)
-          )
-        },
-      },
-    }
-  )
-
-  // Securely retrieve the authenticated user
-  const { data: { user } } = await supabase.auth.getUser()
-
-  // Protect Admin dashboard routes (allow access to /admin/login)
-  if (!effectivePathname.includes('/admin/login') && !user) {
-    return NextResponse.redirect(new URL('/admin/login', request.url))
-  }
-
-  return response
+  return rewriteUrl ? NextResponse.rewrite(rewriteUrl, { request }) : NextResponse.next({ request })
 }
 
 export const config = {

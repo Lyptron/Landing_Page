@@ -128,7 +128,7 @@ export default function TeamHierarchyPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-5 shrink-0">
         <div>
-          <h1 className="font-display text-2xl font-bold tracking-tight" style={{ color: 'var(--cp-text)' }}>Team Hierarchy</h1>
+          <h1 className="font-display text-2xl md:text-3xl font-bold tracking-tight" style={{ color: 'var(--cp-text)' }}>Team Hierarchy</h1>
           <p className="text-[13px] mt-0.5" style={{ color: 'var(--cp-text-faint)' }}>Departments, reporting lines, and project assignments.</p>
         </div>
         {isFounder && (
@@ -140,7 +140,7 @@ export default function TeamHierarchyPage() {
 
       {loading ? (
         <div className="flex-1 flex items-center justify-center">
-          <div className="w-5 h-5 border-2 border-[var(--cp-border)] border-t-[var(--cp-text-muted)] rounded-full animate-spin" />
+          <div className="w-5 h-5 border-2 border-(--cp-border) border-t-(--cp-text-muted) rounded-full animate-spin" />
         </div>
       ) : members.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center">
@@ -149,7 +149,7 @@ export default function TeamHierarchyPage() {
           <p className="text-[13px]" style={{ color: 'var(--cp-text-faint)' }}>Team members added to the agency will appear here.</p>
         </div>
       ) : (
-        <div className={`flex-1 overflow-y-auto custom-scrollbar pr-1 transition-all duration-300 ${selected ? 'lg:pr-[380px]' : ''}`}>
+        <div className={`flex-1 overflow-y-auto custom-scrollbar pr-1 transition-all duration-300 ${selected ? 'lg:pr-95' : ''}`}>
           <div className="flex flex-col gap-6">
             {Object.entries(grouped).map(([dept, list]) => (
               <div key={dept}>
@@ -180,7 +180,7 @@ export default function TeamHierarchyPage() {
                         <p className="text-[10px] truncate" style={{ color: 'var(--cp-text-faint)' }}>Reports to {m.manager.name}</p>
                       )}
                       {m.project_team && m.project_team.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-2.5 pt-2 border-t border-[var(--cp-border-soft)]">
+                        <div className="flex flex-wrap gap-1 mt-2.5 pt-2 border-t border-(--cp-border-soft)">
                           {m.project_team.map((pt: any) => {
                             const proj = Array.isArray(pt.projects) ? pt.projects[0] : pt.projects
                             if (!proj) return null
@@ -217,7 +217,7 @@ export default function TeamHierarchyPage() {
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: 380, opacity: 0 }}
             transition={{ type: 'spring', damping: 28, stiffness: 220 }}
-            className="absolute top-0 right-0 bottom-0 w-full sm:w-[380px] flex flex-col z-20"
+            className="absolute top-0 right-0 bottom-0 w-full sm:w-95 flex flex-col z-20"
             style={{ background: 'var(--cp-surface)', borderLeft: '1px solid var(--cp-border-soft)', boxShadow: '-8px 0 24px rgba(0,0,0,0.06)' }}
           >
             <div className="p-5 border-b flex items-start justify-between" style={{ borderColor: 'var(--cp-border-soft)' }}>
@@ -230,7 +230,7 @@ export default function TeamHierarchyPage() {
                   <p className="text-[11px]" style={{ color: 'var(--cp-text-muted)' }}>{selected.title || selected.role}</p>
                 </div>
               </div>
-              <button onClick={() => setSelected(null)} className="p-1.5 rounded-lg transition-colors text-[var(--cp-text-muted)] hover:text-[var(--cp-text)] hover:bg-[var(--cp-bg-soft)]">
+              <button onClick={() => setSelected(null)} className="p-1.5 rounded-lg transition-colors text-(--cp-text-muted) hover:text-(--cp-text) hover:bg-(--cp-bg-soft)">
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -323,7 +323,7 @@ export default function TeamHierarchyPage() {
                             type="color"
                             value={editForm.accent_color || '#ffffff'}
                             onChange={(e) => setEditForm({ ...editForm, accent_color: e.target.value })}
-                            className="w-10 h-8 rounded border border-[var(--cp-border-soft)] cursor-pointer bg-transparent"
+                            className="w-10 h-8 rounded border border-(--cp-border-soft) cursor-pointer bg-transparent"
                           />
                           <input
                             type="text"
@@ -382,7 +382,7 @@ export default function TeamHierarchyPage() {
           </div>
           <ModalInput label="Department" value={form.department} onChange={(v) => setForm({ ...form, department: v })} placeholder="e.g. Engineering" />
           <div className="flex justify-end gap-3 pt-4 border-t" style={{ borderColor: 'var(--cp-border-soft)' }}>
-            <button onClick={() => setModalOpen(false)} className="px-4 py-2 rounded-xl text-[12px] font-medium transition-colors text-[var(--cp-text-muted)] hover:text-[var(--cp-text)]">Cancel</button>
+            <button onClick={() => setModalOpen(false)} className="px-4 py-2 rounded-xl text-[12px] font-medium transition-colors text-(--cp-text-muted) hover:text-(--cp-text)">Cancel</button>
             <button onClick={handleAdd} disabled={saving || !form.name || !form.initials || !form.role} className="cp-btn-primary px-5 py-2 text-[12px]">
               {saving ? 'Adding...' : 'Add Member'}
             </button>

@@ -17,6 +17,8 @@ export default function Cursor() {
   const springY = useSpring(cursorY, springConfig)
 
   useEffect(() => {
+    // Resolves on the client only — SSR can't know viewport width.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsDesktop(window.innerWidth > 768)
   }, [])
 

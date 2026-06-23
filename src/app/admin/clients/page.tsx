@@ -26,9 +26,9 @@ function OnboardingStepper({ stage, progress }: { stage: string; progress: numbe
       <div className="flex items-center mb-2.5">
         {ONBOARDING_STAGES.map((s, i) => (
           <div key={s} className="flex items-center flex-1 last:flex-none">
-            <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${i <= currentIndex ? 'bg-[var(--cp-emerald)]' : 'bg-[var(--cp-border-strong)]'}`} />
+            <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${i <= currentIndex ? 'bg-(--cp-emerald)' : 'bg-(--cp-border-strong)'}`} />
             {i < ONBOARDING_STAGES.length - 1 && (
-              <div className={`flex-1 h-px mx-1 ${i < currentIndex ? 'bg-[var(--cp-emerald)]/40' : 'bg-[var(--cp-border)]'}`} />
+              <div className={`flex-1 h-px mx-1 ${i < currentIndex ? 'bg-(--cp-emerald)/40' : 'bg-(--cp-border)'}`} />
             )}
           </div>
         ))}
@@ -159,9 +159,9 @@ export default function ClientsPage() {
   }
 
   const statusStyle = (s: string) => {
-    if (s === 'Active') return 'bg-[var(--cp-emerald-soft)] text-[var(--cp-emerald)] border-[var(--cp-emerald-border)]'
-    if (s === 'Onboarding') return 'bg-[var(--cp-cyan-soft)] text-[var(--cp-cyan)] border-[var(--cp-cyan-border)]'
-    return 'bg-[var(--cp-bg-soft)] text-[var(--cp-text-faint)] border-[var(--cp-border)]'
+    if (s === 'Active') return 'bg-(--cp-emerald-soft) text-(--cp-emerald) border-(--cp-emerald-border)'
+    if (s === 'Onboarding') return 'bg-(--cp-cyan-soft) text-(--cp-cyan) border-(--cp-cyan-border)'
+    return 'bg-(--cp-bg-soft) text-(--cp-text-faint) border-(--cp-border)'
   }
 
   return (
@@ -169,7 +169,7 @@ export default function ClientsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-5 shrink-0">
         <div>
-          <h1 className="font-display text-2xl font-bold tracking-tight" style={{ color: 'var(--cp-text)' }}>Clients</h1>
+          <h1 className="font-display text-2xl md:text-3xl font-bold tracking-tight" style={{ color: 'var(--cp-text)' }}>Clients</h1>
           <p className="text-[13px] mt-0.5" style={{ color: 'var(--cp-text-faint)' }}>Manage all agency clients and contracts.</p>
         </div>
         <button onClick={() => setModalOpen(true)} className="cp-btn-primary flex items-center gap-1.5 px-4 py-2 text-[12px]">
@@ -179,7 +179,7 @@ export default function ClientsPage() {
 
       {loading ? (
         <div className="flex-1 flex items-center justify-center">
-          <div className="w-5 h-5 border-2 border-[var(--cp-border)] border-t-[var(--cp-text-muted)] rounded-full animate-spin" />
+          <div className="w-5 h-5 border-2 border-(--cp-border) border-t-(--cp-text-muted) rounded-full animate-spin" />
         </div>
       ) : clients.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center">
@@ -189,7 +189,7 @@ export default function ClientsPage() {
           <button onClick={() => setModalOpen(true)} className="cp-btn-primary px-5 py-2 text-[12px]">Add Client</button>
         </div>
       ) : (
-        <div className={`flex-1 overflow-hidden flex gap-0 transition-all duration-300 ${selectedClient ? 'pr-[360px]' : ''}`}>
+        <div className={`flex-1 overflow-hidden flex gap-0 transition-all duration-300 ${selectedClient ? 'pr-90' : ''}`}>
           {/* Table */}
           <div className="flex-1 rounded-2xl overflow-hidden flex flex-col cp-card">
             {/* Table Header */}
@@ -206,7 +206,7 @@ export default function ClientsPage() {
                 <div
                   key={client.id}
                   onClick={() => setSelectedClient(client)}
-                  className={`grid grid-cols-12 gap-3 px-4 py-3 items-center cursor-pointer border-b transition-colors ${selectedClient?.id === client.id ? 'bg-[var(--cp-cyan-soft)]' : 'hover:bg-[var(--cp-bg-soft)]'}`}
+                  className={`grid grid-cols-12 gap-3 px-4 py-3 items-center cursor-pointer border-b transition-colors ${selectedClient?.id === client.id ? 'bg-(--cp-cyan-soft)' : 'hover:bg-(--cp-bg-soft)'}`}
                   style={{ borderColor: 'var(--cp-border-soft)' }}
                 >
                   <div className="col-span-3 flex items-center gap-2.5 min-w-0">
@@ -247,7 +247,7 @@ export default function ClientsPage() {
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: 360, opacity: 0 }}
             transition={{ type: 'spring', damping: 28, stiffness: 220 }}
-            className="absolute top-0 right-0 bottom-0 w-[360px] flex flex-col z-20"
+            className="absolute top-0 right-0 bottom-0 w-90 flex flex-col z-20"
             style={{ background: 'var(--cp-surface)', borderLeft: '1px solid var(--cp-border-soft)', boxShadow: '-8px 0 24px rgba(0,0,0,0.06)' }}
           >
             {/* Slide-out Header */}
@@ -261,7 +261,7 @@ export default function ClientsPage() {
                   <span className={`inline-flex px-2 py-0.5 rounded-md text-[8px] font-bold uppercase tracking-[0.1em] border mt-0.5 ${statusStyle(selectedClient.status)}`}>{selectedClient.status || 'New'}</span>
                 </div>
               </div>
-              <button onClick={() => setSelectedClient(null)} className="p-1.5 rounded-lg transition-colors hover:bg-[var(--cp-bg-soft)] hover:text-[var(--cp-text)]" style={{ color: 'var(--cp-text-faint)' }}>
+              <button onClick={() => setSelectedClient(null)} className="p-1.5 rounded-lg transition-colors hover:bg-(--cp-bg-soft) hover:text-(--cp-text)" style={{ color: 'var(--cp-text-faint)' }}>
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -326,7 +326,7 @@ export default function ClientsPage() {
                 {!clientProject ? (
                   <p className="text-[11px]" style={{ color: 'var(--cp-text-faint)' }}>No project linked yet.</p>
                 ) : detailLoading ? (
-                  <div className="flex justify-center py-3"><div className="w-4 h-4 border-2 border-[var(--cp-border)] border-t-[var(--cp-text-muted)] rounded-full animate-spin" /></div>
+                  <div className="flex justify-center py-3"><div className="w-4 h-4 border-2 border-(--cp-border) border-t-(--cp-text-muted) rounded-full animate-spin" /></div>
                 ) : documents.length === 0 ? (
                   <p className="text-[11px]" style={{ color: 'var(--cp-text-faint)' }}>No documents uploaded.</p>
                 ) : (
@@ -334,7 +334,7 @@ export default function ClientsPage() {
                     {documents.map((d) => (
                       <div key={d.id} className="flex items-center justify-between gap-2 text-[12px]">
                         <span className="truncate" style={{ color: 'var(--cp-text-secondary)' }}>{d.title}</span>
-                        <span className="shrink-0 px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-[0.1em] border bg-[var(--cp-bg-soft)] text-[var(--cp-text-muted)] border-[var(--cp-border)]">{d.type || 'File'}</span>
+                        <span className="shrink-0 px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-[0.1em] border bg-(--cp-bg-soft) text-(--cp-text-muted) border-(--cp-border)">{d.type || 'File'}</span>
                       </div>
                     ))}
                   </div>
@@ -348,7 +348,7 @@ export default function ClientsPage() {
                 {!clientProject ? (
                   <p className="text-[11px]" style={{ color: 'var(--cp-text-faint)' }}>No project linked yet.</p>
                 ) : detailLoading ? (
-                  <div className="flex justify-center py-3"><div className="w-4 h-4 border-2 border-[var(--cp-border)] border-t-[var(--cp-text-muted)] rounded-full animate-spin" /></div>
+                  <div className="flex justify-center py-3"><div className="w-4 h-4 border-2 border-(--cp-border) border-t-(--cp-text-muted) rounded-full animate-spin" /></div>
                 ) : activities.length === 0 ? (
                   <p className="text-[11px]" style={{ color: 'var(--cp-text-faint)' }}>No activity recorded.</p>
                 ) : (
@@ -370,7 +370,7 @@ export default function ClientsPage() {
                 {!clientProject ? (
                   <p className="text-[11px]" style={{ color: 'var(--cp-text-faint)' }}>No project linked yet.</p>
                 ) : detailLoading ? (
-                  <div className="flex justify-center py-3"><div className="w-4 h-4 border-2 border-[var(--cp-border)] border-t-[var(--cp-text-muted)] rounded-full animate-spin" /></div>
+                  <div className="flex justify-center py-3"><div className="w-4 h-4 border-2 border-(--cp-border) border-t-(--cp-text-muted) rounded-full animate-spin" /></div>
                 ) : meetings.length === 0 ? (
                   <p className="text-[11px]" style={{ color: 'var(--cp-text-faint)' }}>No meetings scheduled.</p>
                 ) : (
@@ -381,7 +381,7 @@ export default function ClientsPage() {
                           <p className="truncate" style={{ color: 'var(--cp-text-secondary)' }}>{m.title}</p>
                           <p className="text-[10px] mt-0.5" style={{ color: 'var(--cp-text-faint)' }}>{m.meeting_date ? new Date(m.meeting_date).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' }) : '-'}{m.meeting_time ? ` · ${m.meeting_time}` : ''}</p>
                         </div>
-                        <span className={`shrink-0 px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-[0.1em] border ${m.type === 'past' ? 'bg-[var(--cp-bg-soft)] text-[var(--cp-text-faint)] border-[var(--cp-border)]' : 'bg-[var(--cp-cyan-soft)] text-[var(--cp-cyan)] border-[var(--cp-cyan-border)]'}`}>{m.type === 'past' ? 'Past' : 'Upcoming'}</span>
+                        <span className={`shrink-0 px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-[0.1em] border ${m.type === 'past' ? 'bg-(--cp-bg-soft) text-(--cp-text-faint) border-(--cp-border)' : 'bg-(--cp-cyan-soft) text-(--cp-cyan) border-(--cp-cyan-border)'}`}>{m.type === 'past' ? 'Past' : 'Upcoming'}</span>
                       </div>
                     ))}
                   </div>
@@ -395,7 +395,7 @@ export default function ClientsPage() {
                 <div className="flex flex-col gap-2">
                   <button
                     onClick={() => openDanger('finance')}
-                    className="flex items-center justify-between gap-3 p-3 rounded-xl text-left transition-colors hover:bg-[var(--cp-red-soft)]"
+                    className="flex items-center justify-between gap-3 p-3 rounded-xl text-left transition-colors hover:bg-(--cp-red-soft)"
                     style={{ background: 'var(--cp-bg-soft)', border: '1px solid var(--cp-border-soft)' }}
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
@@ -408,7 +408,7 @@ export default function ClientsPage() {
                   </button>
                   <button
                     onClick={() => openDanger('data')}
-                    className="flex items-center justify-between gap-3 p-3 rounded-xl text-left transition-colors hover:bg-[var(--cp-red-soft)]"
+                    className="flex items-center justify-between gap-3 p-3 rounded-xl text-left transition-colors hover:bg-(--cp-red-soft)"
                     style={{ background: 'var(--cp-bg-soft)', border: '1px solid var(--cp-border-soft)' }}
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
@@ -456,7 +456,7 @@ export default function ClientsPage() {
             <ModalInput label="Website" value={formWebsite} onChange={setFormWebsite} placeholder="acme.com" />
           </div>
           <div className="flex justify-end gap-3 pt-4 border-t" style={{ borderColor: 'var(--cp-border-soft)' }}>
-            <button onClick={() => setModalOpen(false)} className="px-4 py-2 rounded-xl text-[12px] font-medium text-[var(--cp-text-muted)] hover:text-[var(--cp-text)] transition-colors">Cancel</button>
+            <button onClick={() => setModalOpen(false)} className="px-4 py-2 rounded-xl text-[12px] font-medium text-(--cp-text-muted) hover:text-(--cp-text) transition-colors">Cancel</button>
             <button onClick={addClient} disabled={saving || !formCompany || !formContact || !formEmail} className="cp-btn-primary px-5 py-2 text-[12px]">
               {saving ? 'Adding...' : 'Add Client'}
             </button>

@@ -25,10 +25,10 @@ const ANNOUNCEMENT_TONE_COLORS: Record<string, 'cyan' | 'emerald' | 'amber' | 'r
 
 interface Announcement {
   id: string
-  title: string
+  title?: string
   body?: string
-  tone: string
-  is_active: boolean
+  tone?: string
+  is_active?: boolean
   created_at?: string
 }
 
@@ -177,7 +177,7 @@ export default function ProjectOverviewPage() {
             <select
               value={status}
               onChange={e => setStatus(e.target.value)}
-              className="px-3 py-2.5 rounded-xl text-[13px] outline-none [&>option]:bg-[var(--cp-bg-elevated)] [&>option]:text-[var(--cp-text)]"
+              className="px-3 py-2.5 rounded-xl text-[13px] outline-none [&>option]:bg-(--cp-bg-elevated) [&>option]:text-(--cp-text)"
               style={{ background: 'var(--cp-bg-soft)', border: '1px solid var(--cp-border)', color: 'var(--cp-text)' }}
             >
               <option value="starting">Starting</option>
@@ -191,7 +191,7 @@ export default function ProjectOverviewPage() {
             <select
               value={stage}
               onChange={e => setStage(e.target.value)}
-              className="px-3 py-2.5 rounded-xl text-[13px] outline-none [&>option]:bg-[var(--cp-bg-elevated)] [&>option]:text-[var(--cp-text)]"
+              className="px-3 py-2.5 rounded-xl text-[13px] outline-none [&>option]:bg-(--cp-bg-elevated) [&>option]:text-(--cp-text)"
               style={{ background: 'var(--cp-bg-soft)', border: '1px solid var(--cp-border)', color: 'var(--cp-text)' }}
             >
               <option value="Backlog">Backlog</option>
@@ -233,14 +233,14 @@ export default function ProjectOverviewPage() {
                 setCopiedCode(true)
                 setTimeout(() => setCopiedCode(false), 2000)
               }}
-              className="p-3 rounded-xl transition-all hover:bg-[var(--cp-bg-soft)] hover:text-[var(--cp-text)] cursor-pointer"
+              className="p-3 rounded-xl transition-all hover:bg-(--cp-bg-soft) hover:text-(--cp-text) cursor-pointer"
               style={{ color: 'var(--cp-text-muted)' }}
             >
               {copiedCode ? <CheckCircle2 className="w-4 h-4" style={{ color: 'var(--cp-emerald)' }} /> : <Copy className="w-4 h-4" />}
             </button>
             <button
               onClick={handleRemoveCode}
-              className="p-3 rounded-xl transition-all hover:text-[var(--cp-red)] hover:bg-[var(--cp-red-soft)] cursor-pointer"
+              className="p-3 rounded-xl transition-all hover:text-(--cp-red) hover:bg-(--cp-red-soft) cursor-pointer"
               style={{ color: 'var(--cp-text-muted)' }}
             >
               <Trash2 className="w-4 h-4" />
@@ -253,7 +253,7 @@ export default function ProjectOverviewPage() {
               placeholder="Custom code or leave blank"
               value={customCode}
               onChange={e => setCustomCode(e.target.value.toUpperCase())}
-              className="flex-1 px-4 py-3 rounded-xl text-[13px] font-mono tracking-widest outline-none placeholder:text-[var(--cp-text-faint)]"
+              className="flex-1 px-4 py-3 rounded-xl text-[13px] font-mono tracking-widest outline-none placeholder:text-(--cp-text-faint)"
               style={{ background: 'var(--cp-bg-soft)', border: '1px solid var(--cp-border)', color: 'var(--cp-text)' }}
             />
             <button onClick={handleGenerateCode} className="cp-btn-primary px-5 py-3 text-[12px] cursor-pointer">Generate</button>
@@ -292,8 +292,8 @@ export default function ProjectOverviewPage() {
                   <div className="flex items-center gap-3 min-w-0 flex-1">
                     <Badge tone={ANNOUNCEMENT_TONE_COLORS[a.tone] || 'cyan'}>{a.tone}</Badge>
                     <div className="flex flex-col min-w-0">
-                      <span className="text-[13px] font-semibold truncate text-[var(--cp-text)]">{a.title}</span>
-                      {a.body && <span className="text-[11px] truncate text-[var(--cp-text-muted)]">{a.body}</span>}
+                      <span className="text-[13px] font-semibold truncate text-(--cp-text)">{a.title}</span>
+                      {a.body && <span className="text-[11px] truncate text-(--cp-text-muted)">{a.body}</span>}
                     </div>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
@@ -347,7 +347,7 @@ export default function ProjectOverviewPage() {
             options={ANNOUNCEMENT_TONES}
           />
           <div className="flex justify-end gap-3 pt-4 border-t" style={{ borderColor: 'var(--cp-border-soft)' }}>
-            <button onClick={() => setAnnouncementModalOpen(false)} className="px-4 py-2 rounded-xl text-[12px] font-medium text-[var(--cp-text-muted)] hover:text-[var(--cp-text)]">Cancel</button>
+            <button onClick={() => setAnnouncementModalOpen(false)} className="px-4 py-2 rounded-xl text-[12px] font-medium text-(--cp-text-muted) hover:text-(--cp-text)">Cancel</button>
             <button onClick={handleAddAnnouncement} disabled={announcementSaving || !newAnnouncement.title} className="cp-btn-primary px-5 py-2 text-[12px] cursor-pointer">
               {announcementSaving ? 'Adding...' : 'Add Announcement'}
             </button>

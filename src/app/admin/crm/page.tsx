@@ -157,24 +157,24 @@ export default function CRMPipelinePage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-5 shrink-0">
         <div>
-          <h1 className="font-display text-2xl font-bold tracking-tight text-[var(--cp-text)]">Sales Pipeline</h1>
-          <p className="text-[13px] mt-0.5 flex items-center gap-1.5 text-[var(--cp-text-faint)]">
+          <h1 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-(--cp-text)">Sales Pipeline</h1>
+          <p className="text-[13px] mt-0.5 flex items-center gap-1.5 text-(--cp-text-faint)">
             {isFounder ? (
-              <>Pipeline: <RestrictedValue value={totalPipeline} className="font-mono text-[var(--cp-text-secondary)]" /> across <span className="font-mono text-[var(--cp-text-secondary)]">{filteredLeads.length}</span> leads.</>
+              <>Pipeline: <RestrictedValue value={totalPipeline} className="font-mono text-(--cp-text-secondary)" /> across <span className="font-mono text-(--cp-text-secondary)">{filteredLeads.length}</span> leads.</>
             ) : (
-              <>Tracking <span className="font-mono text-[var(--cp-text-secondary)]">{filteredLeads.length}</span> leads · Avg quality score <span className="font-mono text-[var(--cp-text-secondary)]">{avgQuality}</span>.</>
+              <>Tracking <span className="font-mono text-(--cp-text-secondary)">{filteredLeads.length}</span> leads · Avg quality score <span className="font-mono text-(--cp-text-secondary)">{avgQuality}</span>.</>
             )}
           </p>
         </div>
         <div className="flex items-center gap-2">
           {/* View Toggle */}
-          <div className="flex p-0.5 rounded-xl bg-[var(--cp-bg-soft)] border border-[var(--cp-border)]">
+          <div className="flex p-0.5 rounded-xl bg-(--cp-bg-soft) border border-(--cp-border)">
             <button
               onClick={() => setViewMode('kanban')}
               className={`px-3 py-1 text-[11px] font-semibold rounded-lg transition-colors cursor-pointer ${
                 viewMode === 'kanban'
-                  ? 'bg-[var(--cp-surface)] text-[var(--cp-text)] shadow-sm'
-                  : 'text-[var(--cp-text-muted)] hover:text-[var(--cp-text)]'
+                  ? 'bg-(--cp-surface) text-(--cp-text) shadow-sm'
+                  : 'text-(--cp-text-muted) hover:text-(--cp-text)'
               }`}
             >
               Kanban
@@ -183,8 +183,8 @@ export default function CRMPipelinePage() {
               onClick={() => setViewMode('table')}
               className={`px-3 py-1 text-[11px] font-semibold rounded-lg transition-colors cursor-pointer ${
                 viewMode === 'table'
-                  ? 'bg-[var(--cp-surface)] text-[var(--cp-text)] shadow-sm'
-                  : 'text-[var(--cp-text-muted)] hover:text-[var(--cp-text)]'
+                  ? 'bg-(--cp-surface) text-(--cp-text) shadow-sm'
+                  : 'text-(--cp-text-muted) hover:text-(--cp-text)'
               }`}
             >
               Table
@@ -210,17 +210,17 @@ export default function CRMPipelinePage() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search leads, companies, or owners…"
-          className="flex-1 bg-transparent outline-none text-[13px] placeholder:text-[var(--cp-text-faint)]"
+          className="flex-1 bg-transparent outline-none text-[13px] placeholder:text-(--cp-text-faint)"
           style={{ color: 'var(--cp-text)' }}
         />
       </div>
 
       {loading ? (
         <div className="flex-1 flex items-center justify-center">
-          <div className="w-5 h-5 border-2 border-[var(--cp-border)] border-t-[var(--cp-text-muted)] rounded-full animate-spin" />
+          <div className="w-5 h-5 border-2 border-(--cp-border) border-t-(--cp-text-muted) rounded-full animate-spin" />
         </div>
       ) : (
-        <div className={`flex-1 overflow-hidden relative flex gap-4 transition-all duration-300 ${selectedLead ? 'lg:pr-[380px]' : ''}`}>
+        <div className={`flex-1 overflow-hidden relative flex gap-4 transition-all duration-300 ${selectedLead ? 'lg:pr-95' : ''}`}>
           {viewMode === 'kanban' ? (
             <div className="flex-1 overflow-x-auto overflow-y-hidden pb-4 flex gap-4">
               {STAGES.map((stage) => {
@@ -228,7 +228,7 @@ export default function CRMPipelinePage() {
                 const stageValue = stageLeads.reduce((acc, l) => acc + (l.value || 0), 0)
                 const stageAvgQuality = stageLeads.length ? Math.round(stageLeads.reduce((acc, l) => acc + (l.quality_score ?? 50), 0) / stageLeads.length) : 0
                 return (
-                  <div key={stage} className="flex flex-col w-[270px] shrink-0 rounded-2xl max-h-full overflow-hidden" style={{ background: 'var(--cp-bg-soft)', border: '1px solid var(--cp-border-soft)' }} onDragOver={handleDragOver} onDrop={(e) => handleDrop(e, stage)}>
+                  <div key={stage} className="flex flex-col w-67.5 shrink-0 rounded-2xl max-h-full overflow-hidden" style={{ background: 'var(--cp-bg-soft)', border: '1px solid var(--cp-border-soft)' }} onDragOver={handleDragOver} onDrop={(e) => handleDrop(e, stage)}>
                     <div className="px-4 py-3 border-b" style={{ borderColor: 'var(--cp-border-soft)' }}>
                       <div className="flex justify-between items-center">
                         <div className="flex items-center gap-2">
@@ -268,12 +268,12 @@ export default function CRMPipelinePage() {
                                 next_followup_at: lead.next_followup_at ? new Date(lead.next_followup_at).toISOString().split('T')[0] : '',
                               })
                             }}
-                            className="p-3.5 rounded-xl cursor-grab active:cursor-grabbing hover:border-[var(--cp-cyan-border)] transition-all group relative overflow-hidden"
+                            className="p-3.5 rounded-xl cursor-grab active:cursor-grabbing hover:border-(--cp-cyan-border) transition-all group relative overflow-hidden"
                             style={{ background: 'var(--cp-surface)', border: '1px solid var(--cp-border-soft)' }}
                             whileHover={{ borderColor: 'var(--cp-cyan-border)' }}
                           >
                             {/* Probability bar */}
-                            <div className="absolute top-0 left-0 h-[2px]" style={{ width: `${lead.probability}%`, background: 'linear-gradient(90deg, var(--cp-cyan), var(--cp-cyan-border))' }} />
+                            <div className="absolute top-0 left-0 h-0.5" style={{ width: `${lead.probability}%`, background: 'linear-gradient(90deg, var(--cp-cyan), var(--cp-cyan-border))' }} />
 
                             <h4 className="text-[13px] font-bold mb-0.5 mt-1" style={{ color: 'var(--cp-text)' }}>{lead.company}</h4>
                             <p className="text-[10px] mb-3" style={{ color: 'var(--cp-text-muted)' }}>{lead.contact}{lead.owner ? ` · ${lead.owner}` : ''}</p>
@@ -294,7 +294,7 @@ export default function CRMPipelinePage() {
                                 </span>
                               )}
                               {isFounder && (
-                                <RestrictedValue value={lead.value} className="text-[9px] font-mono text-[var(--cp-text-muted)] px-2 py-0.5 rounded-md" />
+                                <RestrictedValue value={lead.value} className="text-[9px] font-mono text-(--cp-text-muted) px-2 py-0.5 rounded-md" />
                               )}
                             </div>
 
@@ -309,7 +309,7 @@ export default function CRMPipelinePage() {
                         )
                       })}
                       {stageLeads.length === 0 && (
-                        <div className="flex-1 min-h-[80px] border border-dashed rounded-xl flex items-center justify-center" style={{ borderColor: 'var(--cp-border)' }}>
+                        <div className="flex-1 min-h-20 border border-dashed rounded-xl flex items-center justify-center" style={{ borderColor: 'var(--cp-border)' }}>
                           <span className="text-[10px]" style={{ color: 'var(--cp-text-faint)' }}>Drop here</span>
                         </div>
                       )}
@@ -325,28 +325,28 @@ export default function CRMPipelinePage() {
               })}
             </div>
           ) : (
-            <div className="flex-1 overflow-auto rounded-xl border bg-[var(--cp-surface)] border-[var(--cp-border)]">
+            <div className="flex-1 overflow-auto rounded-xl border bg-(--cp-surface) border-(--cp-border)">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b bg-[var(--cp-bg-soft)] border-[var(--cp-border)]">
-                    <th className="p-3 text-[10px] uppercase font-mono tracking-wider text-[var(--cp-text-muted)]">Company</th>
-                    <th className="p-3 text-[10px] uppercase font-mono tracking-wider text-[var(--cp-text-muted)]">Contact</th>
-                    <th className="p-3 text-[10px] uppercase font-mono tracking-wider text-[var(--cp-text-muted)]">Stage</th>
-                    <th className="p-3 text-[10px] uppercase font-mono tracking-wider text-[var(--cp-text-muted)]">Priority</th>
-                    <th className="p-3 text-[10px] uppercase font-mono tracking-wider text-[var(--cp-text-muted)]">Quality Score</th>
-                    <th className="p-3 text-[10px] uppercase font-mono tracking-wider text-[var(--cp-text-muted)]">Probability</th>
-                    {isFounder && <th className="p-3 text-[10px] uppercase font-mono tracking-wider text-[var(--cp-text-muted)]">Value</th>}
-                    <th className="p-3 text-[10px] uppercase font-mono tracking-wider text-[var(--cp-text-muted)]">Owner</th>
-                    <th className="p-3 text-[10px] uppercase font-mono tracking-wider text-[var(--cp-text-muted)]">Next Follow-up</th>
+                  <tr className="border-b bg-(--cp-bg-soft) border-(--cp-border)">
+                    <th className="p-3 text-[10px] uppercase font-mono tracking-wider text-(--cp-text-muted)">Company</th>
+                    <th className="p-3 text-[10px] uppercase font-mono tracking-wider text-(--cp-text-muted)">Contact</th>
+                    <th className="p-3 text-[10px] uppercase font-mono tracking-wider text-(--cp-text-muted)">Stage</th>
+                    <th className="p-3 text-[10px] uppercase font-mono tracking-wider text-(--cp-text-muted)">Priority</th>
+                    <th className="p-3 text-[10px] uppercase font-mono tracking-wider text-(--cp-text-muted)">Quality Score</th>
+                    <th className="p-3 text-[10px] uppercase font-mono tracking-wider text-(--cp-text-muted)">Probability</th>
+                    {isFounder && <th className="p-3 text-[10px] uppercase font-mono tracking-wider text-(--cp-text-muted)">Value</th>}
+                    <th className="p-3 text-[10px] uppercase font-mono tracking-wider text-(--cp-text-muted)">Owner</th>
+                    <th className="p-3 text-[10px] uppercase font-mono tracking-wider text-(--cp-text-muted)">Next Follow-up</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[var(--cp-border-soft)]">
+                <tbody className="divide-y divide-(--cp-border-soft)">
                   {filteredLeads.map((lead) => {
                     const pStyle = priorityStyle(lead.priority)
                     return (
                       <tr
                         key={lead.id}
-                        className="hover:bg-[var(--cp-surface-strong)] transition-colors cursor-pointer"
+                        className="hover:bg-(--cp-surface-strong) transition-colors cursor-pointer"
                         onClick={() => {
                           setSelectedLead(lead)
                           setEditForm({
@@ -363,9 +363,9 @@ export default function CRMPipelinePage() {
                           })
                         }}
                       >
-                        <td className="p-3 text-[13px] font-semibold text-[var(--cp-text)]">{lead.company}</td>
-                        <td className="p-3 text-[12px] text-[var(--cp-text-secondary)]">{lead.contact}</td>
-                        <td className="p-3 text-[12px] text-[var(--cp-text-secondary)]">
+                        <td className="p-3 text-[13px] font-semibold text-(--cp-text)">{lead.company}</td>
+                        <td className="p-3 text-[12px] text-(--cp-text-secondary)">{lead.contact}</td>
+                        <td className="p-3 text-[12px] text-(--cp-text-secondary)">
                           <span className="font-medium">{lead.stage}</span>
                         </td>
                         <td className="p-3">
@@ -378,14 +378,14 @@ export default function CRMPipelinePage() {
                             <Gauge className="w-3 h-3" /> {lead.quality_score ?? 50}
                           </span>
                         </td>
-                        <td className="p-3 text-[12px] font-mono text-[var(--cp-text-muted)]">{lead.probability}%</td>
+                        <td className="p-3 text-[12px] font-mono text-(--cp-text-muted)">{lead.probability}%</td>
                         {isFounder && (
-                          <td className="p-3 text-[12px] font-mono text-[var(--cp-text-secondary)]">
+                          <td className="p-3 text-[12px] font-mono text-(--cp-text-secondary)">
                             <RestrictedValue value={lead.value} />
                           </td>
                         )}
-                        <td className="p-3 text-[12px] text-[var(--cp-text-muted)]">{lead.owner || '—'}</td>
-                        <td className="p-3 text-[11.5px] text-[var(--cp-text-muted)]">
+                        <td className="p-3 text-[12px] text-(--cp-text-muted)">{lead.owner || '—'}</td>
+                        <td className="p-3 text-[11.5px] text-(--cp-text-muted)">
                           {lead.next_followup_at ? new Date(lead.next_followup_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}
                         </td>
                       </tr>
@@ -393,7 +393,7 @@ export default function CRMPipelinePage() {
                   })}
                   {filteredLeads.length === 0 && (
                     <tr>
-                      <td colSpan={isFounder ? 9 : 8} className="p-8 text-center text-[12px] text-[var(--cp-text-faint)]">
+                      <td colSpan={isFounder ? 9 : 8} className="p-8 text-center text-[12px] text-(--cp-text-faint)">
                         No leads found
                       </td>
                     </tr>
@@ -413,15 +413,15 @@ export default function CRMPipelinePage() {
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: 380, opacity: 0 }}
             transition={{ type: 'spring', damping: 28, stiffness: 220 }}
-            className="absolute top-0 right-0 bottom-0 w-full sm:w-[380px] flex flex-col z-20"
+            className="absolute top-0 right-0 bottom-0 w-full sm:w-95 flex flex-col z-20"
             style={{ background: 'var(--cp-surface)', borderLeft: '1px solid var(--cp-border-soft)', boxShadow: '-8px 0 24px rgba(0,0,0,0.06)' }}
           >
             <div className="p-5 border-b flex items-start justify-between" style={{ borderColor: 'var(--cp-border-soft)' }}>
               <div>
-                <h2 className="text-[16px] font-bold text-[var(--cp-text)]">{editForm.company}</h2>
-                <p className="text-[11px] text-[var(--cp-text-muted)]">{editForm.contact}</p>
+                <h2 className="text-[16px] font-bold text-(--cp-text)">{editForm.company}</h2>
+                <p className="text-[11px] text-(--cp-text-muted)">{editForm.contact}</p>
               </div>
-              <button onClick={() => setSelectedLead(null)} className="p-1.5 rounded-lg text-[var(--cp-text-muted)] hover:text-[var(--cp-text)] hover:bg-[var(--cp-bg-soft)] cursor-pointer">
+              <button onClick={() => setSelectedLead(null)} className="p-1.5 rounded-lg text-(--cp-text-muted) hover:text-(--cp-text) hover:bg-(--cp-bg-soft) cursor-pointer">
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -479,7 +479,7 @@ export default function CRMPipelinePage() {
             )}
           </div>
           <div className="flex justify-end gap-3 pt-4 border-t" style={{ borderColor: 'var(--cp-border-soft)' }}>
-            <button onClick={() => setModalOpen(false)} className="px-4 py-2 rounded-xl text-[12px] font-medium transition-colors text-[var(--cp-text-muted)] hover:text-[var(--cp-text)]">Cancel</button>
+            <button onClick={() => setModalOpen(false)} className="px-4 py-2 rounded-xl text-[12px] font-medium transition-colors text-(--cp-text-muted) hover:text-(--cp-text)">Cancel</button>
             <button onClick={addLead} disabled={saving || !form.company || !form.contact} className="cp-btn-primary px-5 py-2 text-[12px] cursor-pointer">
               {saving ? 'Adding...' : 'Add Lead'}
             </button>

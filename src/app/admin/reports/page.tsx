@@ -1,10 +1,7 @@
 'use client'
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import dynamic from 'next/dynamic'
 import { motion } from 'framer-motion'
-import {
-  AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
-  XAxis, YAxis, CartesianGrid, Tooltip as RTooltip, ResponsiveContainer,
-} from 'recharts'
 import {
   Download, Calendar, BarChart3, TrendingUp, Wallet, ListChecks, Activity,
   Megaphone, Gauge, ShieldAlert, FolderKanban,
@@ -12,7 +9,19 @@ import {
 import { useAdminAuth } from '@/lib/AdminAuthContext'
 import { fetchRevenueAnalytics, fetchSubscriptions, fetchCampaigns, fetchLeads, fetchTasks, fetchProjects } from '@/lib/db'
 import { priorityStyle, slaRiskStyle } from '@/lib/badges'
-import { useChartTheme, tooltipContentStyle, tooltipLabelStyle, tooltipItemStyle } from '@/lib/theme/chartTheme'
+import { useChartTheme } from '@/lib/theme/chartTheme'
+
+const loading = () => <div className="h-full w-full" />
+const RevenueExpensesChart = dynamic(() => import('./Charts').then((m) => ({ default: m.RevenueExpensesChart })), { ssr: false, loading })
+const ProfitBarChart = dynamic(() => import('./Charts').then((m) => ({ default: m.ProfitBarChart })), { ssr: false, loading })
+const SubCategoryBarChart = dynamic(() => import('./Charts').then((m) => ({ default: m.SubCategoryBarChart })), { ssr: false, loading })
+const RevenueTrendChart = dynamic(() => import('./Charts').then((m) => ({ default: m.RevenueTrendChart })), { ssr: false, loading })
+const CampaignBarChart = dynamic(() => import('./Charts').then((m) => ({ default: m.CampaignBarChart })), { ssr: false, loading })
+const LeadGenChart = dynamic(() => import('./Charts').then((m) => ({ default: m.LeadGenChart })), { ssr: false, loading })
+const FunnelStageBarChart = dynamic(() => import('./Charts').then((m) => ({ default: m.FunnelStageBarChart })), { ssr: false, loading })
+const PipelineStackedChart = dynamic(() => import('./Charts').then((m) => ({ default: m.PipelineStackedChart })), { ssr: false, loading })
+const SlaBarChart = dynamic(() => import('./Charts').then((m) => ({ default: m.SlaBarChart })), { ssr: false, loading })
+const CategoricalDonut = dynamic(() => import('./Charts').then((m) => ({ default: m.CategoricalDonut })), { ssr: false, loading })
 
 const STAGES = ['New', 'Contacted', 'Qualified', 'Proposal Sent', 'Negotiation', 'Converted', 'Lost']
 const PRIORITY_KEYS = ['critical', 'high', 'medium', 'low'] as const
@@ -77,10 +86,10 @@ function Kpi({ label, value, icon: Icon }: { label: string; value: string | numb
       style={{ background: 'var(--cp-surface)', border: '1px solid var(--cp-border-soft)' }}
     >
       <div>
-        <p className="text-[9px] font-mono uppercase tracking-[0.15em] text-[var(--cp-text-faint)] mb-1">{label}</p>
-        <p className="text-[22px] font-display font-bold tracking-tight text-[var(--cp-text)]">{value}</p>
+        <p className="text-[9px] font-mono uppercase tracking-[0.15em] text-(--cp-text-faint) mb-1">{label}</p>
+        <p className="text-[22px] font-display font-bold tracking-tight text-(--cp-text)">{value}</p>
       </div>
-      <Icon className="w-5 h-5 text-[var(--cp-text-faint)] opacity-50" />
+      <Icon className="w-5 h-5 text-(--cp-text-faint) opacity-50" />
     </motion.div>
   )
 }
@@ -89,10 +98,10 @@ function ChartCard({ title, legend, children }: { title: string; legend?: ReactN
   return (
     <div className="p-5 rounded-2xl mb-5" style={{ background: 'var(--cp-surface)', border: '1px solid var(--cp-border-soft)' }}>
       <div className="flex justify-between items-center mb-5">
-        <h3 className="text-[13px] font-bold text-[var(--cp-text-secondary)]">{title}</h3>
+        <h3 className="text-[13px] font-bold text-(--cp-text-secondary)">{title}</h3>
         {legend}
       </div>
-      <div className="h-[280px] w-full">{children}</div>
+      <div className="h-70 w-full">{children}</div>
     </div>
   )
 }
@@ -101,8 +110,8 @@ function EmptyChart({ icon: Icon, message }: { icon: any; message: string }) {
   return (
     <div className="h-full flex items-center justify-center">
       <div className="text-center">
-        <Icon className="w-8 h-8 text-[var(--cp-text-faint)] mx-auto mb-2" />
-        <p className="text-[12px] text-[var(--cp-text-faint)]">{message}</p>
+        <Icon className="w-8 h-8 text-(--cp-text-faint) mx-auto mb-2" />
+        <p className="text-[12px] text-(--cp-text-faint)">{message}</p>
       </div>
     </div>
   )
@@ -111,26 +120,26 @@ function EmptyChart({ icon: Icon, message }: { icon: any; message: string }) {
 function ReportTable({ headers, rows, onExport }: { headers: string[]; rows: ReactNode[][]; onExport: () => void }) {
   return (
     <div className="rounded-2xl overflow-hidden" style={{ background: 'var(--cp-surface)', border: '1px solid var(--cp-border-soft)' }}>
-      <div className="flex justify-between items-center px-5 py-4 border-b border-[var(--cp-border-soft)]">
-        <h3 className="text-[13px] font-bold text-[var(--cp-text-secondary)]">Detail</h3>
-        <button onClick={onExport} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-semibold text-[var(--cp-text-secondary)] hover:text-[var(--cp-text)] transition-all" style={{ background: 'var(--cp-surface-strong)', border: '1px solid var(--cp-border)' }}>
+      <div className="flex justify-between items-center px-5 py-4 border-b border-(--cp-border-soft)">
+        <h3 className="text-[13px] font-bold text-(--cp-text-secondary)">Detail</h3>
+        <button onClick={onExport} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-semibold text-(--cp-text-secondary) hover:text-(--cp-text) transition-all" style={{ background: 'var(--cp-surface-strong)', border: '1px solid var(--cp-border)' }}>
           <Download className="w-3 h-3" /> Export CSV
         </button>
       </div>
       {rows.length === 0 ? (
-        <div className="py-12 text-center text-[12px] text-[var(--cp-text-faint)]">No data for this range.</div>
+        <div className="py-12 text-center text-[12px] text-(--cp-text-faint)">No data for this range.</div>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
-              <tr className="border-b border-[var(--cp-border-soft)]">
-                {headers.map(h => <th key={h} className="px-4 py-2.5 text-[9px] font-mono uppercase tracking-[0.15em] text-[var(--cp-text-faint)] whitespace-nowrap">{h}</th>)}
+              <tr className="border-b border-(--cp-border-soft)">
+                {headers.map(h => <th key={h} className="px-4 py-2.5 text-[9px] font-mono uppercase tracking-[0.15em] text-(--cp-text-faint) whitespace-nowrap">{h}</th>)}
               </tr>
             </thead>
             <tbody>
               {rows.map((row, i) => (
-                <tr key={i} className="border-b border-[var(--cp-border-soft)] hover:bg-[var(--cp-surface-strong)] transition-colors">
-                  {row.map((cell, j) => <td key={j} className="px-4 py-2.5 text-[12px] text-[var(--cp-text-secondary)] whitespace-nowrap">{cell}</td>)}
+                <tr key={i} className="border-b border-(--cp-border-soft) hover:bg-(--cp-surface-strong) transition-colors">
+                  {row.map((cell, j) => <td key={j} className="px-4 py-2.5 text-[12px] text-(--cp-text-secondary) whitespace-nowrap">{cell}</td>)}
                 </tr>
               ))}
             </tbody>
@@ -170,12 +179,8 @@ export default function ReportsPage() {
   const [dateFrom, setDateFrom] = useState('')
   const [dateTo, setDateTo] = useState('')
 
+  // chartTheme still consumed for the inline legend dots that live outside lazy chart blocks.
   const chartTheme = useChartTheme()
-  const tooltipStyle = useMemo(() => ({
-    contentStyle: tooltipContentStyle(chartTheme),
-    labelStyle: tooltipLabelStyle(chartTheme),
-    itemStyle: tooltipItemStyle(chartTheme),
-  }), [chartTheme])
 
   useEffect(() => {
     async function load() {
@@ -350,7 +355,7 @@ export default function ReportsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-32">
-        <div className="w-5 h-5 border-2 border-[var(--cp-border)] border-t-[var(--cp-text-muted)] rounded-full animate-spin" />
+        <div className="w-5 h-5 border-2 border-(--cp-border) border-t-(--cp-text-muted) rounded-full animate-spin" />
       </div>
     )
   }
@@ -360,18 +365,18 @@ export default function ReportsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-5">
         <div>
-          <h1 className="font-display text-2xl font-bold tracking-tight text-[var(--cp-text)] flex items-center gap-2">
-            <BarChart3 className="w-5 h-5 text-[var(--cp-text-faint)]" /> Reports
+          <h1 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-(--cp-text) flex items-center gap-2">
+            <BarChart3 className="w-5 h-5 text-(--cp-text-faint)" /> Reports
           </h1>
-          <p className="text-[var(--cp-text-faint)] text-[13px] mt-0.5">Role-aware report catalog with date-range filtering and CSV export.</p>
+          <p className="text-(--cp-text-faint) text-[13px] mt-0.5">Role-aware report catalog with date-range filtering and CSV export.</p>
         </div>
         <div className="flex items-center gap-2">
-          <Calendar className="w-3.5 h-3.5 text-[var(--cp-text-faint)]" />
-          <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} className="px-3 py-2 rounded-xl text-[12px] text-[var(--cp-text-secondary)] outline-none" style={{ background: 'var(--cp-surface)', border: '1px solid var(--cp-border-soft)' }} />
-          <span className="text-[var(--cp-text-faint)] text-[12px]">to</span>
-          <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} className="px-3 py-2 rounded-xl text-[12px] text-[var(--cp-text-secondary)] outline-none" style={{ background: 'var(--cp-surface)', border: '1px solid var(--cp-border-soft)' }} />
+          <Calendar className="w-3.5 h-3.5 text-(--cp-text-faint)" />
+          <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} className="px-3 py-2 rounded-xl text-[12px] text-(--cp-text-secondary) outline-none" style={{ background: 'var(--cp-surface)', border: '1px solid var(--cp-border-soft)' }} />
+          <span className="text-(--cp-text-faint) text-[12px]">to</span>
+          <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} className="px-3 py-2 rounded-xl text-[12px] text-(--cp-text-secondary) outline-none" style={{ background: 'var(--cp-surface)', border: '1px solid var(--cp-border-soft)' }} />
           {(dateFrom || dateTo) && (
-            <button onClick={() => { setDateFrom(''); setDateTo('') }} className="text-[11px] text-[var(--cp-text-faint)] hover:text-[var(--cp-text-secondary)] transition-colors px-2">Clear</button>
+            <button onClick={() => { setDateFrom(''); setDateTo('') }} className="text-[11px] text-(--cp-text-faint) hover:text-(--cp-text-secondary) transition-colors px-2">Clear</button>
           )}
         </div>
       </div>
@@ -382,7 +387,7 @@ export default function ReportsPage() {
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-[12px] font-semibold transition-all ${tab === t.id ? 'bg-[var(--cp-cyan)] text-white' : 'text-[var(--cp-text-muted)] hover:text-[var(--cp-text-secondary)]'}`}
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-[12px] font-semibold transition-all ${tab === t.id ? 'bg-(--cp-cyan) text-white' : 'text-(--cp-text-muted) hover:text-(--cp-text-secondary)'}`}
           >
             <t.icon className="w-3.5 h-3.5" /> {t.label}
           </button>
@@ -399,28 +404,9 @@ export default function ReportsPage() {
             <Kpi label="Latest Net Margin" value={`${latestMargin}%`} icon={Gauge} />
           </div>
           <ChartCard title="Revenue & Expenses">
-            {revenueChartData.length === 0 ? <EmptyChart icon={Wallet} message="No revenue data for this range." /> : (
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={revenueChartData} margin={{ top: 5, right: 0, left: -20, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="colorMrr" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor={chartTheme.series[0]} stopOpacity={0.25} />
-                      <stop offset="95%" stopColor={chartTheme.series[0]} stopOpacity={0} />
-                    </linearGradient>
-                    <linearGradient id="colorExp" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor={chartTheme.series[2]} stopOpacity={0.2} />
-                      <stop offset="95%" stopColor={chartTheme.series[2]} stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke={chartTheme.grid} vertical={false} />
-                  <XAxis dataKey="name" stroke={chartTheme.axis} fontSize={9} tickLine={false} axisLine={false} />
-                  <YAxis stroke={chartTheme.axis} fontSize={9} tickLine={false} axisLine={false} tickFormatter={(val) => `₹${(val / 100000).toFixed(0)}L`} width={40} />
-                  <RTooltip {...tooltipStyle} formatter={(value: any, name: any) => [`₹${Number(value).toLocaleString('en-IN')}`, name === 'mrr' ? 'Revenue' : 'Expenses']} />
-                  <Area type="monotone" dataKey="mrr" stroke={chartTheme.series[0]} strokeWidth={1.5} fillOpacity={1} fill="url(#colorMrr)" dot={false} />
-                  <Area type="monotone" dataKey="expenses" stroke={chartTheme.series[2]} strokeWidth={1} fillOpacity={1} fill="url(#colorExp)" dot={false} />
-                </AreaChart>
-              </ResponsiveContainer>
-            )}
+            {revenueChartData.length === 0
+              ? <EmptyChart icon={Wallet} message="No revenue data for this range." />
+              : <RevenueExpensesChart data={revenueChartData} />}
           </ChartCard>
           <ReportTable
             headers={['Month', 'MRR', 'Expenses', 'Net Margin']}
@@ -440,17 +426,9 @@ export default function ReportsPage() {
             <Kpi label="Months Tracked" value={profitData.length} icon={Activity} />
           </div>
           <ChartCard title="Monthly Profit">
-            {profitData.length === 0 ? <EmptyChart icon={Wallet} message="No profitability data for this range." /> : (
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={profitData} margin={{ top: 5, right: 0, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke={chartTheme.grid} vertical={false} />
-                  <XAxis dataKey="name" stroke={chartTheme.axis} fontSize={9} tickLine={false} axisLine={false} />
-                  <YAxis stroke={chartTheme.axis} fontSize={9} tickLine={false} axisLine={false} tickFormatter={(val) => `₹${(val / 100000).toFixed(0)}L`} width={40} />
-                  <RTooltip {...tooltipStyle} formatter={(value: any) => [`₹${Number(value).toLocaleString('en-IN')}`, 'Profit']} />
-                  <Bar dataKey="profit" fill={chartTheme.series[1]} radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            )}
+            {profitData.length === 0
+              ? <EmptyChart icon={Wallet} message="No profitability data for this range." />
+              : <ProfitBarChart data={profitData} />}
           </ChartCard>
           <ReportTable
             headers={['Month', 'Revenue', 'Expenses', 'Profit', 'Margin']}
@@ -470,17 +448,9 @@ export default function ReportsPage() {
             <Kpi label="Renewals Due (30d)" value={renewalsSoon} icon={Calendar} />
           </div>
           <ChartCard title="Monthly Cost by Category">
-            {subCategoryData.length === 0 ? <EmptyChart icon={ListChecks} message="No subscription data yet." /> : (
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={subCategoryData} margin={{ top: 5, right: 0, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke={chartTheme.grid} vertical={false} />
-                  <XAxis dataKey="name" stroke={chartTheme.axis} fontSize={9} tickLine={false} axisLine={false} />
-                  <YAxis stroke={chartTheme.axis} fontSize={9} tickLine={false} axisLine={false} tickFormatter={(val) => `₹${val}`} width={50} />
-                  <RTooltip {...tooltipStyle} formatter={(value: any) => [`₹${Number(value).toLocaleString('en-IN')}`, 'Monthly Cost']} />
-                  <Bar dataKey="total" fill={chartTheme.series[2]} radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            )}
+            {subCategoryData.length === 0
+              ? <EmptyChart icon={ListChecks} message="No subscription data yet." />
+              : <SubCategoryBarChart data={subCategoryData} />}
           </ChartCard>
           <ReportTable
             headers={['Name', 'Category', 'Monthly Cost', 'Yearly Cost', 'Status', 'Renewal Date', 'Owner']}
@@ -512,23 +482,9 @@ export default function ReportsPage() {
             <Kpi label="Open Tasks" value={openTasksCount} icon={ListChecks} />
           </div>
           <ChartCard title="Revenue Trend">
-            {revenueChartData.length === 0 ? <EmptyChart icon={Wallet} message="No revenue data for this range." /> : (
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={revenueChartData} margin={{ top: 5, right: 0, left: -20, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="colorMrr2" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor={chartTheme.series[0]} stopOpacity={0.25} />
-                      <stop offset="95%" stopColor={chartTheme.series[0]} stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke={chartTheme.grid} vertical={false} />
-                  <XAxis dataKey="name" stroke={chartTheme.axis} fontSize={9} tickLine={false} axisLine={false} />
-                  <YAxis stroke={chartTheme.axis} fontSize={9} tickLine={false} axisLine={false} tickFormatter={(val) => `₹${(val / 100000).toFixed(0)}L`} width={40} />
-                  <RTooltip {...tooltipStyle} formatter={(value: any) => [`₹${Number(value).toLocaleString('en-IN')}`, 'Revenue']} />
-                  <Area type="monotone" dataKey="mrr" stroke={chartTheme.series[0]} strokeWidth={1.5} fillOpacity={1} fill="url(#colorMrr2)" dot={false} />
-                </AreaChart>
-              </ResponsiveContainer>
-            )}
+            {revenueChartData.length === 0
+              ? <EmptyChart icon={Wallet} message="No revenue data for this range." />
+              : <RevenueTrendChart data={revenueChartData} />}
           </ChartCard>
           <ReportTable
             headers={['Department', 'Metric', 'Value']}
@@ -566,17 +522,9 @@ export default function ReportsPage() {
             <Kpi label="Avg Conversion Rate" value={`${campaignRows.length ? (campaignRows.reduce((a, c) => a + (c.conversion_rate || 0), 0) / campaignRows.length).toFixed(1) : '0'}%`} icon={Gauge} />
           </div>
           <ChartCard title="Leads Generated by Campaign">
-            {campaignChartData.length === 0 ? <EmptyChart icon={Megaphone} message="No campaign data for this range." /> : (
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={campaignChartData} margin={{ top: 5, right: 0, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke={chartTheme.grid} vertical={false} />
-                  <XAxis dataKey="name" stroke={chartTheme.axis} fontSize={9} tickLine={false} axisLine={false} interval={0} angle={-20} textAnchor="end" height={50} />
-                  <YAxis stroke={chartTheme.axis} fontSize={9} tickLine={false} axisLine={false} width={30} />
-                  <RTooltip {...tooltipStyle} formatter={(value: any) => [value, 'Leads Generated']} />
-                  <Bar dataKey="leads" fill={chartTheme.series[0]} radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            )}
+            {campaignChartData.length === 0
+              ? <EmptyChart icon={Megaphone} message="No campaign data for this range." />
+              : <CampaignBarChart data={campaignChartData} />}
           </ChartCard>
           <ReportTable
             headers={['Campaign', 'Channel', 'Status', 'Leads Generated', 'Conversion Rate', 'Start', 'End']}
@@ -604,23 +552,9 @@ export default function ReportsPage() {
             <Kpi label="Avg Conv. Probability" value={`${leadRows.length ? Math.round(leadRows.reduce((a, l) => a + (l.probability ?? 0), 0) / leadRows.length) : 0}%`} icon={Activity} />
           </div>
           <ChartCard title="New Leads Over Time">
-            {leadGenData.length === 0 ? <EmptyChart icon={TrendingUp} message="No lead data for this range." /> : (
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={leadGenData} margin={{ top: 5, right: 0, left: -20, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="colorLeads" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor={chartTheme.series[0]} stopOpacity={0.25} />
-                      <stop offset="95%" stopColor={chartTheme.series[0]} stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke={chartTheme.grid} vertical={false} />
-                  <XAxis dataKey="name" stroke={chartTheme.axis} fontSize={9} tickLine={false} axisLine={false} />
-                  <YAxis stroke={chartTheme.axis} fontSize={9} tickLine={false} axisLine={false} width={30} allowDecimals={false} />
-                  <RTooltip {...tooltipStyle} formatter={(value: any) => [value, 'New Leads']} />
-                  <Area type="monotone" dataKey="count" stroke={chartTheme.series[0]} strokeWidth={1.5} fillOpacity={1} fill="url(#colorLeads)" dot={false} />
-                </AreaChart>
-              </ResponsiveContainer>
-            )}
+            {leadGenData.length === 0
+              ? <EmptyChart icon={TrendingUp} message="No lead data for this range." />
+              : <LeadGenChart data={leadGenData} />}
           </ChartCard>
           <ReportTable
             headers={['Month', 'New Leads', 'Avg Quality Score']}
@@ -640,17 +574,9 @@ export default function ReportsPage() {
             <Kpi label="Avg Probability" value={`${leadRows.length ? Math.round(leadRows.reduce((a, l) => a + (l.probability ?? 0), 0) / leadRows.length) : 0}%`} icon={TrendingUp} />
           </div>
           <ChartCard title="Leads by Stage">
-            {leadRows.length === 0 ? <EmptyChart icon={Gauge} message="No lead data for this range." /> : (
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={funnelData} margin={{ top: 5, right: 0, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke={chartTheme.grid} vertical={false} />
-                  <XAxis dataKey="stage" stroke={chartTheme.axis} fontSize={9} tickLine={false} axisLine={false} interval={0} angle={-20} textAnchor="end" height={60} />
-                  <YAxis stroke={chartTheme.axis} fontSize={9} tickLine={false} axisLine={false} width={30} allowDecimals={false} />
-                  <RTooltip {...tooltipStyle} formatter={(value: any) => [value, 'Leads']} />
-                  <Bar dataKey="count" fill={chartTheme.series[0]} radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            )}
+            {leadRows.length === 0
+              ? <EmptyChart icon={Gauge} message="No lead data for this range." />
+              : <FunnelStageBarChart data={funnelData} />}
           </ChartCard>
           <ReportTable
             headers={['Stage', 'Count', '% of Total', 'Avg Quality Score', 'Avg Conv. Probability']}
@@ -674,26 +600,16 @@ export default function ReportsPage() {
             legend={
               <div className="flex items-center gap-3">
                 {PRIORITY_KEYS.map(p => (
-                  <div key={p} className="flex items-center gap-1.5 text-[10px] text-[var(--cp-text-faint)]">
+                  <div key={p} className="flex items-center gap-1.5 text-[10px] text-(--cp-text-faint)">
                     <div className="w-1.5 h-1.5 rounded-full" style={{ background: priorityStyle(p).color }} /> {priorityStyle(p).label}
                   </div>
                 ))}
               </div>
             }
           >
-            {leadRows.length === 0 ? <EmptyChart icon={Activity} message="No lead data for this range." /> : (
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={pipelineData} margin={{ top: 5, right: 0, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke={chartTheme.grid} vertical={false} />
-                  <XAxis dataKey="stage" stroke={chartTheme.axis} fontSize={9} tickLine={false} axisLine={false} interval={0} angle={-20} textAnchor="end" height={60} />
-                  <YAxis stroke={chartTheme.axis} fontSize={9} tickLine={false} axisLine={false} width={30} allowDecimals={false} />
-                  <RTooltip {...tooltipStyle} />
-                  {PRIORITY_KEYS.map(p => (
-                    <Bar key={p} dataKey={p} stackId="priority" name={priorityStyle(p).label} fill={priorityStyle(p).color} radius={p === 'critical' ? [4, 4, 0, 0] : undefined} />
-                  ))}
-                </BarChart>
-              </ResponsiveContainer>
-            )}
+            {leadRows.length === 0
+              ? <EmptyChart icon={Activity} message="No lead data for this range." />
+              : <PipelineStackedChart data={pipelineData} />}
           </ChartCard>
           <ReportTable
             headers={['Stage', 'Total', 'Critical', 'High', 'Medium', 'Low', 'Avg Quality']}
@@ -726,21 +642,12 @@ export default function ReportsPage() {
             title="SLA Status — Leads vs Tasks"
             legend={
               <div className="flex items-center gap-3">
-                <div className="flex items-center gap-1.5 text-[10px] text-[var(--cp-text-faint)]"><div className="w-1.5 h-1.5 rounded-full" style={{ background: chartTheme.series[0] }} /> Leads</div>
-                <div className="flex items-center gap-1.5 text-[10px] text-[var(--cp-text-faint)]"><div className="w-1.5 h-1.5 rounded-full" style={{ background: chartTheme.series[3] }} /> Tasks</div>
+                <div className="flex items-center gap-1.5 text-[10px] text-(--cp-text-faint)"><div className="w-1.5 h-1.5 rounded-full" style={{ background: chartTheme.series[0] }} /> Leads</div>
+                <div className="flex items-center gap-1.5 text-[10px] text-(--cp-text-faint)"><div className="w-1.5 h-1.5 rounded-full" style={{ background: chartTheme.series[3] }} /> Tasks</div>
               </div>
             }
           >
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={slaChartData} margin={{ top: 5, right: 0, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke={chartTheme.grid} vertical={false} />
-                <XAxis dataKey="name" stroke={chartTheme.axis} fontSize={9} tickLine={false} axisLine={false} />
-                <YAxis stroke={chartTheme.axis} fontSize={9} tickLine={false} axisLine={false} width={30} allowDecimals={false} />
-                <RTooltip {...tooltipStyle} />
-                <Bar dataKey="Leads" fill={chartTheme.series[0]} radius={[4, 4, 0, 0]} />
-                <Bar dataKey="Tasks" fill={chartTheme.series[3]} radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            <SlaBarChart data={slaChartData} />
           </ChartCard>
           <ReportTable
             headers={['SLA Status', 'Leads', 'Tasks', 'Total']}
@@ -763,16 +670,9 @@ export default function ReportsPage() {
             <Kpi label="Overdue" value={overdueTasks} icon={ShieldAlert} />
           </div>
           <ChartCard title="Tasks by Status">
-            {totalTasks === 0 ? <EmptyChart icon={ListChecks} message="No task data for this range." /> : (
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie data={taskStatusCounts} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={60} outerRadius={90} paddingAngle={2}>
-                    {taskStatusCounts.map((entry, i) => <Cell key={i} fill={entry.color} stroke="none" />)}
-                  </Pie>
-                  <RTooltip {...tooltipStyle} />
-                </PieChart>
-              </ResponsiveContainer>
-            )}
+            {totalTasks === 0
+              ? <EmptyChart icon={ListChecks} message="No task data for this range." />
+              : <CategoricalDonut data={taskStatusCounts} />}
           </ChartCard>
           <ReportTable
             headers={['Status', 'Count', '% of Total']}
@@ -795,16 +695,9 @@ export default function ReportsPage() {
             <Kpi label="Avg Progress" value={`${avgProgress}%`} icon={Activity} />
           </div>
           <ChartCard title="Project Health Distribution">
-            {projects.length === 0 ? <EmptyChart icon={FolderKanban} message="No project data yet." /> : (
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie data={healthCounts} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={60} outerRadius={90} paddingAngle={2}>
-                    {healthCounts.map((entry, i) => <Cell key={i} fill={entry.color} stroke="none" />)}
-                  </Pie>
-                  <RTooltip {...tooltipStyle} />
-                </PieChart>
-              </ResponsiveContainer>
-            )}
+            {projects.length === 0
+              ? <EmptyChart icon={FolderKanban} message="No project data yet." />
+              : <CategoricalDonut data={healthCounts} />}
           </ChartCard>
           <ReportTable
             headers={['Project', 'Stage', 'Health', 'Progress']}

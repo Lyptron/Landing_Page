@@ -50,34 +50,34 @@ export default function ProjectDeliverablesPage() {
   return (
     <div className="cp-card p-5">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-[13px] font-bold text-[var(--cp-text-secondary)]">Feature & Design Approvals</h3>
-        <span className="text-[10px] font-mono text-[var(--cp-text-faint)]">{approvals.length} total</span>
+        <h3 className="text-[13px] font-bold text-(--cp-text-secondary)">Feature & Design Approvals</h3>
+        <span className="text-[10px] font-mono text-(--cp-text-faint)">{approvals.length} total</span>
       </div>
       <div className="flex flex-col gap-2">
         {approvals.map(a => (
-          <div key={a.id} className="flex items-center justify-between p-3 rounded-xl bg-[var(--cp-bg-soft)] border border-[var(--cp-border-soft)]">
+          <div key={a.id} className="flex items-center justify-between p-3 rounded-xl bg-(--cp-bg-soft) border border-(--cp-border-soft)">
             <div className="flex flex-col gap-0.5 min-w-0">
-              <span className="text-[13px] text-[var(--cp-text)] font-semibold truncate">{a.title}</span>
-              {a.description && <span className="text-[11px] text-[var(--cp-text-muted)] truncate">{a.description}</span>}
-              <span className="text-[9px] font-mono uppercase text-[var(--cp-text-faint)]">{a.type} • {a.status || 'pending'}</span>
+              <span className="text-[13px] text-(--cp-text) font-semibold truncate">{a.title}</span>
+              {a.description && <span className="text-[11px] text-(--cp-text-muted) truncate">{a.description}</span>}
+              <span className="text-[9px] font-mono uppercase text-(--cp-text-faint)">{a.type} • {a.status || 'pending'}</span>
             </div>
             <div className="flex items-center gap-2.5 shrink-0">
               <select
                 value={a.status || 'pending'}
                 onChange={(e) => updateStatus(a.id, e.target.value)}
-                className="px-2.5 py-1 rounded-lg text-[10px] font-semibold border cursor-pointer bg-[var(--cp-bg-elevated)] text-[var(--cp-text)] border-[var(--cp-border)]"
+                className="px-2.5 py-1 rounded-lg text-[10px] font-semibold border cursor-pointer bg-(--cp-bg-elevated) text-(--cp-text) border-(--cp-border)"
               >
                 <option value="pending">Pending</option>
                 <option value="approved">Approved</option>
                 <option value="rejected">Rejected</option>
               </select>
-              <button onClick={() => handleDelete(a.id)} className="p-1.5 text-[var(--cp-text-faint)] hover:text-[var(--cp-red)] transition-colors cursor-pointer">
+              <button onClick={() => handleDelete(a.id)} className="p-1.5 text-(--cp-text-faint) hover:text-(--cp-red) transition-colors cursor-pointer">
                 <Trash2 className="w-3.5 h-3.5" />
               </button>
             </div>
           </div>
         ))}
-        <button onClick={() => setModalOpen(true)} className="flex items-center gap-1.5 p-3 rounded-xl text-[11px] text-[var(--cp-text-faint)] hover:text-[var(--cp-text-muted)] hover:bg-[var(--cp-bg-soft)] transition-colors border border-dashed border-[var(--cp-border)] cursor-pointer justify-center">
+        <button onClick={() => setModalOpen(true)} className="flex items-center gap-1.5 p-3 rounded-xl text-[11px] text-(--cp-text-faint) hover:text-(--cp-text-muted) hover:bg-(--cp-bg-soft) transition-colors border border-dashed border-(--cp-border) cursor-pointer justify-center">
           <Plus className="w-3.5 h-3.5" /> Add Deliverable Request
         </button>
       </div>
@@ -88,7 +88,7 @@ export default function ProjectDeliverablesPage() {
           <ModalSelect label="Type" value={form.type} onChange={v => setForm({ ...form, type: v })} options={APPROVAL_TYPES} />
           <ModalInput label="Description" value={form.description} onChange={v => setForm({ ...form, description: v })} placeholder="Optional details..." />
           <div className="flex justify-end gap-3 pt-4 border-t" style={{ borderColor: 'var(--cp-border-soft)' }}>
-            <button onClick={() => setModalOpen(false)} className="px-4 py-2 rounded-xl text-[12px] font-medium text-[var(--cp-text-muted)] hover:text-[var(--cp-text)]">Cancel</button>
+            <button onClick={() => setModalOpen(false)} className="px-4 py-2 rounded-xl text-[12px] font-medium text-(--cp-text-muted) hover:text-(--cp-text)">Cancel</button>
             <button onClick={handleAdd} disabled={saving || !form.title} className="cp-btn-primary px-5 py-2 text-[12px] cursor-pointer">
               {saving ? 'Adding...' : 'Add'}
             </button>

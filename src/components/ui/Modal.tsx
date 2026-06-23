@@ -157,7 +157,7 @@ export function ModalSelect({
         id={id}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="px-4 py-3 rounded-xl text-[13px] outline-none transition-all appearance-none cursor-pointer [&>option]:bg-[var(--cp-bg-elevated)] [&>option]:text-[var(--cp-text)]"
+        className="px-4 py-3 rounded-xl text-[13px] outline-none transition-all appearance-none cursor-pointer [&>option]:bg-(--cp-bg-elevated) [&>option]:text-(--cp-text)"
         style={{ background: 'var(--cp-bg-soft, #F4F4F5)', border: '1px solid var(--cp-border-soft, rgba(0,0,0,0.05))', color: 'var(--cp-text, #18181B)' }}
       >
         {options.map((opt) => (

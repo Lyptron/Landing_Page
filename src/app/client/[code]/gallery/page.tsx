@@ -1,42 +1,33 @@
 'use client'
-import { useEffect, useState } from 'react'
-import { useParams } from 'next/navigation'
+import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Image as ImageIcon, X, ImageOff } from 'lucide-react'
-import { fetchGallery, fetchProjectByAccessCode } from '@/lib/db'
+import { fetchGallery } from '@/lib/db'
 import { PageHeader, EmptyState, Loading } from '@/components/portal/PortalUI'
+import { useClientPortalProject } from '@/hooks/useClientPortalProject'
+
+async function loadGallery(projectId: string) {
+  const { data } = await fetchGallery(projectId)
+  if (!data?.length) return { data: [] }
+  const grouped: Record<string, any> = {}
+  data.forEach((img: any) => {
+    const key = img.week_label || 'General'
+    if (!grouped[key]) {
+      grouped[key] = {
+        week: key,
+        date: new Date(img.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        images: [],
+      }
+    }
+    grouped[key].images.push(img)
+  })
+  return { data: Object.values(grouped) }
+}
 
 export default function ClientGalleryPage() {
-  const params = useParams()
-  const code = params.code as string
-  const [galleryData, setGalleryData] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
+  const { resource, loading } = useClientPortalProject(loadGallery)
+  const galleryData = resource ?? []
   const [selectedImage, setSelectedImage] = useState<{ url: string; title: string } | null>(null)
-
-  useEffect(() => {
-    async function load() {
-      const { data: project } = await fetchProjectByAccessCode(code)
-      if (project) {
-        const { data } = await fetchGallery(project.id)
-        if (data && data.length > 0) {
-          const grouped: Record<string, any> = {}
-          data.forEach((img: any) => {
-            const key = img.week_label || 'General'
-            if (!grouped[key])
-              grouped[key] = {
-                week: key,
-                date: new Date(img.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-                images: [],
-              }
-            grouped[key].images.push(img)
-          })
-          setGalleryData(Object.values(grouped))
-        }
-      }
-      setLoading(false)
-    }
-    load()
-  }, [code])
 
   if (loading) return <Loading />
 

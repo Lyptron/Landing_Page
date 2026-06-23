@@ -80,7 +80,7 @@ export default function PermissionsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-5">
         <div>
-          <h1 className="font-display text-2xl font-bold tracking-tight" style={{ color: 'var(--cp-text)' }}>Permissions</h1>
+          <h1 className="font-display text-2xl md:text-3xl font-bold tracking-tight" style={{ color: 'var(--cp-text)' }}>Permissions</h1>
           <p className="text-[13px] mt-0.5" style={{ color: 'var(--cp-text-faint)' }}>Manage admin access and review role-based route permissions.</p>
         </div>
         <button onClick={() => setModalOpen(true)} className="cp-btn-primary flex items-center gap-1.5 px-4 py-2 text-[12px]">
@@ -111,7 +111,7 @@ export default function PermissionsPage() {
       <div className="cp-card overflow-hidden mb-6">
         {loading ? (
           <div className="flex items-center justify-center py-16">
-            <div className="w-5 h-5 border-2 border-[var(--cp-border)] border-t-[var(--cp-text-muted)] rounded-full animate-spin" />
+            <div className="w-5 h-5 border-2 border-(--cp-border) border-t-(--cp-text-muted) rounded-full animate-spin" />
           </div>
         ) : users.length === 0 ? (
           <div className="py-16 text-center">
@@ -130,14 +130,14 @@ export default function PermissionsPage() {
               </thead>
               <tbody>
                 {users.map((u) => (
-                  <tr key={u.id} className="border-b hover:bg-[var(--cp-bg-soft)] transition-colors group" style={{ borderColor: 'var(--cp-border-soft)' }}>
+                  <tr key={u.id} className="border-b hover:bg-(--cp-bg-soft) transition-colors group" style={{ borderColor: 'var(--cp-border-soft)' }}>
                     <td className="px-4 py-3 text-[13px] whitespace-nowrap" style={{ color: 'var(--cp-text)' }}>{u.email}</td>
                     <td className="px-4 py-3 whitespace-nowrap">
                       <select
                         value={u.role}
                         onChange={(e) => handleRoleChange(u.id, e.target.value)}
                         disabled={u.email === user?.email}
-                        className="px-3 py-1.5 rounded-lg text-[12px] outline-none cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed [&>option]:bg-[var(--cp-bg-elevated)] [&>option]:text-[var(--cp-text)]"
+                        className="px-3 py-1.5 rounded-lg text-[12px] outline-none cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed [&>option]:bg-(--cp-bg-elevated) [&>option]:text-(--cp-text)"
                         style={{ background: 'var(--cp-bg-soft)', border: '1px solid var(--cp-border)', color: 'var(--cp-text-secondary)' }}
                       >
                         {ROLES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
@@ -150,7 +150,7 @@ export default function PermissionsPage() {
                         onClick={() => setPendingDelete({ id: u.id, email: u.email })}
                         disabled={u.email === user?.email}
                         aria-label={`Revoke admin access for ${u.email}`}
-                        className="p-1.5 rounded-lg transition-all opacity-0 group-hover:opacity-100 focus-visible:opacity-100 disabled:opacity-0 text-[var(--cp-text-faint)] hover:text-[var(--cp-red)] hover:bg-[var(--cp-red-soft)]"
+                        className="p-1.5 rounded-lg transition-all opacity-0 group-hover:opacity-100 focus-visible:opacity-100 disabled:opacity-0 text-(--cp-text-faint) hover:text-(--cp-red) hover:bg-(--cp-red-soft)"
                       >
                         <Trash2 className="w-3.5 h-3.5" aria-hidden="true" />
                       </button>
@@ -181,7 +181,7 @@ export default function PermissionsPage() {
             </thead>
             <tbody>
               {Object.entries(ROLE_ROUTE_MAP).map(([route, roles]) => (
-                <tr key={route} className="border-b hover:bg-[var(--cp-bg-soft)] transition-colors" style={{ borderColor: 'var(--cp-border-soft)' }}>
+                <tr key={route} className="border-b hover:bg-(--cp-bg-soft) transition-colors" style={{ borderColor: 'var(--cp-border-soft)' }}>
                   <td className="px-4 py-3 text-[12px] font-mono whitespace-nowrap" style={{ color: 'var(--cp-text-secondary)' }}>{route}</td>
                   {ROLES.map(r => (
                     <td key={r.value} className="px-4 py-3 text-center">
@@ -206,7 +206,7 @@ export default function PermissionsPage() {
           <ModalSelect label="Role" value={form.role} onChange={(v) => setForm({ ...form, role: v })} options={ROLES} />
           {inviteError && <p role="alert" className="text-[12px]" style={{ color: 'var(--cp-red)' }}>{inviteError}</p>}
           <div className="flex justify-end gap-3 pt-4 border-t" style={{ borderColor: 'var(--cp-border-soft)' }}>
-            <button type="button" onClick={() => { setModalOpen(false); setInviteError(null) }} className="px-4 py-2 rounded-xl text-[12px] font-medium transition-colors text-[var(--cp-text-muted)] hover:text-[var(--cp-text)]">Cancel</button>
+            <button type="button" onClick={() => { setModalOpen(false); setInviteError(null) }} className="px-4 py-2 rounded-xl text-[12px] font-medium transition-colors text-(--cp-text-muted) hover:text-(--cp-text)">Cancel</button>
             <button type="button" onClick={handleInvite} disabled={saving || !form.email} className="cp-btn-primary px-5 py-2 text-[12px]">
               {saving ? 'Inviting...' : 'Invite'}
             </button>
@@ -226,7 +226,7 @@ export default function PermissionsPage() {
             They will lose dashboard access immediately. Their auth account is not deleted.
           </p>
           <div className="flex justify-end gap-3 pt-4 border-t" style={{ borderColor: 'var(--cp-border-soft)' }}>
-            <button type="button" onClick={() => setPendingDelete(null)} className="px-4 py-2 rounded-xl text-[12px] font-medium transition-colors text-[var(--cp-text-muted)] hover:text-[var(--cp-text)]">Cancel</button>
+            <button type="button" onClick={() => setPendingDelete(null)} className="px-4 py-2 rounded-xl text-[12px] font-medium transition-colors text-(--cp-text-muted) hover:text-(--cp-text)">Cancel</button>
             <button type="button" onClick={confirmDelete} className="cp-btn-primary px-5 py-2 text-[12px]" style={{ background: 'var(--cp-red)' }}>
               Revoke access
             </button>

@@ -1,12 +1,13 @@
 'use client'
 import { usePathname } from 'next/navigation'
 import { useLowPerfMode } from '@/hooks/useLowPerfMode'
+import { toLogicalPathname } from '@/lib/portalPath'
 
 export default function GlowOrbs() {
-  const pathname = usePathname()
+  const pathname = toLogicalPathname(usePathname())
   const lowPerf = useLowPerfMode()
 
-  if (pathname?.startsWith('/admin') || pathname?.startsWith('/client')) {
+  if (pathname.startsWith('/admin') || pathname.startsWith('/client')) {
     return null
   }
 

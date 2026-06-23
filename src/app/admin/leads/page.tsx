@@ -130,7 +130,7 @@ export default function LeadsPage() {
     <>
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
         <div>
-          <h1 className="font-display text-2xl font-bold tracking-tight" style={{ color: 'var(--cp-text)' }}>Leads</h1>
+          <h1 className="font-display text-2xl md:text-3xl font-bold tracking-tight" style={{ color: 'var(--cp-text)' }}>Leads</h1>
           <p className="text-[13px] mt-0.5" style={{ color: 'var(--cp-text-faint)' }}>Track follow-ups, SLA risk, and lead quality across the pipeline.</p>
         </div>
         <button onClick={openAddModal} className="cp-btn-primary flex items-center gap-1.5 px-4 py-2 text-[12px]">
@@ -141,10 +141,10 @@ export default function LeadsPage() {
       {/* KPI Row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
         {[
-          { label: 'Total Leads', value: String(leads.length), icon: Users, color: 'text-[var(--cp-text)]' },
-          { label: 'Avg Quality Score', value: String(avgQuality), icon: Gauge, color: 'text-[var(--cp-cyan)]' },
-          { label: 'Follow-ups Due (3d)', value: String(followupsDue), icon: Clock, color: followupsDue > 0 ? 'text-[var(--cp-amber)]' : 'text-[var(--cp-text)]' },
-          { label: 'SLA At Risk', value: String(slaAtRisk), icon: ShieldAlert, color: slaAtRisk > 0 ? 'text-[var(--cp-red)]' : 'text-[var(--cp-emerald)]' },
+          { label: 'Total Leads', value: String(leads.length), icon: Users, color: 'text-(--cp-text)' },
+          { label: 'Avg Quality Score', value: String(avgQuality), icon: Gauge, color: 'text-(--cp-cyan)' },
+          { label: 'Follow-ups Due (3d)', value: String(followupsDue), icon: Clock, color: followupsDue > 0 ? 'text-(--cp-amber)' : 'text-(--cp-text)' },
+          { label: 'SLA At Risk', value: String(slaAtRisk), icon: ShieldAlert, color: slaAtRisk > 0 ? 'text-(--cp-red)' : 'text-(--cp-emerald)' },
         ].map((kpi, i) => (
           <motion.div
             key={i}
@@ -164,28 +164,28 @@ export default function LeadsPage() {
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3 mb-4 flex-wrap">
-        <div className="flex-1 min-w-[180px] flex items-center gap-2 px-4 py-2.5 rounded-xl" style={{ background: 'var(--cp-bg-soft)', border: '1px solid var(--cp-border)' }}>
+        <div className="flex-1 min-w-45 flex items-center gap-2 px-4 py-2.5 rounded-xl" style={{ background: 'var(--cp-bg-soft)', border: '1px solid var(--cp-border)' }}>
           <Search className="w-3.5 h-3.5 shrink-0" style={{ color: 'var(--cp-text-faint)' }} />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by company or contact..."
-            className="w-full bg-transparent border-none outline-none text-[13px] text-[var(--cp-text)] placeholder:text-[var(--cp-text-faint)]"
+            className="w-full bg-transparent border-none outline-none text-[13px] text-(--cp-text) placeholder:text-(--cp-text-faint)"
           />
         </div>
-        <select value={stageFilter} onChange={(e) => setStageFilter(e.target.value)} className="px-4 py-2.5 rounded-xl text-[12px] outline-none cursor-pointer [&>option]:bg-[var(--cp-bg-elevated)] [&>option]:text-[var(--cp-text)]" style={{ background: 'var(--cp-bg-soft)', border: '1px solid var(--cp-border)', color: 'var(--cp-text-secondary)' }}>
+        <select value={stageFilter} onChange={(e) => setStageFilter(e.target.value)} className="px-4 py-2.5 rounded-xl text-[12px] outline-none cursor-pointer [&>option]:bg-(--cp-bg-elevated) [&>option]:text-(--cp-text)" style={{ background: 'var(--cp-bg-soft)', border: '1px solid var(--cp-border)', color: 'var(--cp-text-secondary)' }}>
           <option value="all">All Stages</option>
           {STAGES.map(s => <option key={s} value={s}>{s}</option>)}
         </select>
-        <select value={sourceFilter} onChange={(e) => setSourceFilter(e.target.value)} className="px-4 py-2.5 rounded-xl text-[12px] outline-none cursor-pointer [&>option]:bg-[var(--cp-bg-elevated)] [&>option]:text-[var(--cp-text)]" style={{ background: 'var(--cp-bg-soft)', border: '1px solid var(--cp-border)', color: 'var(--cp-text-secondary)' }}>
+        <select value={sourceFilter} onChange={(e) => setSourceFilter(e.target.value)} className="px-4 py-2.5 rounded-xl text-[12px] outline-none cursor-pointer [&>option]:bg-(--cp-bg-elevated) [&>option]:text-(--cp-text)" style={{ background: 'var(--cp-bg-soft)', border: '1px solid var(--cp-border)', color: 'var(--cp-text-secondary)' }}>
           <option value="all">All Sources</option>
           {SOURCES.map(s => <option key={s} value={s}>{s}</option>)}
         </select>
-        <select value={ownerFilter} onChange={(e) => setOwnerFilter(e.target.value)} className="px-4 py-2.5 rounded-xl text-[12px] outline-none cursor-pointer [&>option]:bg-[var(--cp-bg-elevated)] [&>option]:text-[var(--cp-text)]" style={{ background: 'var(--cp-bg-soft)', border: '1px solid var(--cp-border)', color: 'var(--cp-text-secondary)' }}>
+        <select value={ownerFilter} onChange={(e) => setOwnerFilter(e.target.value)} className="px-4 py-2.5 rounded-xl text-[12px] outline-none cursor-pointer [&>option]:bg-(--cp-bg-elevated) [&>option]:text-(--cp-text)" style={{ background: 'var(--cp-bg-soft)', border: '1px solid var(--cp-border)', color: 'var(--cp-text-secondary)' }}>
           <option value="all">All Owners</option>
           {owners.map(o => <option key={o} value={o}>{o}</option>)}
         </select>
-        <select value={priorityFilter} onChange={(e) => setPriorityFilter(e.target.value)} className="px-4 py-2.5 rounded-xl text-[12px] outline-none cursor-pointer [&>option]:bg-[var(--cp-bg-elevated)] [&>option]:text-[var(--cp-text)]" style={{ background: 'var(--cp-bg-soft)', border: '1px solid var(--cp-border)', color: 'var(--cp-text-secondary)' }}>
+        <select value={priorityFilter} onChange={(e) => setPriorityFilter(e.target.value)} className="px-4 py-2.5 rounded-xl text-[12px] outline-none cursor-pointer [&>option]:bg-(--cp-bg-elevated) [&>option]:text-(--cp-text)" style={{ background: 'var(--cp-bg-soft)', border: '1px solid var(--cp-border)', color: 'var(--cp-text-secondary)' }}>
           <option value="all">All Priorities</option>
           {PRIORITIES.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
         </select>
@@ -195,7 +195,7 @@ export default function LeadsPage() {
       <div className="cp-card overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center py-16">
-            <div className="w-5 h-5 border-2 border-[var(--cp-border)] border-t-[var(--cp-text-muted)] rounded-full animate-spin" />
+            <div className="w-5 h-5 border-2 border-(--cp-border) border-t-(--cp-text-muted) rounded-full animate-spin" />
           </div>
         ) : filtered.length === 0 ? (
           <div className="py-16 text-center">
@@ -218,7 +218,7 @@ export default function LeadsPage() {
                   const urgency = followupUrgency(l.next_followup_at)
                   const sla = slaRiskStyle(l.sla_due_at, ['Converted', 'Lost'].includes(l.stage))
                   return (
-                    <tr key={l.id} className="border-b hover:bg-[var(--cp-bg-soft)] transition-colors group" style={{ borderColor: 'var(--cp-border-soft)' }}>
+                    <tr key={l.id} className="border-b hover:bg-(--cp-bg-soft) transition-colors group" style={{ borderColor: 'var(--cp-border-soft)' }}>
                       <td className="px-4 py-3 whitespace-nowrap">
                         <p className="text-[13px] font-medium" style={{ color: 'var(--cp-text)' }}>{l.company}</p>
                         <p className="text-[11px]" style={{ color: 'var(--cp-text-muted)' }}>{l.contact}</p>
@@ -247,13 +247,13 @@ export default function LeadsPage() {
                       </td>
                       {isFounder && (
                         <td className="px-4 py-3 whitespace-nowrap">
-                          <RestrictedValue value={l.value} className="text-[12px] font-mono text-[var(--cp-text-secondary)]" />
+                          <RestrictedValue value={l.value} className="text-[12px] font-mono text-(--cp-text-secondary)" />
                         </td>
                       )}
                       <td className="px-4 py-3 whitespace-nowrap">
                         <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button onClick={() => openEditModal(l)} className="p-1.5 rounded-lg transition-all text-[var(--cp-text-faint)] hover:text-[var(--cp-text)] hover:bg-[var(--cp-bg-soft)]"><Pencil className="w-3.5 h-3.5" /></button>
-                          <button onClick={() => handleDelete(l.id)} className="p-1.5 rounded-lg transition-all text-[var(--cp-text-faint)] hover:text-[var(--cp-red)] hover:bg-[var(--cp-red-soft)]"><Trash2 className="w-3.5 h-3.5" /></button>
+                          <button onClick={() => openEditModal(l)} className="p-1.5 rounded-lg transition-all text-(--cp-text-faint) hover:text-(--cp-text) hover:bg-(--cp-bg-soft)"><Pencil className="w-3.5 h-3.5" /></button>
+                          <button onClick={() => handleDelete(l.id)} className="p-1.5 rounded-lg transition-all text-(--cp-text-faint) hover:text-(--cp-red) hover:bg-(--cp-red-soft)"><Trash2 className="w-3.5 h-3.5" /></button>
                         </div>
                       </td>
                     </tr>
@@ -290,7 +290,7 @@ export default function LeadsPage() {
             <ModalInput label="Deal Value (₹)" value={form.value} onChange={(v) => setForm({ ...form, value: v })} placeholder="100000" type="number" />
           )}
           <div className="flex justify-end gap-3 pt-4 border-t" style={{ borderColor: 'var(--cp-border-soft)' }}>
-            <button onClick={() => setModalOpen(false)} className="px-4 py-2 rounded-xl text-[12px] font-medium transition-colors text-[var(--cp-text-muted)] hover:text-[var(--cp-text)]">Cancel</button>
+            <button onClick={() => setModalOpen(false)} className="px-4 py-2 rounded-xl text-[12px] font-medium transition-colors text-(--cp-text-muted) hover:text-(--cp-text)">Cancel</button>
             <button onClick={handleSave} disabled={saving || !form.company || !form.contact} className="cp-btn-primary px-5 py-2 text-[12px]">
               {saving ? 'Saving...' : editingId ? 'Save Changes' : 'Add Lead'}
             </button>

@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   LayoutDashboard,
@@ -59,9 +59,20 @@ interface ProjectSummary {
   health: string
 }
 
+type NavIcon = typeof LayoutDashboard
+interface NavItem {
+  name: string
+  path: string
+  icon: NavIcon
+}
+interface NavGroup {
+  label: string
+  items: NavItem[]
+}
+
 interface SidebarContentProps {
   project: ProjectSummary | null
-  groups: any[]
+  groups: NavGroup[]
   pathname: string
   onNavigate?: () => void
   onExit?: (e: React.MouseEvent) => void
@@ -88,12 +99,12 @@ function SidebarContent({ project, groups, pathname, onNavigate, onExit }: Sideb
               {group.label}
             </div>
             <div className="flex flex-col gap-0.5">
-              {group.items.map((item: any) => {
+              {group.items.map((item) => {
                 const isActive = pathname === item.path
                 return (
                   <Link href={item.path} key={item.name} onClick={onNavigate}>
                     <div
-                      className="relative flex items-center gap-3 px-3 py-2.5 rounded-[10px] text-[13px] transition-colors group hover:bg-[var(--cp-surface)]"
+                      className="relative flex items-center gap-3 px-3 py-2.5 rounded-[10px] text-[13px] transition-colors group hover:bg-(--cp-surface)"
                       style={{ color: isActive ? 'var(--cp-text)' : 'var(--cp-text-muted)' }}
                     >
                       {isActive && (
@@ -105,7 +116,7 @@ function SidebarContent({ project, groups, pathname, onNavigate, onExit }: Sideb
                         />
                       )}
                       <item.icon
-                        className="w-[16px] h-[16px] relative z-10 shrink-0 transition-colors"
+                        className="w-4 h-4 relative z-10 shrink-0 transition-colors"
                         style={{ color: isActive ? 'var(--cp-cyan)' : undefined }}
                       />
                       <span className="font-medium relative z-10 truncate">{item.name}</span>
@@ -122,7 +133,7 @@ function SidebarContent({ project, groups, pathname, onNavigate, onExit }: Sideb
       <div className="p-4 border-t" style={{ borderColor: 'var(--cp-border-soft)' }}>
         <button
           onClick={onExit}
-          className="flex items-center gap-3 px-3 py-2 rounded-[8px] text-[13px] font-medium transition-colors hover:text-[var(--cp-text)] w-full text-left bg-transparent border-0 cursor-pointer"
+          className="flex items-center gap-3 px-3 py-2 rounded-[8px] text-[13px] font-medium transition-colors hover:text-(--cp-text) w-full text-left bg-transparent border-0 cursor-pointer"
           style={{ color: 'var(--cp-text-muted)' }}
         >
           <LogOut className="w-4 h-4" />
@@ -204,7 +215,7 @@ export default function ClientPortalLayout({
     <div className="client-shell client-shell-bg min-h-screen flex relative">
       {/* Desktop Sidebar */}
       <aside
-        className="relative z-20 h-screen w-[260px] flex-shrink-0 hidden lg:flex flex-col sticky top-0"
+        className="relative z-20 h-screen w-65 flex-shrink-0 hidden lg:flex flex-col sticky top-0"
         style={{ background: 'var(--cp-bg-elevated)', borderRight: '1px solid var(--cp-border-soft)' }}
       >
         <SidebarContent project={project} groups={groups} pathname={pathname} onExit={handleExit} />
@@ -226,12 +237,12 @@ export default function ClientPortalLayout({
               animate={{ x: 0 }}
               exit={{ x: -300 }}
               transition={{ type: 'spring', damping: 26, stiffness: 220 }}
-              className="fixed top-0 left-0 h-screen w-[280px] z-50 lg:hidden flex flex-col"
+              className="fixed top-0 left-0 h-screen w-70 z-50 lg:hidden flex flex-col"
               style={{ background: 'var(--cp-bg-elevated)', borderRight: '1px solid var(--cp-border-soft)' }}
             >
               <div className="absolute top-4 right-4 z-50">
                 <button
-                  className="p-1.5 rounded-lg transition-colors active:scale-90 text-[var(--cp-text-muted)] hover:text-[var(--cp-text)] hover:bg-[var(--cp-surface-strong)]"
+                  className="p-1.5 rounded-lg transition-colors active:scale-90 text-(--cp-text-muted) hover:text-(--cp-text) hover:bg-(--cp-surface-strong)"
                   onClick={() => setSidebarOpen(false)}
                   aria-label="Close menu"
                 >
@@ -248,7 +259,7 @@ export default function ClientPortalLayout({
       <main className="flex-1 flex flex-col min-w-0 min-h-screen relative z-10">
         {/* Top bar */}
         <header
-          className="h-[60px] shrink-0 flex items-center justify-between px-4 sm:px-6 lg:px-8 sticky top-0 z-30 transition-all duration-300"
+          className="h-15 shrink-0 flex items-center justify-between px-4 sm:px-6 lg:px-8 sticky top-0 z-30 transition-all duration-300"
           style={{
             background: scrolled ? 'color-mix(in srgb, var(--cp-bg-elevated) 80%, transparent)' : 'transparent',
             backdropFilter: scrolled ? 'blur(20px)' : 'none',
@@ -258,7 +269,7 @@ export default function ClientPortalLayout({
         >
           <div className="flex items-center gap-3 min-w-0">
             <button
-              className="lg:hidden p-1 -ml-1 rounded-lg transition-colors active:scale-90 text-[var(--cp-text-muted)] hover:text-[var(--cp-text)]"
+              className="lg:hidden p-1 -ml-1 rounded-lg transition-colors active:scale-90 text-(--cp-text-muted) hover:text-(--cp-text)"
               onClick={() => setSidebarOpen(true)}
               aria-label="Open menu"
             >
@@ -285,15 +296,15 @@ export default function ClientPortalLayout({
 
 function FullPageSplash() {
   return (
-    <div className="client-shell min-h-screen flex flex-col items-center justify-center bg-[var(--cp-bg)] gap-5 text-center select-none" data-theme="dark">
+    <div className="client-shell min-h-screen flex flex-col items-center justify-center bg-(--cp-bg) gap-5 text-center select-none" data-theme="dark">
       <div className="relative flex items-center justify-center">
-        <div className="absolute w-[68px] h-[68px] rounded-full border border-dashed border-[var(--cp-cyan)] animate-spin [animation-duration:3s]" />
-        <div className="absolute w-14 h-14 rounded-full border border-[var(--cp-cyan-border)] animate-ping opacity-40 [animation-duration:1.5s]" />
+        <div className="absolute w-17 h-17 rounded-full border border-dashed border-(--cp-cyan) animate-spin [animation-duration:3s]" />
+        <div className="absolute w-14 h-14 rounded-full border border-(--cp-cyan-border) animate-ping opacity-40 [animation-duration:1.5s]" />
         <LyptronMark size={50} className="relative z-10 shadow-md" />
       </div>
       <div className="flex flex-col gap-1">
-        <span className="font-display font-bold text-[18px] tracking-tight text-[var(--cp-text)]">Lyptron</span>
-        <span className="text-[10px] font-mono tracking-[0.18em] uppercase text-[var(--cp-text-faint)]">Loading workspace...</span>
+        <span className="font-display font-bold text-[18px] tracking-tight text-(--cp-text)">Lyptron</span>
+        <span className="text-[10px] font-mono tracking-[0.18em] uppercase text-(--cp-text-faint)">Loading workspace...</span>
       </div>
     </div>
   )

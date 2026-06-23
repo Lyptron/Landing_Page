@@ -31,37 +31,37 @@ export default function ProjectFeedbackPage() {
   return (
     <div className="cp-card p-5">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-[13px] font-bold text-[var(--cp-text-secondary)]">Client Feedback & Bugs</h3>
-        <span className="text-[10px] font-mono text-[var(--cp-text-faint)]">{feedback.length} items</span>
+        <h3 className="text-[13px] font-bold text-(--cp-text-secondary)">Client Feedback & Bugs</h3>
+        <span className="text-[10px] font-mono text-(--cp-text-faint)">{feedback.length} items</span>
       </div>
       <div className="flex flex-col gap-2.5">
         {feedback.map(f => (
-          <div key={f.id} className="p-3.5 rounded-xl bg-[var(--cp-bg-soft)] border border-[var(--cp-border-soft)]">
+          <div key={f.id} className="p-3.5 rounded-xl bg-(--cp-bg-soft) border border-(--cp-border-soft)">
             <div className="flex justify-between items-start mb-2">
               <div className="flex items-center gap-2">
-                <MessageSquare className="w-4 h-4 text-[var(--cp-text-faint)]" />
-                <span className="text-[13.5px] font-semibold text-[var(--cp-text)]">{f.title}</span>
+                <MessageSquare className="w-4 h-4 text-(--cp-text-faint)" />
+                <span className="text-[13.5px] font-semibold text-(--cp-text)">{f.title}</span>
               </div>
-              <span className="text-[9.5px] font-mono text-[var(--cp-text-faint)]">
+              <span className="text-[9.5px] font-mono text-(--cp-text-faint)">
                 {f.submitted_at ? new Date(f.submitted_at).toLocaleDateString() : ''}
               </span>
             </div>
 
-            <p className="text-[12px] text-[var(--cp-text-muted)] mb-3 leading-relaxed">{f.description || 'No description provided.'}</p>
+            <p className="text-[12px] text-(--cp-text-muted) mb-3 leading-relaxed">{f.description || 'No description provided.'}</p>
 
-            <div className="flex items-center justify-between pt-2.5 border-t border-[var(--cp-border-soft)] flex-wrap gap-2">
+            <div className="flex items-center justify-between pt-2.5 border-t border-(--cp-border-soft) flex-wrap gap-2">
               <div className="flex items-center gap-3">
-                <span className="text-[10px] uppercase font-mono tracking-wider text-[var(--cp-text-faint)]">Type:</span>
-                <span className="text-[11px] font-semibold text-[var(--cp-text-secondary)]">{f.type || 'General Comment'}</span>
+                <span className="text-[10px] uppercase font-mono tracking-wider text-(--cp-text-faint)">Type:</span>
+                <span className="text-[11px] font-semibold text-(--cp-text-secondary)">{f.type || 'General Comment'}</span>
               </div>
 
               <div className="flex items-center gap-3 flex-wrap">
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[10px] font-mono uppercase tracking-wider text-[var(--cp-text-faint)]">Priority:</span>
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-(--cp-text-faint)">Priority:</span>
                   <select
                     value={f.priority || 'Medium'}
                     onChange={(e) => updatePriority(f.id, e.target.value)}
-                    className="px-2 py-0.5 rounded border text-[10px] bg-[var(--cp-bg-elevated)] border-[var(--cp-border)] text-[var(--cp-text)] cursor-pointer"
+                    className="px-2 py-0.5 rounded border text-[10px] bg-(--cp-bg-elevated) border-(--cp-border) text-(--cp-text) cursor-pointer"
                   >
                     <option value="Low">Low</option>
                     <option value="Medium">Medium</option>
@@ -70,11 +70,11 @@ export default function ProjectFeedbackPage() {
                 </div>
 
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[10px] font-mono uppercase tracking-wider text-[var(--cp-text-faint)]">Status:</span>
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-(--cp-text-faint)">Status:</span>
                   <select
                     value={f.status || 'In Review'}
                     onChange={(e) => updateStatus(f.id, e.target.value)}
-                    className="px-2 py-0.5 rounded border text-[10px] bg-[var(--cp-bg-elevated)] border-[var(--cp-border)] text-[var(--cp-text)] cursor-pointer"
+                    className="px-2 py-0.5 rounded border text-[10px] bg-(--cp-bg-elevated) border-(--cp-border) text-(--cp-text) cursor-pointer"
                   >
                     <option value="In Review">In Review</option>
                     <option value="Planned">Planned</option>
@@ -83,7 +83,7 @@ export default function ProjectFeedbackPage() {
                   </select>
                 </div>
 
-                <button onClick={() => handleDelete(f.id)} className="p-1 text-[var(--cp-text-faint)] hover:text-[var(--cp-red)] transition-colors cursor-pointer ml-1">
+                <button onClick={() => handleDelete(f.id)} className="p-1 text-(--cp-text-faint) hover:text-(--cp-red) transition-colors cursor-pointer ml-1">
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
               </div>
@@ -91,7 +91,7 @@ export default function ProjectFeedbackPage() {
           </div>
         ))}
         {feedback.length === 0 && (
-          <div className="py-8 text-center text-[12px] text-[var(--cp-text-faint)]">
+          <div className="py-8 text-center text-[12px] text-(--cp-text-faint)">
             No feedback submitted yet.
           </div>
         )}

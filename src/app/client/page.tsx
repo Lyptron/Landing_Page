@@ -48,7 +48,7 @@ function ClientLoginGate() {
       {/* Soft accent ambient — fixed to viewport */}
       <div
         aria-hidden
-        className="pointer-events-none fixed -top-[20%] -right-[10%] w-[800px] h-[800px] rounded-full z-0"
+        className="pointer-events-none fixed -top-[20%] -right-[10%] w-200 h-200 rounded-full z-0"
         style={{ background: 'radial-gradient(circle, rgba(79,70,229,0.05) 0%, transparent 70%)' }}
       />
 
@@ -211,7 +211,7 @@ function ClientLoginGate() {
             {/* Help line */}
             <p className="text-[12px] text-center mt-6 leading-relaxed" style={{ color: 'var(--cp-text-faint)' }}>
               Lost your code? Email{' '}
-              <a href={`mailto:${EMAIL_HELP}`} className="transition-colors hover:text-[var(--cp-text-secondary)]" style={{ color: 'var(--cp-text-muted)' }}>
+              <a href={`mailto:${EMAIL_HELP}`} className="transition-colors hover:text-(--cp-text-secondary)" style={{ color: 'var(--cp-text-muted)' }}>
                 {EMAIL_HELP}
               </a>
               {' '}and we&apos;ll resend it.
@@ -227,8 +227,8 @@ function ClientLoginGate() {
             © {new Date().getFullYear()} Lyptron
           </span>
           <div className="flex items-center gap-6 text-[11px]" style={{ color: 'var(--cp-text-faint)' }}>
-            <a href="https://lyptron.com" className="transition-colors hover:text-[var(--cp-text-muted)]">lyptron.com</a>
-            <a href="https://lyptron.com/privacy" className="transition-colors hover:text-[var(--cp-text-muted)] hidden sm:inline">Privacy</a>
+            <a href="https://lyptron.com" className="transition-colors hover:text-(--cp-text-muted)">lyptron.com</a>
+            <a href="https://lyptron.com/privacy" className="transition-colors hover:text-(--cp-text-muted) hidden sm:inline">Privacy</a>
           </div>
         </div>
       </footer>
@@ -238,15 +238,15 @@ function ClientLoginGate() {
 
 function FullPageSplash() {
   return (
-    <div className="client-shell min-h-screen flex flex-col items-center justify-center bg-[var(--cp-bg)] gap-5 text-center select-none" data-theme="dark">
+    <div className="client-shell min-h-screen flex flex-col items-center justify-center bg-(--cp-bg) gap-5 text-center select-none" data-theme="dark">
       <div className="relative flex items-center justify-center">
-        <div className="absolute w-[68px] h-[68px] rounded-full border border-dashed border-[var(--cp-cyan)] animate-spin [animation-duration:3s]" />
-        <div className="absolute w-14 h-14 rounded-full border border-[var(--cp-cyan-border)] animate-ping opacity-40 [animation-duration:1.5s]" />
+        <div className="absolute w-17 h-17 rounded-full border border-dashed border-(--cp-cyan) animate-spin [animation-duration:3s]" />
+        <div className="absolute w-14 h-14 rounded-full border border-(--cp-cyan-border) animate-ping opacity-40 [animation-duration:1.5s]" />
         <LyptronMark size={50} className="relative z-10 shadow-md" />
       </div>
       <div className="flex flex-col gap-1">
-        <span className="font-display font-bold text-[18px] tracking-tight text-[var(--cp-text)]">Lyptron</span>
-        <span className="text-[10px] font-mono tracking-[0.18em] uppercase text-[var(--cp-text-faint)]">Loading workspace...</span>
+        <span className="font-display font-bold text-[18px] tracking-tight text-(--cp-text)">Lyptron</span>
+        <span className="text-[10px] font-mono tracking-[0.18em] uppercase text-(--cp-text-faint)">Loading workspace...</span>
       </div>
     </div>
   )

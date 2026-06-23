@@ -1,35 +1,32 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { useParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Send, MessagesSquare } from 'lucide-react'
-import { fetchFeedback, insertFeedback, fetchProjectByAccessCode } from '@/lib/db'
+import { fetchFeedback, insertFeedback } from '@/lib/db'
 import { PageHeader, EmptyState, Loading, Badge } from '@/components/portal/PortalUI'
+import { useClientPortalProject } from '@/hooks/useClientPortalProject'
+
+async function loadFeedback(projectId: string) {
+  const { data } = await fetchFeedback(projectId)
+  return { data: data ?? [] }
+}
 
 export default function FeedbackPage() {
-  const params = useParams()
-  const code = params.code as string
+  const { project, resource, loading } = useClientPortalProject<any[]>(loadFeedback)
+  const projectId = project?.id ?? null
+  const [feedbackList, setFeedbackList] = useState<any[]>([])
   const [activeTab, setActiveTab] = useState<'submit' | 'history'>('submit')
   const [feedbackType, setFeedbackType] = useState('Feature Request')
   const [subject, setSubject] = useState('')
   const [details, setDetails] = useState('')
-  const [feedbackList, setFeedbackList] = useState<any[]>([])
-  const [projectId, setProjectId] = useState<string | null>(null)
-  const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
 
+  // Hydrate local feedback list once the hook returns the fetched data,
+  // so subsequent submissions can prepend to it without re-fetching.
   useEffect(() => {
-    async function load() {
-      const { data: project } = await fetchProjectByAccessCode(code)
-      if (project) {
-        setProjectId(project.id)
-        const { data } = await fetchFeedback(project.id)
-        if (data && data.length > 0) setFeedbackList(data)
-      }
-      setLoading(false)
-    }
-    load()
-  }, [code])
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (resource) setFeedbackList(resource)
+  }, [resource])
 
   const handleSubmit = async () => {
     if (!subject || !projectId) return
@@ -64,7 +61,7 @@ export default function FeedbackPage() {
               {active && (
                 <motion.span
                   layoutId="feedback-tab-active"
-                  className="absolute left-0 right-0 -bottom-px h-[1.5px]"
+                  className="absolute left-0 right-0 -bottom-px h-0.38"
                   style={{ background: 'var(--cp-cyan)' }}
                 />
               )}
@@ -171,7 +168,7 @@ export default function FeedbackPage() {
                 return (
                   <div
                     key={item.id}
-                    className="flex flex-col sm:flex-row sm:items-center justify-between p-4 gap-3 transition-colors hover:bg-[var(--cp-bg-soft)]"
+                    className="flex flex-col sm:flex-row sm:items-center justify-between p-4 gap-3 transition-colors hover:bg-(--cp-bg-soft)"
                   >
                     <div className="flex flex-col gap-1 min-w-0">
                       <span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: 'var(--cp-text-faint)' }}>

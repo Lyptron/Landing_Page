@@ -1,36 +1,18 @@
 'use client'
-import { useEffect, useState } from 'react'
-import { useParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Wallet, ArrowUpRight } from 'lucide-react'
-import { fetchProjectByAccessCode } from '@/lib/db'
 import { PageHeader, EmptyState, Loading, Badge } from '@/components/portal/PortalUI'
+import { useClientPortalProject } from '@/hooks/useClientPortalProject'
 
 const fmt = (n: number) => `₹${n.toLocaleString('en-IN')}`
 
 export default function FinancePage() {
-  const params = useParams()
-  const code = params.code as string
-  const [invoices, setInvoices] = useState<any[]>([])
-  const [totalValue, setTotalValue] = useState(0)
-  const [paidAmount, setPaidAmount] = useState(0)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    async function load() {
-      const { data: project } = await fetchProjectByAccessCode(code)
-      if (project && project.payments && project.payments.length > 0) {
-        const payments = project.payments
-        setInvoices(payments)
-        const total = payments.reduce((s: number, p: any) => s + (p.amount || 0), 0)
-        const paid = payments.filter((p: any) => p.status === 'paid').reduce((s: number, p: any) => s + (p.amount || 0), 0)
-        setTotalValue(project.contract_value || total)
-        setPaidAmount(paid)
-      }
-      setLoading(false)
-    }
-    load()
-  }, [code])
+  const { project, loading } = useClientPortalProject()
+  const payments: any[] = project?.payments ?? []
+  const invoices = payments
+  const totalPayments = payments.reduce((s, p) => s + (p.amount || 0), 0)
+  const totalValue = project?.contract_value || totalPayments
+  const paidAmount = payments.filter((p) => p.status === 'paid').reduce((s, p) => s + (p.amount || 0), 0)
 
   if (loading) return <Loading />
 
@@ -118,7 +100,7 @@ export default function FinancePage() {
             return (
               <div
                 key={inv.id}
-                className="flex flex-col sm:flex-row sm:items-center justify-between p-4 gap-3 transition-colors hover:bg-[var(--cp-bg-soft)]"
+                className="flex flex-col sm:flex-row sm:items-center justify-between p-4 gap-3 transition-colors hover:bg-(--cp-bg-soft)"
               >
                 {/* Description & Date */}
                 <div className="flex items-center gap-3.5 min-w-0">
@@ -160,7 +142,7 @@ export default function FinancePage() {
         <span>Invoice questions? Contact your project manager.</span>
         <a
           href="mailto:billing@lyptron.com"
-          className="flex items-center gap-1 transition-colors text-[var(--cp-text-muted)] hover:text-[var(--cp-cyan)]"
+          className="flex items-center gap-1 transition-colors text-(--cp-text-muted) hover:text-(--cp-cyan)"
         >
           billing@lyptron.com
           <ArrowUpRight className="w-3.5 h-3.5" />

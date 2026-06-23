@@ -165,7 +165,7 @@ export default function TasksPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-5 shrink-0">
         <div>
-          <h1 className="font-display text-2xl font-bold tracking-tight" style={{ color: 'var(--cp-text)' }}>Tasks</h1>
+          <h1 className="font-display text-2xl md:text-3xl font-bold tracking-tight" style={{ color: 'var(--cp-text)' }}>Tasks</h1>
           <p className="text-[13px] mt-0.5" style={{ color: 'var(--cp-text-faint)' }}>Follow-ups, escalations, onboarding, and SLA tracking.</p>
         </div>
         <button onClick={openAddModal} className="cp-btn-primary flex items-center gap-1.5 px-4 py-2 text-[12px]">
@@ -176,10 +176,10 @@ export default function TasksPage() {
       {/* KPI Row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4 shrink-0">
         {[
-          { label: 'Open Tasks', value: String(openCount), icon: ListChecks, color: 'text-[var(--cp-text)]' },
-          { label: 'Overdue', value: String(overdueCount), icon: Clock, color: overdueCount > 0 ? 'text-[var(--cp-red)]' : 'text-[var(--cp-text)]' },
-          { label: 'SLA At Risk', value: String(slaAtRisk), icon: ShieldAlert, color: slaAtRisk > 0 ? 'text-[var(--cp-amber)]' : 'text-[var(--cp-emerald)]' },
-          { label: 'Completed', value: String(doneCount), icon: CheckCircle2, color: 'text-[var(--cp-emerald)]' },
+          { label: 'Open Tasks', value: String(openCount), icon: ListChecks, color: 'text-(--cp-text)' },
+          { label: 'Overdue', value: String(overdueCount), icon: Clock, color: overdueCount > 0 ? 'text-(--cp-red)' : 'text-(--cp-text)' },
+          { label: 'SLA At Risk', value: String(slaAtRisk), icon: ShieldAlert, color: slaAtRisk > 0 ? 'text-(--cp-amber)' : 'text-(--cp-emerald)' },
+          { label: 'Completed', value: String(doneCount), icon: CheckCircle2, color: 'text-(--cp-emerald)' },
         ].map((kpi, i) => (
           <motion.div
             key={i}
@@ -199,24 +199,24 @@ export default function TasksPage() {
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3 mb-4 flex-wrap shrink-0">
-        <div className="flex-1 min-w-[180px] flex items-center gap-2 px-4 py-2.5 rounded-xl" style={{ background: 'var(--cp-bg-soft)', border: '1px solid var(--cp-border)' }}>
+        <div className="flex-1 min-w-45 flex items-center gap-2 px-4 py-2.5 rounded-xl" style={{ background: 'var(--cp-bg-soft)', border: '1px solid var(--cp-border)' }}>
           <Search className="w-3.5 h-3.5 shrink-0" style={{ color: 'var(--cp-text-faint)' }} />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search tasks..."
-            className="w-full bg-transparent border-none outline-none text-[13px] text-[var(--cp-text)] placeholder:text-[var(--cp-text-faint)]"
+            className="w-full bg-transparent border-none outline-none text-[13px] text-(--cp-text) placeholder:text-(--cp-text-faint)"
           />
         </div>
-        <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)} className="px-4 py-2.5 rounded-xl text-[12px] outline-none cursor-pointer [&>option]:bg-[var(--cp-bg-elevated)] [&>option]:text-[var(--cp-text)]" style={{ background: 'var(--cp-bg-soft)', border: '1px solid var(--cp-border)', color: 'var(--cp-text-secondary)' }}>
+        <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)} className="px-4 py-2.5 rounded-xl text-[12px] outline-none cursor-pointer [&>option]:bg-(--cp-bg-elevated) [&>option]:text-(--cp-text)" style={{ background: 'var(--cp-bg-soft)', border: '1px solid var(--cp-border)', color: 'var(--cp-text-secondary)' }}>
           <option value="all">All Types</option>
           {TYPE_OPTIONS.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
         </select>
-        <select value={assigneeFilter} onChange={(e) => setAssigneeFilter(e.target.value)} className="px-4 py-2.5 rounded-xl text-[12px] outline-none cursor-pointer [&>option]:bg-[var(--cp-bg-elevated)] [&>option]:text-[var(--cp-text)]" style={{ background: 'var(--cp-bg-soft)', border: '1px solid var(--cp-border)', color: 'var(--cp-text-secondary)' }}>
+        <select value={assigneeFilter} onChange={(e) => setAssigneeFilter(e.target.value)} className="px-4 py-2.5 rounded-xl text-[12px] outline-none cursor-pointer [&>option]:bg-(--cp-bg-elevated) [&>option]:text-(--cp-text)" style={{ background: 'var(--cp-bg-soft)', border: '1px solid var(--cp-border)', color: 'var(--cp-text-secondary)' }}>
           <option value="all">All Assignees</option>
           {assignees.map(a => <option key={a} value={a}>{a}</option>)}
         </select>
-        <select value={priorityFilter} onChange={(e) => setPriorityFilter(e.target.value)} className="px-4 py-2.5 rounded-xl text-[12px] outline-none cursor-pointer [&>option]:bg-[var(--cp-bg-elevated)] [&>option]:text-[var(--cp-text)]" style={{ background: 'var(--cp-bg-soft)', border: '1px solid var(--cp-border)', color: 'var(--cp-text-secondary)' }}>
+        <select value={priorityFilter} onChange={(e) => setPriorityFilter(e.target.value)} className="px-4 py-2.5 rounded-xl text-[12px] outline-none cursor-pointer [&>option]:bg-(--cp-bg-elevated) [&>option]:text-(--cp-text)" style={{ background: 'var(--cp-bg-soft)', border: '1px solid var(--cp-border)', color: 'var(--cp-text-secondary)' }}>
           <option value="all">All Priorities</option>
           {PRIORITIES.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
         </select>
@@ -225,14 +225,14 @@ export default function TasksPage() {
       {/* Board */}
       {loading ? (
         <div className="flex-1 flex items-center justify-center">
-          <div className="w-5 h-5 border-2 border-[var(--cp-border)] border-t-[var(--cp-text-muted)] rounded-full animate-spin" />
+          <div className="w-5 h-5 border-2 border-(--cp-border) border-t-(--cp-text-muted) rounded-full animate-spin" />
         </div>
       ) : (
         <div className="flex-1 overflow-x-auto overflow-y-hidden pb-4 flex gap-4">
           {STATUSES.map((col) => {
             const colTasks = filtered.filter(t => t.status === col.value)
             return (
-              <div key={col.value} className="flex flex-col w-[290px] shrink-0 rounded-2xl max-h-full overflow-hidden" style={{ background: 'var(--cp-bg-soft)', border: '1px solid var(--cp-border-soft)' }} onDragOver={handleDragOver} onDrop={(e) => handleDrop(e, col.value)}>
+              <div key={col.value} className="flex flex-col w-72.5 shrink-0 rounded-2xl max-h-full overflow-hidden" style={{ background: 'var(--cp-bg-soft)', border: '1px solid var(--cp-border-soft)' }} onDragOver={handleDragOver} onDrop={(e) => handleDrop(e, col.value)}>
                 <div className="px-4 py-3 border-b flex items-center gap-2" style={{ borderColor: 'var(--cp-border-soft)' }}>
                   <h3 className="text-[12px] font-bold" style={{ color: 'var(--cp-text-secondary)' }}>{col.label}</h3>
                   <span className="text-[9px] font-mono px-1.5 py-0.5 rounded-md" style={{ background: 'var(--cp-surface)', color: 'var(--cp-text-muted)', border: '1px solid var(--cp-border-soft)' }}>{colTasks.length}</span>
@@ -261,8 +261,8 @@ export default function TasksPage() {
                             <TypeIcon className="w-3 h-3" /> {TYPE_META[task.type]?.label || 'General'}
                           </div>
                           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button onClick={() => openEditModal(task)} className="p-1 rounded transition-all text-[var(--cp-text-faint)] hover:text-[var(--cp-text)] hover:bg-[var(--cp-bg-soft)]"><Pencil className="w-3 h-3" /></button>
-                            <button onClick={() => handleDelete(task.id)} className="p-1 rounded transition-all text-[var(--cp-text-faint)] hover:text-[var(--cp-red)] hover:bg-[var(--cp-red-soft)]"><Trash2 className="w-3 h-3" /></button>
+                            <button onClick={() => openEditModal(task)} className="p-1 rounded transition-all text-(--cp-text-faint) hover:text-(--cp-text) hover:bg-(--cp-bg-soft)"><Pencil className="w-3 h-3" /></button>
+                            <button onClick={() => handleDelete(task.id)} className="p-1 rounded transition-all text-(--cp-text-faint) hover:text-(--cp-red) hover:bg-(--cp-red-soft)"><Trash2 className="w-3 h-3" /></button>
                           </div>
                         </div>
 
@@ -290,7 +290,7 @@ export default function TasksPage() {
                     )
                   })}
                   {colTasks.length === 0 && (
-                    <div className="flex-1 min-h-[80px] border border-dashed rounded-xl flex items-center justify-center" style={{ borderColor: 'var(--cp-border)' }}>
+                    <div className="flex-1 min-h-20 border border-dashed rounded-xl flex items-center justify-center" style={{ borderColor: 'var(--cp-border)' }}>
                       <span className="text-[10px]" style={{ color: 'var(--cp-text-faint)' }}>Drop here</span>
                     </div>
                   )}
@@ -321,7 +321,7 @@ export default function TasksPage() {
             <ModalInput label="SLA Due Date" value={form.sla_due_at} onChange={(v) => setForm({ ...form, sla_due_at: v })} type="date" />
           </div>
           <div className="flex justify-end gap-3 pt-4 border-t" style={{ borderColor: 'var(--cp-border-soft)' }}>
-            <button onClick={() => setModalOpen(false)} className="px-4 py-2 rounded-xl text-[12px] font-medium transition-colors text-[var(--cp-text-muted)] hover:text-[var(--cp-text)]">Cancel</button>
+            <button onClick={() => setModalOpen(false)} className="px-4 py-2 rounded-xl text-[12px] font-medium transition-colors text-(--cp-text-muted) hover:text-(--cp-text)">Cancel</button>
             <button onClick={handleSave} disabled={saving || !form.title} className="cp-btn-primary px-5 py-2 text-[12px]">
               {saving ? 'Saving...' : editingId ? 'Save Changes' : 'Add Task'}
             </button>

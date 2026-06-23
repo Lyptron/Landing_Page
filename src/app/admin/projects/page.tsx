@@ -226,7 +226,7 @@ export default function ProjectsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-5 shrink-0">
         <div>
-          <h1 className="font-display text-[26px] font-semibold tracking-tight" style={{ color: 'var(--cp-text)' }}>
+          <h1 className="font-display text-2xl md:text-3xl font-bold tracking-tight" style={{ color: 'var(--cp-text)' }}>
             Projects
           </h1>
           <p className="text-[13px] mt-0.5" style={{ color: 'var(--cp-text-muted)' }}>
@@ -235,13 +235,13 @@ export default function ProjectsPage() {
         </div>
         <div className="flex items-center gap-2">
           {/* View Toggle */}
-          <div className="flex p-0.5 rounded-xl bg-[var(--cp-bg-soft)] border" style={{ borderColor: 'var(--cp-border)' }}>
+          <div className="flex p-0.5 rounded-xl bg-(--cp-bg-soft) border" style={{ borderColor: 'var(--cp-border)' }}>
             <button
               onClick={() => setViewMode('kanban')}
               className={`px-3 py-1 text-[11px] font-semibold rounded-lg transition-colors cursor-pointer ${
                 viewMode === 'kanban'
-                  ? 'bg-[var(--cp-surface)] text-[var(--cp-text)] shadow-sm'
-                  : 'text-[var(--cp-text-muted)] hover:text-[var(--cp-text)]'
+                  ? 'bg-(--cp-surface) text-(--cp-text) shadow-sm'
+                  : 'text-(--cp-text-muted) hover:text-(--cp-text)'
               }`}
             >
               Kanban
@@ -250,8 +250,8 @@ export default function ProjectsPage() {
               onClick={() => setViewMode('table')}
               className={`px-3 py-1 text-[11px] font-semibold rounded-lg transition-colors cursor-pointer ${
                 viewMode === 'table'
-                  ? 'bg-[var(--cp-surface)] text-[var(--cp-text)] shadow-sm'
-                  : 'text-[var(--cp-text-muted)] hover:text-[var(--cp-text)]'
+                  ? 'bg-(--cp-surface) text-(--cp-text) shadow-sm'
+                  : 'text-(--cp-text-muted) hover:text-(--cp-text)'
               }`}
             >
               Table
@@ -322,14 +322,14 @@ export default function ProjectsPage() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search projects, clients, or access codes…"
-          className="flex-1 bg-transparent outline-none text-[13px] placeholder:text-[var(--cp-text-faint)]"
+          className="flex-1 bg-transparent outline-none text-[13px] placeholder:text-(--cp-text-faint)"
           style={{ color: 'var(--cp-text)' }}
         />
       </div>
 
       {loading ? (
         <div className="flex-1 flex items-center justify-center">
-          <div className="w-5 h-5 border-2 border-[var(--cp-border)] border-t-[var(--cp-text-muted)] rounded-full animate-spin" />
+          <div className="w-5 h-5 border-2 border-(--cp-border) border-t-(--cp-text-muted) rounded-full animate-spin" />
         </div>
       ) : viewMode === 'kanban' ? (
         <div className="flex-1 overflow-x-auto overflow-y-hidden pb-4 flex gap-4">
@@ -338,7 +338,7 @@ export default function ProjectsPage() {
             return (
               <div
                 key={stage}
-                className="flex flex-col w-[300px] shrink-0 rounded-xl max-h-full overflow-hidden"
+                className="flex flex-col w-75 shrink-0 rounded-xl max-h-full overflow-hidden"
                 style={{
                   background: 'var(--cp-bg-soft)',
                   border: '1px solid var(--cp-border)',
@@ -452,7 +452,7 @@ export default function ProjectsPage() {
                           <span>Progress</span>
                           <span>{project.progress ?? 0}%</span>
                         </div>
-                        <div className="w-full h-[3px] rounded-full overflow-hidden mb-3" style={{ background: 'var(--cp-surface-strong)' }}>
+                        <div className="w-full h-0.75 rounded-full overflow-hidden mb-3" style={{ background: 'var(--cp-surface-strong)' }}>
                           <div
                             className="h-full rounded-full"
                             style={{
@@ -506,7 +506,7 @@ export default function ProjectsPage() {
                   })}
                   {stageProjects.length === 0 && (
                     <div
-                      className="flex-1 min-h-[80px] rounded-xl flex items-center justify-center"
+                      className="flex-1 min-h-20 rounded-xl flex items-center justify-center"
                       style={{ border: '1px dashed var(--cp-border-soft)' }}
                     >
                       <span className="text-[10px]" style={{ color: 'var(--cp-text-faint)' }}>
@@ -560,13 +560,13 @@ export default function ProjectsPage() {
                 <th className="p-3 text-[10px] uppercase font-mono tracking-wider" style={{ color: 'var(--cp-text-muted)' }}>Team</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[var(--cp-border-soft)]">
+            <tbody className="divide-y divide-(--cp-border-soft)">
               {filteredProjects.map((project) => {
                 const hMeta = healthMeta(project.health)
                 return (
                   <tr
                     key={project.id}
-                    className="hover:bg-[var(--cp-surface-strong)] transition-colors"
+                    className="hover:bg-(--cp-surface-strong) transition-colors"
                   >
                     <td className="p-3">
                       <Link
@@ -617,8 +617,8 @@ export default function ProjectsPage() {
                       </span>
                     </td>
                     <td className="p-3">
-                      <div className="flex items-center gap-2 min-w-[100px]">
-                        <div className="flex-1 h-[4px] rounded-full overflow-hidden" style={{ background: 'var(--cp-surface-strong)' }}>
+                      <div className="flex items-center gap-2 min-w-25">
+                        <div className="flex-1 h-1 rounded-full overflow-hidden" style={{ background: 'var(--cp-surface-strong)' }}>
                           <div
                             className="h-full rounded-full"
                             style={{
@@ -749,7 +749,7 @@ export default function ProjectsPage() {
             </div>
 
             {createNewClient ? (
-              <div className="flex flex-col gap-3 p-3.5 rounded-xl border border-[var(--cp-border-soft)]" style={{ background: 'var(--cp-bg-soft)' }}>
+              <div className="flex flex-col gap-3 p-3.5 rounded-xl border border-(--cp-border-soft)" style={{ background: 'var(--cp-bg-soft)' }}>
                 <ModalInput
                   label="Client Company"
                   value={formClientName}
@@ -797,7 +797,7 @@ export default function ProjectsPage() {
                 <select
                   value={formClientId}
                   onChange={(e) => handleSelectClient(e.target.value)}
-                  className="px-4 py-3 rounded-xl text-[13px] outline-none appearance-none cursor-pointer [&>option]:bg-[var(--cp-bg-elevated)] [&>option]:text-[var(--cp-text)] w-full"
+                  className="px-4 py-3 rounded-xl text-[13px] outline-none appearance-none cursor-pointer [&>option]:bg-(--cp-bg-elevated) [&>option]:text-(--cp-text) w-full"
                   style={{
                     background: 'var(--cp-bg-soft)',
                     border: '1px solid var(--cp-border)',
@@ -841,7 +841,7 @@ export default function ProjectsPage() {
           >
             <button
               onClick={() => setModalOpen(false)}
-              className="px-4 py-2 rounded-xl text-[12px] font-medium transition-colors text-[var(--cp-text-muted)] hover:text-[var(--cp-text)]"
+              className="px-4 py-2 rounded-xl text-[12px] font-medium transition-colors text-(--cp-text-muted) hover:text-(--cp-text)"
             >
               Cancel
             </button>

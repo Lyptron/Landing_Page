@@ -1,28 +1,25 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { useParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { CheckSquare, XCircle, CheckCircle2, AlertCircle, ClipboardCheck } from 'lucide-react'
-import { fetchApprovals, updateApproval, fetchProjectByAccessCode } from '@/lib/db'
+import { fetchApprovals, updateApproval } from '@/lib/db'
 import { PageHeader, EmptyState, Loading, SectionLabel, Badge, type PortalTone } from '@/components/portal/PortalUI'
+import { useClientPortalProject } from '@/hooks/useClientPortalProject'
+
+async function loadApprovals(projectId: string) {
+  const { data } = await fetchApprovals(projectId)
+  return { data: data ?? [] }
+}
 
 export default function ApprovalsPage() {
-  const params = useParams()
-  const code = params.code as string
+  const { resource, loading } = useClientPortalProject<any[]>(loadApprovals)
   const [approvals, setApprovals] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
 
+  // Hydrate local list so optimistic updates from handleApproval persist.
   useEffect(() => {
-    async function load() {
-      const { data: project } = await fetchProjectByAccessCode(code)
-      if (project) {
-        const { data } = await fetchApprovals(project.id)
-        if (data) setApprovals(data)
-      }
-      setLoading(false)
-    }
-    load()
-  }, [code])
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (resource) setApprovals(resource)
+  }, [resource])
 
   const handleApproval = async (id: string, status: string) => {
     setApprovals(approvals.map((a) => (a.id === id ? { ...a, status } : a)))

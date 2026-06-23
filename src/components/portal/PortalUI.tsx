@@ -1,6 +1,6 @@
 'use client'
 import Link from 'next/link'
-import { CheckCircle2, AlertTriangle, OctagonAlert, ArrowUpRight, type LucideIcon } from 'lucide-react'
+import { CheckCircle2, AlertTriangle, OctagonAlert, ArrowUpRight, Circle, Clock, type LucideIcon } from 'lucide-react'
 import { LyptronMark } from '@/components/ui/LyptronLogo'
 
 export type PortalTone = 'cyan' | 'emerald' | 'amber' | 'violet' | 'red' | 'neutral'
@@ -98,11 +98,11 @@ export function Loading() {
   return (
     <div className="flex flex-col items-center justify-center min-h-[50vh] py-12 gap-4 select-none">
       <div className="relative flex items-center justify-center">
-        <div className="absolute w-[60px] h-[60px] rounded-full border border-dashed border-[var(--cp-cyan)] animate-spin [animation-duration:3s]" />
-        <div className="absolute w-12 h-12 rounded-full border border-[var(--cp-cyan-border)] animate-ping opacity-40 [animation-duration:1.5s]" />
+        <div className="absolute w-15 h-15 rounded-full border border-dashed border-(--cp-cyan) animate-spin [animation-duration:3s]" />
+        <div className="absolute w-12 h-12 rounded-full border border-(--cp-cyan-border) animate-ping opacity-40 [animation-duration:1.5s]" />
         <LyptronMark size={44} className="relative z-10 shadow-sm" />
       </div>
-      <span className="text-[10px] font-mono tracking-[0.16em] uppercase text-[var(--cp-text-faint)] animate-pulse">
+      <span className="text-[10px] font-mono tracking-[0.16em] uppercase text-(--cp-text-faint) animate-pulse">
         Updating workspace...
       </span>
     </div>
@@ -126,7 +126,7 @@ export function QuickAction({
       <div className="group cp-card cp-card-hover h-full flex flex-col gap-5 p-4 cursor-pointer">
         <div className="flex items-center justify-between">
           <Icon
-            className="w-[18px] h-[18px] transition-transform duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-110"
+            className="w-4.5 h-4.5 transition-transform duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-110"
             style={{ color: TONE_TEXT[tone] }}
           />
           <ArrowUpRight
@@ -140,6 +140,21 @@ export function QuickAction({
       </div>
     </Link>
   )
+}
+
+/** Maps a milestone/task status to icon + tone + color. Used by both
+    admin timeline (compact CRUD list) and client timeline (presentation
+    view) so the visual vocabulary stays in sync as new statuses are
+    added. */
+export function getMilestoneStatusInfo(status?: string): { tone: PortalTone; icon: LucideIcon; color: string; label: string } {
+  switch (status) {
+    case 'completed':
+      return { tone: 'emerald', icon: CheckCircle2, color: TONE_TEXT.emerald, label: 'Completed' }
+    case 'in-progress':
+      return { tone: 'cyan', icon: Clock, color: TONE_TEXT.cyan, label: 'In Progress' }
+    default:
+      return { tone: 'neutral', icon: Circle, color: 'var(--cp-text-faint)', label: 'Upcoming' }
+  }
 }
 
 /** Maps a project's "health" field to plain-language status info.

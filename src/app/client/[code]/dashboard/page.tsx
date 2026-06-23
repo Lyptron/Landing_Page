@@ -1,6 +1,5 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { useParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import {
   CheckCircle2,
@@ -9,10 +8,8 @@ import {
   Hammer,
   ClipboardCheck,
   Rocket,
-  TrendingUp,
   CalendarClock,
   Calendar,
-  Layers,
   Inbox,
   Sparkles,
   Users,
@@ -23,7 +20,8 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 import Link from 'next/link'
-import { fetchProjectByAccessCode, fetchProjectTeam, fetchAnnouncements } from '@/lib/db'
+import { fetchProjectTeam, fetchAnnouncements } from '@/lib/db'
+import { useClientPortalProject } from '@/hooks/useClientPortalProject'
 import {
   EmptyState,
   Loading,
@@ -81,35 +79,26 @@ function hasMeaningfulTitle(m: any) {
 
 const DIVIDER = { borderColor: 'var(--cp-border-soft)' }
 
-export default function ClientDashboardPage() {
-  const params = useParams()
-  const code = params.code as string
-  const [project, setProject] = useState<any>(null)
-  const [team, setTeam] = useState<any[]>([])
-  const [announcements, setAnnouncements] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-  const [daysRemaining, setDaysRemaining] = useState<number | null>(null)
+interface DashboardSide { team: any[]; announcements: any[] }
 
+async function loadDashboardSidecars(projectId: string): Promise<{ data: DashboardSide }> {
+  const [{ data: teamData }, { data: announcementData }] = await Promise.all([
+    fetchProjectTeam(projectId),
+    fetchAnnouncements(projectId),
+  ])
+  return { data: { team: teamData || [], announcements: announcementData || [] } }
+}
+
+export default function ClientDashboardPage() {
+  const { project, resource, loading, code } = useClientPortalProject<DashboardSide>(loadDashboardSidecars)
+  const { team, announcements } = resource ?? { team: [], announcements: [] }
+  // Date.now() is impure for render, so we resolve the countdown after mount.
+  const [daysRemaining, setDaysRemaining] = useState<number | null>(null)
   useEffect(() => {
-    async function load() {
-      const { data, error } = await fetchProjectByAccessCode(code)
-      if (!error && data) {
-        setProject(data)
-        const days = data.due_date
-          ? Math.max(0, Math.ceil((new Date(data.due_date).getTime() - Date.now()) / 86400000))
-          : null
-        setDaysRemaining(days)
-        const [{ data: teamData }, { data: announcementData }] = await Promise.all([
-          fetchProjectTeam(data.id),
-          fetchAnnouncements(data.id),
-        ])
-        setTeam(teamData || [])
-        setAnnouncements(announcementData || [])
-      }
-      setLoading(false)
-    }
-    load()
-  }, [code])
+    if (!project?.due_date) return
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setDaysRemaining(Math.max(0, Math.ceil((new Date(project.due_date as string).getTime() - Date.now()) / 86400000)))
+  }, [project?.due_date])
 
   if (loading) return <Loading />
 
@@ -136,18 +125,17 @@ export default function ClientDashboardPage() {
     return { ...a, time: timeAgo(a.created_at), ...meta }
   })
 
-  const accentTone: PortalTone = isMusicClient ? 'violet' : 'cyan'
   const actionsTone: PortalTone = pendingApprovals.length > 0 ? 'amber' : 'emerald'
   const currentStageIndex = Math.max(0, STAGES.indexOf(project.stage || 'Backlog'))
 
   return (
-    <div className="flex flex-col gap-10 sm:gap-14">
+    <div className="flex flex-col gap-8 sm:gap-12 lg:gap-14">
       {/* Project Health */}
       <motion.div
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ ease: EASE_OUT }}
-        className="relative overflow-hidden rounded-[20px] flex flex-col sm:flex-row sm:items-end justify-between gap-6 p-6 sm:p-9"
+        className="relative overflow-hidden rounded-[20px] flex flex-col md:flex-row md:items-end justify-between gap-6 md:gap-8 p-5 sm:p-7 lg:p-9"
         style={{
           background: 'var(--cp-surface)',
           border: '1px solid var(--cp-border-soft)',
@@ -155,7 +143,7 @@ export default function ClientDashboardPage() {
       >
         {/* Ambient tint matching project health, anchored top-right */}
         <div
-          className="absolute -top-24 -right-24 w-[340px] h-[340px] rounded-full pointer-events-none"
+          className="absolute -top-24 -right-24 w-55 h-55 sm:w-75 sm:h-75 lg:w-85 lg:h-85 rounded-full pointer-events-none"
           style={{
             background: `radial-gradient(circle, color-mix(in srgb, ${TONE_TEXT[health.tone]} 14%, transparent) 0%, transparent 70%)`,
           }}
@@ -164,27 +152,20 @@ export default function ClientDashboardPage() {
         <div className="relative min-w-0 flex-1">
           <SectionLabel tone="cyan">{project.status || 'In Progress'}</SectionLabel>
           <h1
-            className="font-display text-[30px] sm:text-[44px] font-bold tracking-[-0.03em] mt-2 leading-[1.02] text-balance"
+            className="font-display text-[26px] sm:text-[34px] md:text-[38px] lg:text-[44px] font-bold tracking-[-0.03em] mt-2 leading-[1.05] sm:leading-[1.02] text-balance"
             style={{ color: 'var(--cp-text)' }}
           >
             {project.name}
           </h1>
-          <p className="text-[14px] sm:text-[15px] mt-3.5 max-w-xl leading-relaxed text-balance" style={{ color: 'var(--cp-text-secondary)' }}>
+          <p className="text-[13.5px] sm:text-[14.5px] lg:text-[15px] mt-3 lg:mt-3.5 max-w-xl leading-relaxed text-balance" style={{ color: 'var(--cp-text-secondary)' }}>
             {health.description}
           </p>
         </div>
 
-        <div className="relative flex flex-col items-start sm:items-end gap-4 shrink-0">
-          <div
-            className="flex items-center gap-2 px-3 py-1.5 rounded-full"
-            style={{
-              color: TONE_TEXT[health.tone],
-              background: `color-mix(in srgb, ${TONE_TEXT[health.tone]} 12%, transparent)`,
-              border: `1px solid color-mix(in srgb, ${TONE_TEXT[health.tone]} 28%, transparent)`,
-            }}
-          >
-            <health.icon className="w-3.5 h-3.5" />
-            <span className="text-[11.5px] font-semibold uppercase tracking-[0.14em]">{health.label}</span>
+        <div className="relative flex flex-col items-start md:items-end gap-3 sm:gap-4 shrink-0">
+          <div className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: TONE_TEXT[health.tone] }} />
+            <span className="text-[13px] font-medium" style={{ color: TONE_TEXT[health.tone] }}>{health.label}</span>
           </div>
           {recentActivity[0] && (
             <span className="text-[11.5px]" style={{ color: 'var(--cp-text-faint)' }}>
@@ -216,7 +197,7 @@ export default function ClientDashboardPage() {
               const meta = ANNOUNCEMENT_META[a.tone] || ANNOUNCEMENT_META.info
               return (
                 <div key={a.id} className="flex items-start gap-3 p-4 sm:p-5">
-                  <meta.icon className="w-[18px] h-[18px] shrink-0 mt-0.5" style={{ color: TONE_TEXT[meta.tone] }} />
+                  <meta.icon className="w-4.5 h-4.5 shrink-0 mt-0.5" style={{ color: TONE_TEXT[meta.tone] }} />
                   <div className="min-w-0 flex-1">
                     <p className="text-[13.5px] font-semibold" style={{ color: 'var(--cp-text)' }}>{a.title}</p>
                     {a.body && (
@@ -243,23 +224,20 @@ export default function ClientDashboardPage() {
         className="pb-10 sm:pb-14 border-b"
         style={DIVIDER}
       >
-        <div className={`cp-card ${isMusicClient ? 'cp-card-accent-violet' : 'cp-card-accent'} pl-5 sm:pl-7 p-5 sm:p-7 flex flex-col gap-8`}>
+        <div className={`cp-card ${isMusicClient ? 'cp-card-accent-violet' : 'cp-card-accent'} pl-5 sm:pl-6 lg:pl-7 p-5 sm:p-6 lg:p-7 flex flex-col gap-7 sm:gap-8`}>
 
           {/* Top row: big % + days remaining */}
-          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6">
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-5 sm:gap-6">
             <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-2.5">
-                <TrendingUp className="w-[18px] h-[18px]" style={{ color: TONE_TEXT[accentTone] }} />
-                <SectionLabel tone={accentTone}>Progress</SectionLabel>
-              </div>
+              <span className="text-[13px]" style={{ color: 'var(--cp-text-muted)' }}>Progress</span>
               <div className="flex items-baseline gap-2">
                 <span
-                  className="font-display font-bold tabular-nums leading-none text-[64px] sm:text-[80px] tracking-[-0.03em]"
+                  className="font-display font-bold tabular-nums leading-none text-[56px] sm:text-[68px] lg:text-[80px] tracking-[-0.03em]"
                   style={{ color: 'var(--cp-text)' }}
                 >
                   {progress}
                 </span>
-                <span className="font-display font-bold leading-none text-[26px] sm:text-[32px]" style={{ color: 'var(--cp-text-muted)' }}>
+                <span className="font-display font-bold leading-none text-[22px] sm:text-[28px] lg:text-[32px]" style={{ color: 'var(--cp-text-muted)' }}>
                   %
                 </span>
               </div>
@@ -281,7 +259,7 @@ export default function ClientDashboardPage() {
             </div>
           </div>
 
-          <div className="w-full h-[5px] rounded-full overflow-hidden" style={{ background: 'var(--cp-surface-strong)' }}>
+          <div className="w-full h-1.25 rounded-full overflow-hidden" style={{ background: 'var(--cp-surface-strong)' }}>
             <motion.div
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
@@ -294,22 +272,19 @@ export default function ClientDashboardPage() {
             />
           </div>
 
-          {/* Horizontal stage tracker */}
+          {/* Horizontal stage tracker — scrolls on phones so 5 stages don't crush */}
           <div>
-            <div className="flex items-center gap-2.5 mb-5">
-              <Layers className="w-[18px] h-[18px]" style={{ color: 'var(--cp-cyan)' }} />
-              <SectionLabel>Current Phase</SectionLabel>
-            </div>
-            <div className="flex items-start">
+            <span className="text-[13px] block mb-5" style={{ color: 'var(--cp-text-muted)' }}>Phase</span>
+            <div className="flex items-start overflow-x-auto sm:overflow-visible -mx-1 px-1 pb-1 scrollbar-none [&::-webkit-scrollbar]:hidden">
               {STAGES.map((stage, i) => {
                 const isDone = i < currentStageIndex
                 const isCurrent = i === currentStageIndex
                 const isLast = i === STAGES.length - 1
                 return (
-                  <div key={stage} className={`flex flex-col ${isLast ? '' : 'flex-1'} min-w-0`}>
+                  <div key={stage} className={`flex flex-col ${isLast ? 'shrink-0 sm:shrink' : 'flex-1'} min-w-24 sm:min-w-0`}>
                     <div className="flex items-center w-full">
                       <div
-                        className="w-[11px] h-[11px] rounded-full shrink-0"
+                        className="w-2.75 h-2.75 rounded-full shrink-0"
                         style={
                           isDone
                             ? { background: 'var(--cp-cyan)' }
@@ -322,12 +297,12 @@ export default function ClientDashboardPage() {
                         <div className="h-px flex-1" style={{ background: isDone ? 'var(--cp-cyan)' : 'var(--cp-border-soft)' }} />
                       )}
                     </div>
-                    <div className="mt-2.5 pr-2">
-                      <span className="text-[12.5px] font-semibold block truncate" style={{ color: isCurrent || isDone ? 'var(--cp-text)' : 'var(--cp-text-faint)' }}>
+                    <div className="mt-2.5 pr-3 sm:pr-2">
+                      <span className="text-[12px] sm:text-[12.5px] font-semibold block truncate" style={{ color: isCurrent || isDone ? 'var(--cp-text)' : 'var(--cp-text-faint)' }}>
                         {stage}
                       </span>
                       {isCurrent && (
-                        <span className="text-[11.5px] block mt-0.5 leading-relaxed" style={{ color: 'var(--cp-text-muted)' }}>
+                        <span className="text-[11px] sm:text-[11.5px] block mt-0.5 leading-relaxed" style={{ color: 'var(--cp-text-muted)' }}>
                           {STAGE_DESCRIPTIONS[stage]}
                         </span>
                       )}
@@ -345,7 +320,7 @@ export default function ClientDashboardPage() {
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1, ease: EASE_OUT }}
-        className="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-14 pb-10 sm:pb-14 border-b"
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-7 lg:gap-10 pb-10 sm:pb-14 border-b"
         style={DIVIDER}
       >
         {/* Pending client actions */}
@@ -385,7 +360,7 @@ export default function ClientDashboardPage() {
         {/* Upcoming milestones */}
         <div className="cp-card p-5 sm:p-6 flex flex-col gap-3.5 h-full">
           <div className="flex items-center gap-2.5">
-            <CalendarClock className="w-[18px] h-[18px]" style={{ color: 'var(--cp-cyan)' }} />
+            <CalendarClock className="w-4.5 h-4.5" style={{ color: 'var(--cp-cyan)' }} />
             <SectionLabel>Upcoming Milestones</SectionLabel>
           </div>
           {upcomingMilestones.length > 0 ? (
@@ -426,13 +401,13 @@ export default function ClientDashboardPage() {
         </div>
 
         {/* Team members */}
-        <div className="cp-card p-5 sm:p-6 flex flex-col gap-3.5 h-full">
+        <div className="cp-card p-5 sm:p-6 flex flex-col gap-3.5 h-full md:col-span-2 lg:col-span-1">
           <div className="flex items-center gap-2.5">
-            <Users className="w-[18px] h-[18px]" style={{ color: 'var(--cp-cyan)' }} />
+            <Users className="w-4.5 h-4.5" style={{ color: 'var(--cp-cyan)' }} />
             <SectionLabel>Team Members</SectionLabel>
           </div>
           {team.length > 0 ? (
-            <div className="flex flex-col gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3">
               {team.slice(0, 4).map((t: any) => {
                 const tm = t.team_members || {}
                 return (

@@ -65,28 +65,28 @@ export default function ProjectDevelopmentPage() {
       {/* Deployments Section */}
       <div className="cp-card p-5">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-[13px] font-bold text-[var(--cp-text-secondary)] flex items-center gap-1.5"><Zap className="w-4 h-4 text-[var(--cp-text-faint)]" /> Deployments</h3>
-          <span className="text-[10px] font-mono text-[var(--cp-text-faint)]">{deployments.length} total</span>
+          <h3 className="text-[13px] font-bold text-(--cp-text-secondary) flex items-center gap-1.5"><Zap className="w-4 h-4 text-(--cp-text-faint)" /> Deployments</h3>
+          <span className="text-[10px] font-mono text-(--cp-text-faint)">{deployments.length} total</span>
         </div>
         <div className="flex flex-col gap-2">
           {deployments.map(d => (
-            <div key={d.id} className="flex items-center justify-between p-3 rounded-xl bg-[var(--cp-bg-soft)] border border-[var(--cp-border-soft)]">
+            <div key={d.id} className="flex items-center justify-between p-3 rounded-xl bg-(--cp-bg-soft) border border-(--cp-border-soft)">
               <div className="flex items-center gap-2.5">
-                <span className={`w-2 h-2 rounded-full shrink-0 ${d.status === 'success' ? 'bg-[var(--cp-emerald)]' : d.status === 'failed' ? 'bg-[var(--cp-red)]' : 'bg-[var(--cp-cyan)] animate-pulse'}`} />
+                <span className={`w-2 h-2 rounded-full shrink-0 ${d.status === 'success' ? 'bg-(--cp-emerald)' : d.status === 'failed' ? 'bg-(--cp-red)' : 'bg-(--cp-cyan) animate-pulse'}`} />
                 <div>
-                  <span className="text-[13px] block font-semibold text-[var(--cp-text)]">{d.environment}{d.version && ` v${d.version}`}</span>
-                  {d.url && <a href={d.url} target="_blank" rel="noreferrer" className="text-[10.5px] text-[var(--cp-cyan)] hover:underline truncate block max-w-[200px]">{d.url}</a>}
+                  <span className="text-[13px] block font-semibold text-(--cp-text)">{d.environment}{d.version && ` v${d.version}`}</span>
+                  {d.url && <a href={d.url} target="_blank" rel="noreferrer" className="text-[10.5px] text-(--cp-cyan) hover:underline truncate block max-w-50">{d.url}</a>}
                 </div>
               </div>
               <div className="flex items-center gap-2 shrink-0">
-                <span className={`text-[9px] font-mono uppercase ${d.status === 'success' ? 'text-[var(--cp-emerald)]' : d.status === 'failed' ? 'text-[var(--cp-red)]' : 'text-[var(--cp-cyan)]'}`}>{d.status}</span>
-                <button onClick={() => handleDeleteDeployment(d.id)} className="p-1 text-[var(--cp-text-faint)] hover:text-[var(--cp-red)] transition-colors cursor-pointer">
+                <span className={`text-[9px] font-mono uppercase ${d.status === 'success' ? 'text-(--cp-emerald)' : d.status === 'failed' ? 'text-(--cp-red)' : 'text-(--cp-cyan)'}`}>{d.status}</span>
+                <button onClick={() => handleDeleteDeployment(d.id)} className="p-1 text-(--cp-text-faint) hover:text-(--cp-red) transition-colors cursor-pointer">
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
               </div>
             </div>
           ))}
-          <button onClick={() => setDepModalOpen(true)} className="flex items-center gap-1.5 p-3 rounded-xl text-[11px] text-[var(--cp-text-faint)] hover:text-[var(--cp-text-muted)] hover:bg-[var(--cp-bg-soft)] transition-colors border border-dashed border-[var(--cp-border)] cursor-pointer justify-center">
+          <button onClick={() => setDepModalOpen(true)} className="flex items-center gap-1.5 p-3 rounded-xl text-[11px] text-(--cp-text-faint) hover:text-(--cp-text-muted) hover:bg-(--cp-bg-soft) transition-colors border border-dashed border-(--cp-border) cursor-pointer justify-center">
             <Plus className="w-3.5 h-3.5" /> Add Deployment
           </button>
         </div>
@@ -95,27 +95,27 @@ export default function ProjectDevelopmentPage() {
       {/* Activity Logs Section */}
       <div className="cp-card p-5">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-[13px] font-bold text-[var(--cp-text-secondary)] flex items-center gap-1.5"><GitCommit className="w-4 h-4 text-[var(--cp-text-faint)]" /> Activity Logs</h3>
-          <span className="text-[10px] font-mono text-[var(--cp-text-faint)]">{activities.length} total</span>
+          <h3 className="text-[13px] font-bold text-(--cp-text-secondary) flex items-center gap-1.5"><GitCommit className="w-4 h-4 text-(--cp-text-faint)" /> Activity Logs</h3>
+          <span className="text-[10px] font-mono text-(--cp-text-faint)">{activities.length} total</span>
         </div>
         <div className="flex flex-col gap-2">
           {activities.map(a => (
-            <div key={a.id} className="flex items-start justify-between p-3 rounded-xl bg-[var(--cp-bg-soft)] border border-[var(--cp-border-soft)]">
+            <div key={a.id} className="flex items-start justify-between p-3 rounded-xl bg-(--cp-bg-soft) border border-(--cp-border-soft)">
               <div className="flex items-start gap-2.5">
                 <div className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0" style={{ background: 'var(--cp-border-strong)' }} />
                 <div>
-                  <span className="text-[13px] block text-[var(--cp-text)]">{a.action_text}</span>
-                  <span className="text-[9px] font-mono text-[var(--cp-text-faint)]">
+                  <span className="text-[13px] block text-(--cp-text)">{a.action_text}</span>
+                  <span className="text-[9px] font-mono text-(--cp-text-faint)">
                     {a.actor_name} • {a.created_at ? new Date(a.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : ''}
                   </span>
                 </div>
               </div>
-              <button onClick={() => handleDeleteActivity(a.id)} className="p-1 text-[var(--cp-text-faint)] hover:text-[var(--cp-red)] transition-colors cursor-pointer shrink-0">
+              <button onClick={() => handleDeleteActivity(a.id)} className="p-1 text-(--cp-text-faint) hover:text-(--cp-red) transition-colors cursor-pointer shrink-0">
                 <Trash2 className="w-3.5 h-3.5" />
               </button>
             </div>
           ))}
-          <button onClick={() => setActModalOpen(true)} className="flex items-center gap-1.5 p-3 rounded-xl text-[11px] text-[var(--cp-text-faint)] hover:text-[var(--cp-text-muted)] hover:bg-[var(--cp-bg-soft)] transition-colors border border-dashed border-[var(--cp-border)] cursor-pointer justify-center">
+          <button onClick={() => setActModalOpen(true)} className="flex items-center gap-1.5 p-3 rounded-xl text-[11px] text-(--cp-text-faint) hover:text-(--cp-text-muted) hover:bg-(--cp-bg-soft) transition-colors border border-dashed border-(--cp-border) cursor-pointer justify-center">
             <Plus className="w-3.5 h-3.5" /> Log Activity
           </button>
         </div>
@@ -129,7 +129,7 @@ export default function ProjectDevelopmentPage() {
           <ModalSelect label="Status" value={depForm.status} onChange={v => setDepForm({ ...depForm, status: v })} options={[{ value: 'success', label: 'Success' }, { value: 'building', label: 'Building' }, { value: 'failed', label: 'Failed' }]} />
           <ModalInput label="URL" value={depForm.url} onChange={v => setDepForm({ ...depForm, url: v })} placeholder="https://..." />
           <div className="flex justify-end gap-3 pt-4 border-t" style={{ borderColor: 'var(--cp-border-soft)' }}>
-            <button onClick={() => setDepModalOpen(false)} className="px-4 py-2 rounded-xl text-[12px] font-medium text-[var(--cp-text-muted)] hover:text-[var(--cp-text)]">Cancel</button>
+            <button onClick={() => setDepModalOpen(false)} className="px-4 py-2 rounded-xl text-[12px] font-medium text-(--cp-text-muted) hover:text-(--cp-text)">Cancel</button>
             <button onClick={handleAddDeployment} disabled={saving} className="cp-btn-primary px-5 py-2 text-[12px] cursor-pointer">
               {saving ? 'Adding...' : 'Add'}
             </button>
@@ -144,7 +144,7 @@ export default function ProjectDevelopmentPage() {
           <ModalInput label="Actor Name" value={actForm.actor_name} onChange={v => setActForm({ ...actForm, actor_name: v })} placeholder="Admin" />
           <ModalSelect label="Type" value={actForm.type} onChange={v => setActForm({ ...actForm, type: v })} options={[{ value: 'milestone', label: 'Milestone' }, { value: 'commit', label: 'Commit' }, { value: 'deployment', label: 'Deployment' }, { value: 'approval', label: 'Approval' }]} />
           <div className="flex justify-end gap-3 pt-4 border-t" style={{ borderColor: 'var(--cp-border-soft)' }}>
-            <button onClick={() => setActModalOpen(false)} className="px-4 py-2 rounded-xl text-[12px] font-medium text-[var(--cp-text-muted)] hover:text-[var(--cp-text)]">Cancel</button>
+            <button onClick={() => setActModalOpen(false)} className="px-4 py-2 rounded-xl text-[12px] font-medium text-(--cp-text-muted) hover:text-(--cp-text)">Cancel</button>
             <button onClick={handleAddActivity} disabled={saving || !actForm.action_text} className="cp-btn-primary px-5 py-2 text-[12px] cursor-pointer">
               {saving ? 'Logging...' : 'Log'}
             </button>

@@ -49,32 +49,32 @@ export default function ProjectDocumentsPage() {
   return (
     <div className="cp-card p-5">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-[13px] font-bold text-[var(--cp-text-secondary)]">Documents & Contracts</h3>
-        <span className="text-[10px] font-mono text-[var(--cp-text-faint)]">{documents.length} total</span>
+        <h3 className="text-[13px] font-bold text-(--cp-text-secondary)">Documents & Contracts</h3>
+        <span className="text-[10px] font-mono text-(--cp-text-faint)">{documents.length} total</span>
       </div>
       <div className="flex flex-col gap-2">
         {documents.map(d => (
-          <div key={d.id} className="flex items-center justify-between p-3 rounded-xl bg-[var(--cp-bg-soft)] border border-[var(--cp-border-soft)]">
+          <div key={d.id} className="flex items-center justify-between p-3 rounded-xl bg-(--cp-bg-soft) border border-(--cp-border-soft)">
             <div className="flex items-center gap-2.5">
-              <FileText className="w-4 h-4 text-[var(--cp-text-faint)]" />
+              <FileText className="w-4 h-4 text-(--cp-text-faint)" />
               <div>
-                <span className="text-[13px] block text-[var(--cp-text)]">{d.title}</span>
-                <span className="text-[9px] font-mono uppercase text-[var(--cp-text-muted)]">{d.type}</span>
+                <span className="text-[13px] block text-(--cp-text)">{d.title}</span>
+                <span className="text-[9px] font-mono uppercase text-(--cp-text-muted)">{d.type}</span>
               </div>
             </div>
             <div className="flex items-center gap-2">
               {d.file_url && (
-                <a href={d.file_url} target="_blank" rel="noreferrer" className="p-1.5 text-[var(--cp-cyan)] hover:text-[var(--cp-cyan-strong)] transition-colors">
+                <a href={d.file_url} target="_blank" rel="noreferrer" className="p-1.5 text-(--cp-cyan) hover:text-(--cp-cyan-strong) transition-colors">
                   <ExternalLink className="w-3.5 h-3.5" />
                 </a>
               )}
-              <button onClick={() => handleDelete(d.id)} className="p-1.5 text-[var(--cp-text-faint)] hover:text-[var(--cp-red)] transition-colors cursor-pointer">
+              <button onClick={() => handleDelete(d.id)} className="p-1.5 text-(--cp-text-faint) hover:text-(--cp-red) transition-colors cursor-pointer">
                 <Trash2 className="w-3.5 h-3.5" />
               </button>
             </div>
           </div>
         ))}
-        <button onClick={() => setModalOpen(true)} className="flex items-center gap-1.5 p-3 rounded-xl text-[11px] text-[var(--cp-text-faint)] hover:text-[var(--cp-text-muted)] hover:bg-[var(--cp-bg-soft)] transition-colors border border-dashed border-[var(--cp-border)] cursor-pointer justify-center">
+        <button onClick={() => setModalOpen(true)} className="flex items-center gap-1.5 p-3 rounded-xl text-[11px] text-(--cp-text-faint) hover:text-(--cp-text-muted) hover:bg-(--cp-bg-soft) transition-colors border border-dashed border-(--cp-border) cursor-pointer justify-center">
           <Plus className="w-3.5 h-3.5" /> Add Document
         </button>
       </div>
@@ -85,7 +85,7 @@ export default function ProjectDocumentsPage() {
           <ModalSelect label="Type" value={form.type} onChange={v => setForm({ ...form, type: v })} options={DOCUMENT_TYPES} />
           <ModalInput label="File URL" value={form.file_url} onChange={v => setForm({ ...form, file_url: v })} placeholder="https://..." />
           <div className="flex justify-end gap-3 pt-4 border-t" style={{ borderColor: 'var(--cp-border-soft)' }}>
-            <button onClick={() => setModalOpen(false)} className="px-4 py-2 rounded-xl text-[12px] font-medium text-[var(--cp-text-muted)] hover:text-[var(--cp-text)]">Cancel</button>
+            <button onClick={() => setModalOpen(false)} className="px-4 py-2 rounded-xl text-[12px] font-medium text-(--cp-text-muted) hover:text-(--cp-text)">Cancel</button>
             <button onClick={handleAdd} disabled={saving || !form.title} className="cp-btn-primary px-5 py-2 text-[12px] cursor-pointer">
               {saving ? 'Adding...' : 'Add'}
             </button>

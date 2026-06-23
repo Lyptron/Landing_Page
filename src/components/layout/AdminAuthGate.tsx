@@ -4,11 +4,12 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useAdminAuth } from '@/lib/AdminAuthContext'
 import EnterpriseAdminLayout from './EnterpriseAdminLayout'
 import { canAccessRoute, getFallbackRoute } from '@/lib/adminRoles'
+import { toLogicalPathname } from '@/lib/portalPath'
 import { LyptronMark } from '@/components/ui/LyptronLogo'
 
 export default function AdminAuthGate({ children }: { children: React.ReactNode }) {
   const { user, loading, logout } = useAdminAuth()
-  const pathname = usePathname()
+  const pathname = toLogicalPathname(usePathname())
   const router = useRouter()
   const [authorized, setAuthorized] = useState(false)
 
@@ -43,15 +44,15 @@ export default function AdminAuthGate({ children }: { children: React.ReactNode 
   // Loading state
   if (loading) {
     return (
-      <div className="admin-shell min-h-screen flex flex-col items-center justify-center bg-[var(--cp-bg)] gap-5 text-center select-none">
+      <div className="admin-shell min-h-screen flex flex-col items-center justify-center bg-(--cp-bg) gap-5 text-center select-none">
         <div className="relative flex items-center justify-center">
-          <div className="absolute w-[68px] h-[68px] rounded-full border border-dashed border-[var(--cp-cyan)] animate-spin [animation-duration:3s]" />
-          <div className="absolute w-14 h-14 rounded-full border border-[var(--cp-cyan-border)] animate-ping opacity-40 [animation-duration:1.5s]" />
+          <div className="absolute w-17 h-17 rounded-full border border-dashed border-(--cp-cyan) animate-spin [animation-duration:3s]" />
+          <div className="absolute w-14 h-14 rounded-full border border-(--cp-cyan-border) animate-ping opacity-40 [animation-duration:1.5s]" />
           <LyptronMark size={50} className="relative z-10 shadow-md" />
         </div>
         <div className="flex flex-col gap-1">
-          <span className="font-display font-bold text-[18px] tracking-tight text-[var(--cp-text)]">Lyptron</span>
-          <span className="text-[10px] font-mono tracking-[0.18em] uppercase text-[var(--cp-text-faint)]">Loading portal...</span>
+          <span className="font-display font-bold text-[18px] tracking-tight text-(--cp-text)">Lyptron</span>
+          <span className="text-[10px] font-mono tracking-[0.18em] uppercase text-(--cp-text-faint)">Loading portal...</span>
         </div>
       </div>
     )

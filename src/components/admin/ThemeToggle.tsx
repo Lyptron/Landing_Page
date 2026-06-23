@@ -66,10 +66,10 @@ export default function ThemeToggle() {
             onTouchStart={startPress}
             onTouchEnd={cancelPress}
             aria-label={`Theme: ${mode}. Click to change, right-click for appearance settings.`}
-            className="hover:text-[var(--cp-text)] transition-colors"
+            className="hover:text-(--cp-text) transition-colors"
             style={{ color: 'var(--cp-text-faint)' }}
           >
-            <Icon className="w-[16px] h-[16px]" />
+            <Icon className="w-4 h-4" />
           </button>
         </Tooltip.Trigger>
         <Tooltip.Portal>

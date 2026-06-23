@@ -211,7 +211,7 @@ export default function AdminDashboard() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
         <div>
-          <h1 className="font-display text-[26px] font-semibold tracking-tight" style={{ color: 'var(--cp-text)' }}>
+          <h1 className="font-display text-2xl md:text-3xl font-bold tracking-tight" style={{ color: 'var(--cp-text)' }}>
             Overview
           </h1>
           <p className="text-[13px] mt-0.5" style={{ color: 'var(--cp-text-muted)' }}>
@@ -285,7 +285,7 @@ export default function AdminDashboard() {
 
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <div className="w-5 h-5 border-2 border-[var(--cp-border)] border-t-[var(--cp-text-muted)] rounded-full animate-spin" />
+          <div className="w-5 h-5 border-2 border-(--cp-border) border-t-(--cp-text-muted) rounded-full animate-spin" />
         </div>
       ) : projects.length === 0 ? (
         <div
@@ -368,7 +368,7 @@ export default function AdminDashboard() {
                   <select
                     value={proj.status}
                     onChange={(e) => updateStatusHandler(proj.id, e.target.value)}
-                    className="px-3 py-1 rounded-lg text-[10px] uppercase tracking-[0.1em] font-semibold outline-none cursor-pointer [&>option]:bg-[var(--cp-bg-elevated)] [&>option]:text-[var(--cp-text)]"
+                    className="px-3 py-1 rounded-lg text-[10px] uppercase tracking-[0.1em] font-semibold outline-none cursor-pointer [&>option]:bg-(--cp-bg-elevated) [&>option]:text-(--cp-text)"
                     style={{
                       background:
                         proj.status === 'in-progress'
@@ -405,7 +405,7 @@ export default function AdminDashboard() {
 
               {/* Progress slider */}
               <div
-                className="w-full h-[3px] rounded-full overflow-hidden relative cursor-ew-resize mb-4"
+                className="w-full h-0.75 rounded-full overflow-hidden relative cursor-ew-resize mb-4"
                 style={{ background: 'var(--cp-surface-strong)' }}
               >
                 <input
@@ -458,7 +458,7 @@ export default function AdminDashboard() {
                       <button
                         key={m.id}
                         onClick={() => toggleMilestone(proj.id, m.id, m.status)}
-                        className="flex items-center gap-2 p-2 rounded-lg transition-colors text-left hover:bg-[var(--cp-bg-soft)]"
+                        className="flex items-center gap-2 p-2 rounded-lg transition-colors text-left hover:bg-(--cp-bg-soft)"
                       >
                         <div
                           className="w-1.5 h-1.5 rounded-full shrink-0"
@@ -528,7 +528,7 @@ export default function AdminDashboard() {
             </div>
 
             {createNewClient ? (
-              <div className="flex flex-col gap-3 p-3.5 rounded-xl border border-[var(--cp-border-soft)]" style={{ background: 'var(--cp-bg-soft)' }}>
+              <div className="flex flex-col gap-3 p-3.5 rounded-xl border border-(--cp-border-soft)" style={{ background: 'var(--cp-bg-soft)' }}>
                 <ModalInput
                   label="Client Company"
                   value={formClientCompany}
@@ -575,7 +575,7 @@ export default function AdminDashboard() {
                 <select
                   value={formClientId}
                   onChange={(e) => setFormClientId(e.target.value)}
-                  className="px-4 py-3 rounded-xl text-[13px] outline-none appearance-none cursor-pointer [&>option]:bg-[var(--cp-bg-elevated)] [&>option]:text-[var(--cp-text)] w-full"
+                  className="px-4 py-3 rounded-xl text-[13px] outline-none appearance-none cursor-pointer [&>option]:bg-(--cp-bg-elevated) [&>option]:text-(--cp-text) w-full"
                   style={{
                     background: 'var(--cp-bg-soft)',
                     border: '1px solid var(--cp-border)',
@@ -612,7 +612,7 @@ export default function AdminDashboard() {
           >
             <button
               onClick={() => setProjectModalOpen(false)}
-              className="px-4 py-2 rounded-xl text-[12px] font-medium transition-colors text-[var(--cp-text-muted)] hover:text-[var(--cp-text)]"
+              className="px-4 py-2 rounded-xl text-[12px] font-medium transition-colors text-(--cp-text-muted) hover:text-(--cp-text)"
             >
               Cancel
             </button>
@@ -652,7 +652,7 @@ export default function AdminDashboard() {
           >
             <button
               onClick={() => setMilestoneModalOpen(false)}
-              className="px-4 py-2 rounded-xl text-[12px] font-medium transition-colors text-[var(--cp-text-muted)] hover:text-[var(--cp-text)]"
+              className="px-4 py-2 rounded-xl text-[12px] font-medium transition-colors text-(--cp-text-muted) hover:text-(--cp-text)"
             >
               Cancel
             </button>

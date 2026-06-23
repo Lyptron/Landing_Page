@@ -14,6 +14,7 @@ export default function ProjectTeamPage() {
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [updatingId, setUpdatingId] = useState<string | null>(null)
+  const [roleUpdateError, setRoleUpdateError] = useState<string | null>(null)
 
   const assignedIds = teamAssigned.map(t => t.id)
   const unassignedMembers = allTeamMembers.filter(m => !assignedIds.includes(m.id))
@@ -67,9 +68,10 @@ export default function ProjectTeamPage() {
   }
 
   async function handleUpdateRole(memberId: string, newRole: string) {
+    const snapshot = teamAssigned
     setTeamAssigned(prev => prev.map(t => t.id === memberId ? { ...t, role_on_project: newRole } : t))
     setUpdatingId(memberId)
-    
+
     const { error } = await supabase
       .from('project_team')
       .update({ role_on_project: newRole })
@@ -77,7 +79,10 @@ export default function ProjectTeamPage() {
       .eq('team_member_id', memberId)
 
     if (error) {
-      console.error('Failed to update role on project:', error)
+      // Roll back the optimistic update so the UI reflects the real DB state.
+      setTeamAssigned(snapshot)
+      setRoleUpdateError("Couldn't update role. Try again.")
+      setTimeout(() => setRoleUpdateError(null), 3000)
     }
     setUpdatingId(null)
   }
@@ -87,8 +92,11 @@ export default function ProjectTeamPage() {
       {/* Title & Add button header */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-[15px] font-bold text-[var(--cp-text)]">Project Command & Team</h3>
-          <p className="text-[11px] text-[var(--cp-text-faint)] mt-0.5">{teamAssigned.length} experts assigned</p>
+          <h3 className="text-[15px] font-bold text-(--cp-text)">Project Command & Team</h3>
+          <p className="text-[11px] text-(--cp-text-faint) mt-0.5">{teamAssigned.length} experts assigned</p>
+          {roleUpdateError && (
+            <p className="text-[11px] text-(--cp-red) mt-1" role="alert">{roleUpdateError}</p>
+          )}
         </div>
         
         {/* Dropdown Container */}
@@ -107,25 +115,25 @@ export default function ProjectTeamPage() {
                 className="absolute right-0 mt-2 w-72 rounded-xl p-3 z-40 border border-white/[0.05] shadow-2xl flex flex-col gap-2.5"
                 style={{ background: 'var(--cp-bg-elevated)' }}
               >
-                <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-[var(--cp-border)] bg-white/[0.015]">
-                  <Search className="w-3.5 h-3.5 text-[var(--cp-text-faint)]" />
+                <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-(--cp-border) bg-white/[0.015]">
+                  <Search className="w-3.5 h-3.5 text-(--cp-text-faint)" />
                   <input
                     type="text"
                     placeholder="Search members..."
                     value={searchQuery}
                     onChange={e => setSearchQuery(e.target.value)}
-                    className="bg-transparent border-none outline-none text-[12.5px] w-full text-[var(--cp-text)]"
+                    className="bg-transparent border-none outline-none text-[12.5px] w-full text-(--cp-text)"
                   />
                 </div>
                 <div className="max-h-52 overflow-y-auto flex flex-col gap-1 custom-scrollbar">
                   {filteredUnassigned.length === 0 ? (
-                    <p className="text-[11px] text-[var(--cp-text-faint)] text-center py-4">No available team members</p>
+                    <p className="text-[11px] text-(--cp-text-faint) text-center py-4">No available team members</p>
                   ) : (
                     filteredUnassigned.map(m => (
                       <button
                         key={m.id}
                         onClick={() => handleAssign(m.id)}
-                        className="flex items-center gap-2.5 w-full text-left p-2 rounded-lg hover:bg-white/[0.025] hover:text-[var(--cp-text)] transition-all cursor-pointer text-[var(--cp-text-muted)]"
+                        className="flex items-center gap-2.5 w-full text-left p-2 rounded-lg hover:bg-white/[0.025] hover:text-(--cp-text) transition-all cursor-pointer text-(--cp-text-muted)"
                       >
                         <div 
                           className="w-7 h-7 rounded-full shrink-0 flex items-center justify-center font-mono text-[9px] font-bold text-white"
@@ -135,7 +143,7 @@ export default function ProjectTeamPage() {
                         </div>
                         <div className="min-w-0 flex-1 leading-tight">
                           <p className="text-[12px] font-semibold truncate">{m.name}</p>
-                          <p className="text-[10px] text-[var(--cp-text-faint)] truncate mt-0.5">{m.role}</p>
+                          <p className="text-[10px] text-(--cp-text-faint) truncate mt-0.5">{m.role}</p>
                         </div>
                       </button>
                     ))
@@ -150,9 +158,9 @@ export default function ProjectTeamPage() {
       {/* Grid of Team Cards */}
       {teamAssigned.length === 0 ? (
         <div className="cp-card py-16 flex flex-col items-center justify-center text-center">
-          <Briefcase className="w-8 h-8 text-[var(--cp-text-faint)] mb-3" />
-          <h4 className="text-[14px] font-semibold text-[var(--cp-text-secondary)] mb-1">No Team Members Assigned</h4>
-          <p className="text-[12px] text-[var(--cp-text-muted)] max-w-xs leading-relaxed">
+          <Briefcase className="w-8 h-8 text-(--cp-text-faint) mb-3" />
+          <h4 className="text-[14px] font-semibold text-(--cp-text-secondary) mb-1">No Team Members Assigned</h4>
+          <p className="text-[12px] text-(--cp-text-muted) max-w-xs leading-relaxed">
             Assign specialists to collaborate on deliverables and manage task flows.
           </p>
         </div>
@@ -163,12 +171,12 @@ export default function ProjectTeamPage() {
             return (
               <div 
                 key={m.id} 
-                className="cp-card p-4.5 flex flex-col gap-4 relative group transition-all duration-300 hover:border-[var(--cp-cyan-border)] hover:bg-white/[0.015]"
+                className="cp-card p-4.5 flex flex-col gap-4 relative group transition-all duration-300 hover:border-(--cp-cyan-border) hover:bg-white/[0.015]"
               >
                 {/* Remove button (visible on hover) */}
                 <button
                   onClick={() => handleRemove(m.id)}
-                  className="absolute top-3 right-3 p-1.5 rounded-lg text-[var(--cp-text-faint)] hover:text-[var(--cp-red)] hover:bg-[var(--cp-red-soft)] transition-all opacity-0 group-hover:opacity-100 cursor-pointer z-10"
+                  className="absolute top-3 right-3 p-1.5 rounded-lg text-(--cp-text-faint) hover:text-(--cp-red) hover:bg-(--cp-red-soft) transition-all opacity-0 group-hover:opacity-100 cursor-pointer z-10"
                   title="Remove from project"
                 >
                   <X className="w-3.5 h-3.5" />
@@ -191,35 +199,35 @@ export default function ProjectTeamPage() {
                     )}
                   </div>
                   <div className="min-w-0 flex-1 pr-6 leading-tight">
-                    <h4 className="text-[14px] font-bold text-[var(--cp-text)] truncate">{m.name}</h4>
-                    <p className="text-[11px] text-[var(--cp-text-faint)] mt-1 truncate">{m.role}</p>
+                    <h4 className="text-[14px] font-bold text-(--cp-text) truncate">{m.name}</h4>
+                    <p className="text-[11px] text-(--cp-text-faint) mt-1 truncate">{m.role}</p>
                   </div>
                 </div>
 
                 {/* Inline Project Role */}
                 <div className="flex flex-col gap-1.5 pt-1">
-                  <label className="text-[9px] font-mono uppercase tracking-wider text-[var(--cp-text-faint)]">Project Role</label>
+                  <label className="text-[9px] font-mono uppercase tracking-wider text-(--cp-text-faint)">Project Role</label>
                   <div className="relative flex items-center">
                     <input
                       type="text"
                       value={m.role_on_project || ''}
                       onChange={e => handleUpdateRole(m.id, e.target.value)}
                       placeholder="e.g. Lead Frontend"
-                      className="w-full bg-white/[0.015] border border-white/[0.05] rounded-lg px-3 py-2 text-[12px] text-[var(--cp-text)] outline-none focus:border-[var(--cp-cyan-border)] transition-colors pr-8 font-medium"
+                      className="w-full bg-white/[0.015] border border-white/[0.05] rounded-lg px-3 py-2 text-[12px] text-(--cp-text) outline-none focus:border-(--cp-cyan-border) transition-colors pr-8 font-medium"
                     />
                     {updatingId === m.id && (
-                      <div className="absolute right-2.5 w-3.5 h-3.5 border border-[var(--cp-border)] border-t-[var(--cp-cyan)] rounded-full animate-spin" />
+                      <div className="absolute right-2.5 w-3.5 h-3.5 border border-(--cp-border) border-t-(--cp-cyan) rounded-full animate-spin" />
                     )}
                   </div>
                 </div>
 
                 {/* Expertise tags from member details */}
                 {m.expertise && m.expertise.length > 0 && (
-                  <div className="flex flex-wrap gap-1 mt-1 border-t border-[var(--cp-border-soft)] pt-3">
+                  <div className="flex flex-wrap gap-1 mt-1 border-t border-(--cp-border-soft) pt-3">
                     {m.expertise.slice(0, 3).map((exp: string) => (
                       <span 
                         key={exp} 
-                        className="text-[9.5px] px-2 py-0.5 rounded bg-white/[0.02] border border-white/[0.04] text-[var(--cp-text-muted)] font-medium"
+                        className="text-[9.5px] px-2 py-0.5 rounded bg-white/[0.02] border border-white/[0.04] text-(--cp-text-muted) font-medium"
                       >
                         {exp}
                       </span>

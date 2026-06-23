@@ -111,7 +111,7 @@ function SidebarNav({ filteredNavGroups, sidebarOpen, pathname, onNavigate }: Si
                   className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors mb-0.5 ${
                     isActive
                       ? 'font-medium'
-                      : 'hover:bg-[var(--cp-bg-soft)]'
+                      : 'hover:bg-(--cp-bg-soft)'
                   }`}
                   style={
                     isActive
@@ -119,7 +119,7 @@ function SidebarNav({ filteredNavGroups, sidebarOpen, pathname, onNavigate }: Si
                       : { color: 'var(--cp-text-muted)' }
                   }
                 >
-                  <item.icon className="shrink-0 w-[15px] h-[15px]" />
+                  <item.icon className="shrink-0 w-3.75 h-3.75" />
                   <AnimatePresence>
                     {sidebarOpen && (
                       <motion.span
@@ -193,7 +193,7 @@ export default function EnterpriseAdminLayout({ children }: { children: React.Re
 
   return (
     <div
-      className="client-shell admin-shell min-h-screen flex overflow-hidden selection:bg-[var(--cp-cyan-soft)]"
+      className="client-shell admin-shell min-h-screen flex overflow-hidden selection:bg-(--cp-cyan-soft)"
       style={{ background: 'var(--cp-bg)', color: 'var(--cp-text)' }}
     >
       {/* Desktop Sidebar */}
@@ -263,7 +263,7 @@ export default function EnterpriseAdminLayout({ children }: { children: React.Re
           )}
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="w-full flex items-center justify-center gap-2 p-2 rounded-lg hover:bg-[var(--cp-bg-soft)] hover:text-[var(--cp-text)] transition-colors text-[11px]"
+            className="w-full flex items-center justify-center gap-2 p-2 rounded-lg hover:bg-(--cp-bg-soft) hover:text-(--cp-text) transition-colors text-[11px]"
             style={{ color: 'var(--cp-text-muted)' }}
           >
             <PanelLeft className="w-3.5 h-3.5" />
@@ -288,7 +288,7 @@ export default function EnterpriseAdminLayout({ children }: { children: React.Re
               animate={{ x: 0 }}
               exit={{ x: -260 }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed top-0 left-0 h-screen w-[248px] z-50 md:hidden flex flex-col"
+              className="fixed top-0 left-0 h-screen w-62 z-50 md:hidden flex flex-col"
               style={{
                 background: 'var(--cp-bg-elevated)',
                 borderRight: '1px solid var(--cp-border-soft)',
@@ -296,7 +296,7 @@ export default function EnterpriseAdminLayout({ children }: { children: React.Re
             >
               <div className="px-5 pt-5 pb-4 flex items-center justify-between">
                 <LyptronLogo subtitle={roleSubtitle(user?.role)} />
-                <button onClick={() => setMobileMenuOpen(false)} className="hover:text-[var(--cp-text)] transition-colors" style={{ color: 'var(--cp-text-muted)' }}>
+                <button onClick={() => setMobileMenuOpen(false)} className="hover:text-(--cp-text) transition-colors" style={{ color: 'var(--cp-text-muted)' }}>
                   <X className="w-5 h-5" />
                 </button>
               </div>
@@ -316,7 +316,7 @@ export default function EnterpriseAdminLayout({ children }: { children: React.Re
       <main className="flex-1 flex flex-col h-screen overflow-hidden relative z-10">
         {/* Top Bar */}
         <header
-          className="h-[56px] shrink-0 flex items-center justify-between px-5 lg:px-8 z-30 transition-all duration-300"
+          className="h-14 shrink-0 flex items-center justify-between px-5 lg:px-8 z-30 transition-all duration-300"
           style={{
             background: scrolled ? 'color-mix(in srgb, var(--cp-bg-elevated) 80%, transparent)' : 'transparent',
             backdropFilter: scrolled ? 'blur(20px)' : 'none',
@@ -327,7 +327,7 @@ export default function EnterpriseAdminLayout({ children }: { children: React.Re
             <button
               type="button"
               aria-label="Open menu"
-              className="md:hidden hover:text-[var(--cp-text)] transition-colors"
+              className="md:hidden hover:text-(--cp-text) transition-colors"
               style={{ color: 'var(--cp-text-muted)' }}
               onClick={() => setMobileMenuOpen(true)}
             >
@@ -343,7 +343,7 @@ export default function EnterpriseAdminLayout({ children }: { children: React.Re
           <div className="flex items-center gap-3">
             <button
               onClick={() => setCommandPaletteOpen(true)}
-              className="hidden sm:flex items-center gap-2.5 px-3 py-1.5 rounded-full text-[12px] hover:text-[var(--cp-text)] transition-colors"
+              className="hidden sm:flex items-center gap-2.5 px-3 py-1.5 rounded-full text-[12px] hover:text-(--cp-text) transition-colors"
               style={{
                 background: 'var(--cp-cyan-soft)',
                 border: '1px solid var(--cp-border)',
@@ -364,8 +364,8 @@ export default function EnterpriseAdminLayout({ children }: { children: React.Re
               </kbd>
             </button>
 
-            <button className="relative hover:text-[var(--cp-text)] transition-colors" style={{ color: 'var(--cp-text-faint)' }}>
-              <Bell className="w-[17px] h-[17px]" />
+            <button className="relative hover:text-(--cp-text) transition-colors" style={{ color: 'var(--cp-text-faint)' }}>
+              <Bell className="w-4.25 h-4.25" />
               <span
                 className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full"
                 style={{ background: 'var(--cp-cyan)' }}
@@ -376,11 +376,11 @@ export default function EnterpriseAdminLayout({ children }: { children: React.Re
 
             <button
               onClick={logout}
-              className="hover:text-[var(--cp-text)] transition-colors"
+              className="hover:text-(--cp-text) transition-colors"
               style={{ color: 'var(--cp-text-faint)' }}
               title="Sign out"
             >
-              <LogOut className="w-[16px] h-[16px]" />
+              <LogOut className="w-4 h-4" />
             </button>
           </div>
         </header>
@@ -424,7 +424,7 @@ export default function EnterpriseAdminLayout({ children }: { children: React.Re
                   autoFocus
                   type="text"
                   placeholder="Search or type a command..."
-                  className="flex-1 bg-transparent border-none outline-none text-[13px] placeholder:text-[var(--cp-text-faint)]"
+                  className="flex-1 bg-transparent border-none outline-none text-[13px] placeholder:text-(--cp-text-faint)"
                   style={{ color: 'var(--cp-text)' }}
                 />
                 <kbd
@@ -438,13 +438,13 @@ export default function EnterpriseAdminLayout({ children }: { children: React.Re
                   ESC
                 </kbd>
               </div>
-              <div className="p-1.5 max-h-[320px] overflow-y-auto custom-scrollbar">
+              <div className="p-1.5 max-h-80 overflow-y-auto custom-scrollbar">
                 <div className="px-3 py-1.5 text-[10px] uppercase font-semibold tracking-[0.12em]" style={{ color: 'var(--cp-text-faint)' }}>
                   Pages
                 </div>
                 {filteredNavGroups.flatMap((g) => g.items).map((item, i) => (
                   <Link href={item.path} key={i} onClick={() => setCommandPaletteOpen(false)}>
-                    <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-[var(--cp-bg-soft)] hover:text-[var(--cp-text)] transition-colors cursor-pointer" style={{ color: 'var(--cp-text-muted)' }}>
+                    <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-(--cp-bg-soft) hover:text-(--cp-text) transition-colors cursor-pointer" style={{ color: 'var(--cp-text-muted)' }}>
                       <item.icon className="w-4 h-4" />
                       <span className="text-[13px] font-medium">{item.name}</span>
                     </div>

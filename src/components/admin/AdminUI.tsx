@@ -69,7 +69,7 @@ export function Select({
       )}
       <select
         {...props}
-        className={`w-full px-4 py-2.5 rounded-xl text-[13.5px] outline-none transition-colors appearance-none cursor-pointer [&>option]:bg-[var(--cp-bg-elevated)] [&>option]:text-[var(--cp-text)] ${className}`}
+        className={`w-full px-4 py-2.5 rounded-xl text-[13.5px] outline-none transition-colors appearance-none cursor-pointer [&>option]:bg-(--cp-bg-elevated) [&>option]:text-(--cp-text) ${className}`}
         style={{ background: 'var(--cp-bg-soft)', border: '1px solid var(--cp-border-soft)', color: 'var(--cp-text)' }}
       >
         {children}
