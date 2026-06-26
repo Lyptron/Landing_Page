@@ -1,6 +1,6 @@
 'use client'
 import { useRef } from 'react'
-import { motion, useInView } from 'framer-motion'
+import { m, useInView } from 'framer-motion'
 
 export default function SectionDivider() {
   const ref = useRef<HTMLDivElement>(null)
@@ -8,7 +8,7 @@ export default function SectionDivider() {
 
   return (
     <div ref={ref} className="w-full px-6 md:px-[120px] py-8 relative z-10 pointer-events-none">
-      <motion.div
+      <m.div
         className="h-[1px] w-full bg-linear-to-r from-transparent via-white/[0.08] to-transparent"
         initial={{ scaleX: 0, opacity: 0 }}
         animate={inView ? { scaleX: 1, opacity: 1 } : { scaleX: 0, opacity: 0 }}

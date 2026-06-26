@@ -1,6 +1,6 @@
 'use client'
 import { useRef, useEffect, useCallback, useState } from 'react'
-import { motion } from 'framer-motion'
+import { m } from 'framer-motion'
 
 const EASE = [0.16, 1, 0.3, 1] as const
 
@@ -134,7 +134,7 @@ export default function Hero() {
     const el = sectionRef.current
     if (!el) return
     // Skip the radial-gradient mouse-follow on touch devices and
-    // reduced-motion. Tap events fire synthetic mousemoves and would
+    // reduced-m. Tap events fire synthetic mousemoves and would
     // otherwise trigger an expensive repaint on every interaction.
     if (typeof window !== 'undefined') {
       if (
@@ -200,7 +200,7 @@ export default function Hero() {
         <div className="absolute inset-0 opacity-[0.018]" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.75%22 numOctaves=%224%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")' }} />
 
         {/* Mobile Ambient Glow */}
-        <motion.div 
+        <m.div 
           className="absolute inset-0 md:hidden z-0 pointer-events-none"
           initial={{ opacity: 0.2 }}
           animate={{ opacity: [0.2, 0.4, 0.2], scale: [1, 1.05, 1] }}
@@ -210,7 +210,7 @@ export default function Hero() {
 
         {/* Animated SVG Timeline Thread — synced to story steps */}
         <svg aria-hidden="true" focusable="false" className="hidden md:block absolute inset-x-0 top-0 w-full pointer-events-none z-10" style={{ height: '800px' }} preserveAspectRatio="none" viewBox="0 0 1440 800">
-          <motion.path
+          <m.path
             d="M -100,200 C 300,200 400,100 720,100 C 1000,100 1200,400 1500,400"
             fill="none"
             stroke="url(#glowGradient)"
@@ -222,7 +222,7 @@ export default function Hero() {
             }}
             transition={{ duration: 2, ease: [0.25, 0.46, 0.45, 0.94] }}
           />
-          <motion.path
+          <m.path
             d="M -100,200 C 300,200 400,100 720,100 C 1000,100 1200,400 1500,400"
             fill="none"
             stroke="url(#glowGradientBright)"
@@ -256,7 +256,7 @@ export default function Hero() {
       <div ref={glowRef} className="absolute inset-0 z-1 pointer-events-none" />
 
       {/* Top accent line */}
-      <motion.div className="absolute top-0 left-0 right-0 h-px z-30"
+      <m.div className="absolute top-0 left-0 right-0 h-px z-30"
                   style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.08) 30%, rgba(255,255,255,0.08) 70%, transparent)' }}
                   initial={{ scaleX: 0 }} animate={{ scaleX: 1 }}
                   transition={{ duration: 2, delay: 0.1, ease: EASE }} />
@@ -273,7 +273,7 @@ export default function Hero() {
                 and no-JS readers see the real H1 immediately; the animated
                 teasers below sit visually in front via z-index but are
                 aria-hidden so they never replace the H1 semantically. */}
-            <motion.h1
+            <m.h1
               initial={{ opacity: 0, filter: 'blur(14px)', scale: 0.98 }}
               animate={{
                 // After 6s storyStep flips to 2 and the H1 fades in. Before
@@ -292,10 +292,10 @@ export default function Hero() {
                 digital products
               </span>
               <span className="text-white/30"> that grow your business.</span>
-            </motion.h1>
+            </m.h1>
 
             {/* Step 0 — tease line (visual only, not a heading) */}
-            <motion.span
+            <m.span
               aria-hidden="true"
               initial={{ opacity: 0, filter: 'blur(10px)', y: 8 }}
               animate={{
@@ -307,10 +307,10 @@ export default function Hero() {
               className="absolute inset-0 font-display font-medium text-[clamp(24px,4.5vw,58px)] md:text-[58px] text-white/50 tracking-[-0.02em] leading-tight flex items-center pointer-events-none z-20"
             >
               You have an ambitious vision.
-            </motion.span>
+            </m.span>
 
             {/* Step 1 — problem line (visual only, not a heading) */}
-            <motion.span
+            <m.span
               aria-hidden="true"
               initial={{ opacity: 0, filter: 'blur(10px)', y: 8 }}
               animate={{
@@ -322,11 +322,11 @@ export default function Hero() {
               className="absolute inset-0 font-display font-medium text-[clamp(24px,4.5vw,58px)] md:text-[58px] text-white/50 tracking-[-0.02em] leading-tight flex items-center pointer-events-none z-20"
             >
               But scaling the right technology is hard.
-            </motion.span>
+            </m.span>
           </div>
 
           {/* Sub + CTAs — full width row */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: storyStep === 2 ? 1 : 0, y: storyStep === 2 ? 0 : 12 }}
             transition={{ duration: 1.8, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
@@ -347,12 +347,12 @@ export default function Hero() {
                 Our Work
               </a>
             </div>
-          </motion.div>
+          </m.div>
         </div>
 
         {/* ── SHOWCASE STRIP ── full bleed */}
         <div className="w-full max-w-[1440px] mx-auto px-6 md:px-12 lg:px-20">
-          <motion.div className="h-px w-full mb-0"
+          <m.div className="h-px w-full mb-0"
                       style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.06) 15%, rgba(255,255,255,0.06) 85%, transparent)' }}
                       initial={{ scaleX: 0 }} animate={{ scaleX: 1 }}
                       transition={{ duration: 1.4, delay: 0.6, ease: EASE }} />
@@ -361,7 +361,7 @@ export default function Hero() {
         <div className="w-full max-w-[1440px] mx-auto px-6 md:px-12 lg:px-20 py-6 md:py-14">
           <div className="flex overflow-x-auto lg:grid lg:grid-cols-3 gap-5 pb-8 snap-x snap-mandatory" style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
             {PROJECTS.map((p, i) => (
-              <motion.div
+              <m.div
                 key={p.title}
                 className="group rounded-2xl overflow-hidden cursor-default shrink-0 w-[85vw] sm:w-[400px] lg:w-auto snap-center"
                 style={{
@@ -482,20 +482,20 @@ export default function Hero() {
                   </div>
                   <span className="font-mono text-[10px] text-white/50">{p.result}</span>
                 </div>
-              </motion.div>
+              </m.div>
             ))}
           </div>
         </div>
 
         {/* ── TRUST BAR ── */}
         <div className="w-full max-w-[1440px] mx-auto px-6 md:px-12 lg:px-20 pb-12 md:pb-24">
-          <motion.div className="h-px w-full mb-10"
+          <m.div className="h-px w-full mb-10"
                       style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.06) 15%, rgba(255,255,255,0.06) 85%, transparent)' }}
                       initial={{ scaleX: 0 }} animate={{ scaleX: 1 }}
                       transition={{ duration: 1.2, delay: 1.0, ease: EASE }} />
 
           {/* Tech stack / social proof */}
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+          <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                       transition={{ duration: 0.8, delay: 1.1, ease: EASE }}
                       className="flex flex-wrap items-center justify-start gap-4 sm:gap-8 mb-12">
             <span className="font-mono text-[9px] uppercase tracking-[0.15em] text-white/15 shrink-0">Built with</span>
@@ -512,10 +512,10 @@ export default function Hero() {
                 </div>
               ))}
             </div>
-          </motion.div>
+          </m.div>
 
           {/* Stats */}
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+          <m.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.8, delay: 1.15, ease: EASE }}>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
               {TRUST.map((t, i) => (
@@ -526,7 +526,7 @@ export default function Hero() {
                 </div>
               ))}
             </div>
-          </motion.div>
+          </m.div>
         </div>
 
       </div>

@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useId, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { motion, AnimatePresence } from 'framer-motion'
+import { m, AnimatePresence } from 'framer-motion'
 import { TeamMember } from '@/types'
 import { useCursor } from '../providers/CursorProvider'
 import { X } from 'lucide-react'
@@ -53,7 +53,7 @@ export default function TeamModal({ member, onClose }: TeamModalProps) {
   return createPortal(
     <AnimatePresence>
       {/* Backdrop */}
-      <motion.div
+      <m.div
         key="backdrop"
         className="fixed inset-0 z-100 bg-black/70 backdrop-blur-[12px]"
         initial={{ opacity: 0 }}
@@ -66,7 +66,7 @@ export default function TeamModal({ member, onClose }: TeamModalProps) {
 
       {/* Modal */}
       <div key="modal-content" className="fixed inset-0 z-101 flex items-center justify-center pointer-events-none p-4 sm:p-8">
-        <motion.div
+        <m.div
           ref={dialogRef}
           role="dialog"
           aria-modal="true"
@@ -124,7 +124,7 @@ export default function TeamModal({ member, onClose }: TeamModalProps) {
             </button>
 
             {/* Name */}
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.5, ease: 'easeOut' }}
@@ -135,10 +135,10 @@ export default function TeamModal({ member, onClose }: TeamModalProps) {
               <h2 id={titleId} className="font-display font-bold text-3xl md:text-4xl text-white/90 tracking-[-0.03em] leading-none mb-8">
                 {member.name}
               </h2>
-            </motion.div>
+            </m.div>
 
             {/* Bio */}
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.5, ease: 'easeOut' }}
@@ -147,10 +147,10 @@ export default function TeamModal({ member, onClose }: TeamModalProps) {
               <p className="font-body text-[14px] text-white/30 leading-relaxed">
                 {member.bio}
               </p>
-            </motion.div>
+            </m.div>
 
             {/* Skills */}
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4, duration: 0.5, ease: 'easeOut' }}
@@ -183,9 +183,9 @@ export default function TeamModal({ member, onClose }: TeamModalProps) {
                   ))}
                 </ul>
               </div>
-            </motion.div>
+            </m.div>
           </div>
-        </motion.div>
+        </m.div>
       </div>
     </AnimatePresence>,
     document.body

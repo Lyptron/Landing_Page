@@ -1,6 +1,6 @@
 'use client'
 import { useRef, useState, useEffect } from 'react'
-import { motion, useScroll, useTransform, useInView, type Variants } from 'framer-motion'
+import { m, useScroll, useTransform, useInView, type Variants } from 'framer-motion'
 import { projects } from '@/data/projects'
 import { ArrowUpRight, ArrowRight } from 'lucide-react'
 import { useCursor } from '../providers/CursorProvider'
@@ -114,22 +114,22 @@ function TimelineDivider({ number }: { number: string }) {
 
   return (
     <div ref={ref} className="flex items-center gap-4 my-16 md:my-24">
-      <motion.div
+      <m.div
         className="h-px flex-1 origin-left"
         style={{ background: 'linear-gradient(90deg, rgba(255,255,255,0.06), transparent)' }}
         initial={{ scaleX: 0 }}
         animate={inView ? { scaleX: 1 } : {}}
         transition={{ duration: 1.2, ease: EASE }}
       />
-      <motion.span
+      <m.span
         className="font-mono text-[10px] text-white/15 tracking-widest"
         initial={{ opacity: 0, scale: 0.5 }}
         animate={inView ? { opacity: 1, scale: 1 } : {}}
         transition={{ duration: 0.5, delay: 0.8, ease: EASE }}
       >
         {number}
-      </motion.span>
-      <motion.div
+      </m.span>
+      <m.div
         className="h-px flex-1 origin-right"
         style={{ background: 'linear-gradient(270deg, rgba(255,255,255,0.06), transparent)' }}
         initial={{ scaleX: 0 }}
@@ -169,11 +169,11 @@ function ProjectRow({ project, index }: { project: typeof projects[0]; index: nu
       <div className={`relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 xl:gap-24 items-center ${isReversed ? 'lg:[direction:rtl]' : ''}`}>
 
         {/* Mockup — rotates in from side */}
-        <motion.div
+        <m.div
           style={{ y: mockupY, willChange: 'transform' }}
           className={isReversed ? 'lg:[direction:ltr]' : ''}
         >
-          <motion.div
+          <m.div
             initial={{
               opacity: 0,
               scale: 0.85,
@@ -193,13 +193,13 @@ function ProjectRow({ project, index }: { project: typeof projects[0]; index: nu
             style={{ perspective: '1000px' }}
           >
             <DeviceMockup project={project} />
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
 
         {/* Info — typewriter sequence */}
         <div ref={infoRef} className={`flex flex-col ${isReversed ? 'lg:[direction:ltr]' : ''}`}>
           {/* Number */}
-          <motion.div
+          <m.div
             className="flex items-center gap-3 mb-5"
             initial={{ opacity: 0, x: isReversed ? 30 : -30 }}
             animate={infoInView ? { opacity: 1, x: 0 } : {}}
@@ -208,7 +208,7 @@ function ProjectRow({ project, index }: { project: typeof projects[0]; index: nu
             <span className="font-mono text-[11px] font-medium tracking-[0.2em] text-white/40 uppercase">
               {project.number}
             </span>
-            <motion.div
+            <m.div
               className="w-6 h-px bg-white/10"
               initial={{ scaleX: 0 }}
               animate={infoInView ? { scaleX: 1 } : {}}
@@ -220,37 +220,37 @@ function ProjectRow({ project, index }: { project: typeof projects[0]; index: nu
             <span className="font-mono text-[10px] text-white/15 tracking-wider ml-auto hidden sm:block">
               {project.year}
             </span>
-          </motion.div>
+          </m.div>
 
           {/* Name — blur reveal */}
-          <motion.h3
+          <m.h3
             className="font-display font-bold text-[clamp(28px,4vw,52px)] text-white/90 tracking-[-0.03em] leading-[0.95] mb-4"
             initial={{ opacity: 0, filter: 'blur(16px)', y: 16 }}
             animate={infoInView ? { opacity: 1, filter: 'blur(0px)', y: 0 } : {}}
             transition={{ duration: 1, delay: 0.15, ease: EASE }}
           >
             {project.name}
-          </motion.h3>
+          </m.h3>
 
           {/* Description — fade */}
-          <motion.p
+          <m.p
             className="font-body text-[15px] text-white/30 leading-relaxed max-w-[480px] mb-6"
             initial={{ opacity: 0, y: 16 }}
             animate={infoInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.3, ease: EASE }}
           >
             {project.desc}
-          </motion.p>
+          </m.p>
 
           {/* Stats — camera focus bounce */}
-          <motion.div
+          <m.div
             className="hidden sm:grid grid-cols-3 gap-3 mb-6"
             initial="hidden"
             animate={infoInView ? 'visible' : 'hidden'}
             variants={stagger(0.4, 0.1)}
           >
             {stats.map((stat) => (
-              <motion.div
+              <m.div
                 key={stat.label}
                 variants={statChild}
                 className="flex flex-col gap-1.5 p-3 lg:p-4 rounded-xl border border-white/[0.04] bg-white/[0.015] hover:border-white/[0.08] transition-colors duration-300"
@@ -261,12 +261,12 @@ function ProjectRow({ project, index }: { project: typeof projects[0]; index: nu
                 <span className="font-display font-bold text-base lg:text-lg text-white/80 tabular-nums">
                   {stat.value}
                 </span>
-              </motion.div>
+              </m.div>
             ))}
-          </motion.div>
+          </m.div>
 
           {/* Result */}
-          <motion.div
+          <m.div
             className="mb-5"
             initial={{ opacity: 0, y: 12 }}
             animate={infoInView ? { opacity: 1, y: 0 } : {}}
@@ -275,12 +275,12 @@ function ProjectRow({ project, index }: { project: typeof projects[0]; index: nu
             <span className="font-mono text-[12px] font-medium text-white/50 tracking-wide uppercase">
               {project.result}
             </span>
-          </motion.div>
+          </m.div>
 
           {/* Tech tags — pop in */}
           <div className="flex items-center gap-5 mb-7">
             {project.tags.map((tag, tIdx) => (
-              <motion.span
+              <m.span
                 key={tag}
                 className="font-mono text-[11px] text-white/25 tracking-wide hover:text-white/50 transition-colors duration-300"
                 initial={{ opacity: 0, scale: 0.6 }}
@@ -288,12 +288,12 @@ function ProjectRow({ project, index }: { project: typeof projects[0]; index: nu
                 transition={{ duration: 0.4, delay: 0.6 + tIdx * 0.06, ease: [0.34, 1.56, 0.64, 1] }}
               >
                 {tag}
-              </motion.span>
+              </m.span>
             ))}
           </div>
 
           {/* CTA */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 12 }}
             animate={infoInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.7, ease: EASE }}
@@ -311,7 +311,7 @@ function ProjectRow({ project, index }: { project: typeof projects[0]; index: nu
                 <ArrowUpRight className="w-3.5 h-3.5 group-hover/link:translate-x-[1px] group-hover/link:-translate-y-[1px] transition-transform duration-300" />
               </div>
             </button>
-          </motion.div>
+          </m.div>
         </div>
       </div>
     </div>
@@ -346,7 +346,7 @@ export default function Work() {
 
       {/* Header — word-by-word */}
       <div ref={headerRef} className="w-full px-6 md:px-12 lg:px-[120px] mb-20 md:mb-28 lg:mb-36">
-        <motion.div
+        <m.div
           className="h-px w-full mb-10 origin-left"
           style={{ background: 'linear-gradient(90deg, rgba(255,255,255,0.08), rgba(255,255,255,0.06) 50%, transparent)' }}
           initial={{ scaleX: 0 }}
@@ -355,32 +355,32 @@ export default function Work() {
         />
 
         <div className="flex flex-col gap-6">
-          <motion.span
+          <m.span
             className="font-mono text-[11px] tracking-[0.25em] uppercase text-white/50"
             initial={{ opacity: 0, y: 12 }}
             animate={headerInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.7, delay: 0.2, ease: EASE }}
           >
             Selected Projects
-          </motion.span>
+          </m.span>
 
-          <motion.h2
+          <m.h2
             className="font-display font-bold text-[clamp(32px,5vw,68px)] text-white/90 tracking-[-0.04em] leading-[0.97]"
             initial={{ opacity: 0, filter: 'blur(16px)', y: 16 }}
             animate={headerInView ? { opacity: 1, filter: 'blur(0px)', y: 0 } : {}}
             transition={{ duration: 1.2, delay: 0.3, ease: EASE }}
           >
             Our work
-          </motion.h2>
+          </m.h2>
 
-          <motion.p
+          <m.p
             className="font-body text-[15px] md:text-[17px] text-white/30 max-w-[520px] leading-[1.7]"
             initial={{ opacity: 0, y: 20 }}
             animate={headerInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.55, ease: EASE }}
           >
             Engineering-led builds for SaaS, mobile, and AI — shipped to production and scaled to real users.
-          </motion.p>
+          </m.p>
         </div>
       </div>
 
@@ -398,7 +398,7 @@ export default function Work() {
 
       {/* Bottom bar */}
       <div className="w-full px-6 md:px-12 lg:px-[120px] mt-24 md:mt-32 lg:mt-40">
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-60px' }}
@@ -431,7 +431,7 @@ export default function Work() {
               <ArrowRight className="w-3.5 h-3.5 text-white/25 group-hover/btn:text-white/50 group-hover/btn:translate-x-0.5 transition-all duration-300" />
             </button>
           </div>
-        </motion.div>
+        </m.div>
       </div>
     </section>
   )

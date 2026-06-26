@@ -1,6 +1,6 @@
 'use client'
 import { useRef, useEffect, useState } from 'react'
-import { motion, useScroll, useTransform, useInView } from 'framer-motion'
+import { m, useScroll, useTransform, useInView } from 'framer-motion'
 import { processSteps } from '@/data/process'
 
 const EASE = [0.22, 1, 0.36, 1] as const
@@ -57,7 +57,7 @@ function ProcessCard({ step, idx }: { step: typeof processSteps[0]; idx: number 
   }, [])
 
   return (
-    <motion.div
+    <m.div
       ref={ref}
       className={`relative w-[82vw] sm:w-[320px] md:w-[52%] ${isLeft ? 'md:mr-auto' : 'md:ml-auto'}`}
       initial={{ opacity: 0, y: 60, x: isLeft ? -50 : 50 }}
@@ -92,7 +92,7 @@ function ProcessCard({ step, idx }: { step: typeof processSteps[0]; idx: number 
         />
 
         {/* Top accent line — tinted */}
-        <motion.div
+        <m.div
           className="absolute top-0 left-0 h-[1px]"
           style={{ background: `linear-gradient(90deg, ${color.tint}, transparent)` }}
           initial={{ width: '0%' }}
@@ -105,7 +105,7 @@ function ProcessCard({ step, idx }: { step: typeof processSteps[0]; idx: number 
           {/* Phase number + icon */}
           <div className="flex items-start justify-between mb-8">
             <div className="flex items-center gap-4">
-              <motion.span
+              <m.span
                 className="font-display font-bold text-[56px] md:text-[64px] leading-none tracking-tighter"
                 style={{ color: 'rgba(255,255,255,0.04)' }}
                 initial={{ opacity: 0, scale: 0.5 }}
@@ -113,18 +113,18 @@ function ProcessCard({ step, idx }: { step: typeof processSteps[0]; idx: number 
                 transition={{ duration: 0.8, delay: 0.3, ease: EASE }}
               >
                 {step.number}
-              </motion.span>
-              <motion.div
+              </m.span>
+              <m.div
                 style={{ color: color.accent }}
                 initial={{ opacity: 0, rotate: -20 }}
                 animate={inView ? { opacity: 1, rotate: 0 } : {}}
                 transition={{ duration: 0.6, delay: 0.5, ease: EASE }}
               >
                 {ICONS[idx]}
-              </motion.div>
+              </m.div>
             </div>
             <div className="flex flex-col items-end gap-1 mt-2">
-              <motion.span
+              <m.span
                 className="font-mono text-[9px] tracking-[0.2em] uppercase"
                 style={{ color: color.accent, opacity: 0.5 }}
                 initial={{ opacity: 0 }}
@@ -132,40 +132,40 @@ function ProcessCard({ step, idx }: { step: typeof processSteps[0]; idx: number 
                 transition={{ duration: 0.5, delay: 0.6, ease: EASE }}
               >
                 Phase {step.number}
-              </motion.span>
-              <motion.span
+              </m.span>
+              <m.span
                 className="font-mono text-[10px] tracking-wider text-white/20"
                 initial={{ opacity: 0 }}
                 animate={inView ? { opacity: 1 } : {}}
                 transition={{ duration: 0.5, delay: 0.7, ease: EASE }}
               >
                 {TIMELINE[idx]}
-              </motion.span>
+              </m.span>
             </div>
           </div>
 
           {/* Title */}
-          <motion.h3
+          <m.h3
             className="font-display font-bold text-[24px] md:text-[30px] text-white/90 tracking-[-0.02em] leading-tight mb-4 group-hover:text-white transition-colors duration-300"
             initial={{ opacity: 0, filter: 'blur(12px)', y: 12 }}
             animate={inView ? { opacity: 1, filter: 'blur(0px)', y: 0 } : {}}
             transition={{ duration: 1, delay: 0.4, ease: EASE }}
           >
             {step.title}
-          </motion.h3>
+          </m.h3>
 
           {/* Description */}
-          <motion.p
+          <m.p
             className="font-body text-[14px] md:text-[15px] text-white/25 leading-[1.7] mb-8 max-w-[440px] group-hover:text-white/35 transition-colors duration-300"
             initial={{ opacity: 0, y: 12 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.7, delay: 0.55, ease: EASE }}
           >
             {step.desc}
-          </motion.p>
+          </m.p>
 
           {/* Tech tags */}
-          <motion.div
+          <m.div
             className="flex flex-wrap gap-4 mb-8"
             initial={{ opacity: 0 }}
             animate={inView ? { opacity: 1 } : {}}
@@ -176,10 +176,10 @@ function ProcessCard({ step, idx }: { step: typeof processSteps[0]; idx: number 
                 {tag}
               </span>
             ))}
-          </motion.div>
+          </m.div>
 
           {/* Divider */}
-          <motion.div
+          <m.div
             className="h-px w-full mb-6 origin-left"
             style={{ background: `${color.accent}15` }}
             initial={{ scaleX: 0 }}
@@ -189,39 +189,39 @@ function ProcessCard({ step, idx }: { step: typeof processSteps[0]; idx: number 
 
           {/* Deliverables — dots appear first, text slides in */}
           <div>
-            <motion.span
+            <m.span
               className="font-mono text-[9px] block mb-4 uppercase tracking-[0.15em] text-white/15"
               initial={{ opacity: 0 }}
               animate={inView ? { opacity: 1 } : {}}
               transition={{ duration: 0.5, delay: 0.75, ease: EASE }}
             >
               Deliverables
-            </motion.span>
+            </m.span>
             <ul className="flex flex-col gap-3">
               {step.details.map((detail, dIdx) => (
                 <li key={dIdx} className="flex gap-3 items-start">
-                  <motion.div
+                  <m.div
                     className="w-1.5 h-1.5 mt-1.5 shrink-0"
                     style={{ backgroundColor: `${color.accent}50` }}
                     initial={{ scale: 0 }}
                     animate={inView ? { scale: 1 } : {}}
                     transition={{ duration: 0.3, delay: 0.8 + dIdx * 0.1, ease: [0.34, 1.56, 0.64, 1] }}
                   />
-                  <motion.span
+                  <m.span
                     className="font-body text-[13px] text-white/25 leading-snug"
                     initial={{ opacity: 0, x: 16 }}
                     animate={inView ? { opacity: 1, x: 0 } : {}}
                     transition={{ duration: 0.5, delay: 0.85 + dIdx * 0.1, ease: EASE }}
                   >
                     {detail}
-                  </motion.span>
+                  </m.span>
                 </li>
               ))}
             </ul>
           </div>
         </div>
       </div>
-    </motion.div>
+    </m.div>
   )
 }
 
@@ -235,7 +235,7 @@ function StepConnector({ fromIdx }: { fromIdx: number }) {
     <div ref={ref} className="relative w-full py-6 md:py-10 z-20 hidden md:block">
       <div className="relative flex items-center justify-center h-[80px]">
         {/* Vertical dashed line */}
-        <motion.div
+        <m.div
           className="absolute left-1/2 -translate-x-1/2 w-px h-full origin-top"
           style={{
             background: `linear-gradient(180deg, ${fromColor.accent}20, ${toColor.accent}20)`,
@@ -246,7 +246,7 @@ function StepConnector({ fromIdx }: { fromIdx: number }) {
         />
 
         {/* Center node */}
-        <motion.div
+        <m.div
           className="relative z-10 flex items-center justify-center"
           initial={{ scale: 0, opacity: 0 }}
           animate={inView ? { scale: 1, opacity: 1 } : {}}
@@ -260,10 +260,10 @@ function StepConnector({ fromIdx }: { fromIdx: number }) {
               boxShadow: `0 0 12px ${fromColor.accent}20`,
             }}
           />
-        </motion.div>
+        </m.div>
 
         {/* Horizontal arms extending to card edges */}
-        <motion.div
+        <m.div
           className="absolute top-0 left-1/2 h-px"
           style={{
             width: '24%',
@@ -274,7 +274,7 @@ function StepConnector({ fromIdx }: { fromIdx: number }) {
           animate={inView ? { scaleX: 1, opacity: 1 } : {}}
           transition={{ duration: 0.6, delay: 0.2, ease: EASE }}
         />
-        <motion.div
+        <m.div
           className="absolute top-0 right-1/2 h-px"
           style={{
             width: '24%',
@@ -286,7 +286,7 @@ function StepConnector({ fromIdx }: { fromIdx: number }) {
           transition={{ duration: 0.6, delay: 0.2, ease: EASE }}
         />
 
-        <motion.div
+        <m.div
           className="absolute bottom-0 left-1/2 h-px"
           style={{
             width: '24%',
@@ -297,7 +297,7 @@ function StepConnector({ fromIdx }: { fromIdx: number }) {
           animate={inView ? { scaleX: 1, opacity: 1 } : {}}
           transition={{ duration: 0.6, delay: 0.5, ease: EASE }}
         />
-        <motion.div
+        <m.div
           className="absolute bottom-0 right-1/2 h-px"
           style={{
             width: '24%',
@@ -331,7 +331,7 @@ export default function Process() {
       style={{ background: '#050505' }}
     >
       {/* Background glow */}
-      <motion.div
+      <m.div
         className="absolute left-1/2 -translate-x-1/2 w-[700px] h-[700px] pointer-events-none"
         style={{
           y: glowY,
@@ -348,7 +348,7 @@ export default function Process() {
 
         {/* Header — word-by-word */}
         <div ref={headerRef} className="mb-20 md:mb-28">
-          <motion.div
+          <m.div
             className="h-px w-full mb-10 origin-left"
             style={{ background: 'linear-gradient(90deg, rgba(255,255,255,0.08), rgba(255,255,255,0.06) 50%, transparent)' }}
             initial={{ scaleX: 0 }}
@@ -358,51 +358,51 @@ export default function Process() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-end">
             <div className="flex flex-col gap-6">
-              <motion.span
+              <m.span
                 className="font-mono text-[11px] tracking-[0.25em] uppercase text-white/50"
                 initial={{ opacity: 0, y: 12 }}
                 animate={headerInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.7, delay: 0.1, ease: EASE }}
               >
                 Our Process
-              </motion.span>
+              </m.span>
 
               <h2 className="font-display font-bold text-[clamp(28px,5vw,68px)] leading-[0.97] tracking-[-0.04em]">
-                <motion.span
+                <m.span
                   className="text-white/90 inline-block"
                   initial={{ opacity: 0, filter: 'blur(16px)', y: 16 }}
                   animate={headerInView ? { opacity: 1, filter: 'blur(0px)', y: 0 } : {}}
                   transition={{ duration: 1.2, delay: 0.2, ease: EASE }}
                 >
                   From idea{' '}
-                </motion.span>
-                <motion.span
+                </m.span>
+                <m.span
                   className="text-white/35 inline-block"
                   initial={{ opacity: 0, filter: 'blur(16px)', y: 16 }}
                   animate={headerInView ? { opacity: 1, filter: 'blur(0px)', y: 0 } : {}}
                   transition={{ duration: 1.2, delay: 0.5, ease: EASE }}
                 >
                   to production{' '}
-                </motion.span>
-                <motion.span
+                </m.span>
+                <m.span
                   className="text-white/90 inline-block"
                   initial={{ opacity: 0, filter: 'blur(16px)', y: 16 }}
                   animate={headerInView ? { opacity: 1, filter: 'blur(0px)', y: 0 } : {}}
                   transition={{ duration: 1.2, delay: 0.8, ease: EASE }}
                 >
                   in four phases.
-                </motion.span>
+                </m.span>
               </h2>
             </div>
 
-            <motion.p
+            <m.p
               className="font-body text-[15px] md:text-[17px] text-white/30 leading-[1.7] max-w-[480px] lg:text-right lg:ml-auto"
               initial={{ opacity: 0, y: 20 }}
               animate={headerInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.8, delay: 0.6, ease: EASE }}
             >
               A structured, milestone-driven approach. Every step is scoped, tested, and delivered with transparency — so you always know where your product stands.
-            </motion.p>
+            </m.p>
           </div>
         </div>
 
@@ -419,7 +419,7 @@ export default function Process() {
         </div>
 
         {/* Bottom summary */}
-        <motion.div
+        <m.div
           className="mt-20 md:mt-28"
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -440,7 +440,7 @@ export default function Process() {
               Average delivery: 4–8 weeks from kickoff to launch.
             </p>
           </div>
-        </motion.div>
+        </m.div>
       </div>
     </section>
   )

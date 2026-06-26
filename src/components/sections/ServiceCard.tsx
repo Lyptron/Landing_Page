@@ -1,6 +1,6 @@
 'use client'
 import { useRef, useState, useEffect } from 'react'
-import { motion, useInView, useScroll, useTransform } from 'framer-motion'
+import { m, useInView, useScroll, useTransform } from 'framer-motion'
 import { Service } from '@/types'
 import { useCursor } from '../providers/CursorProvider'
 import { ArrowRight } from 'lucide-react'
@@ -27,14 +27,14 @@ function CapabilityBullet({ text, delay }: { text: string; delay: number }) {
   const inView = useInView(ref, { once: true, margin: '-40px' })
 
   return (
-    <motion.li
+    <m.li
       ref={ref}
       className="flex gap-4 items-start group/item"
       initial={{ opacity: 0, x: -20 }}
       animate={inView ? { opacity: 1, x: 0 } : {}}
       transition={{ duration: 0.6, delay, ease: EASE }}
     >
-      <motion.div
+      <m.div
         className="w-1 h-1 rounded-full mt-2.5 shrink-0 bg-white/20 group-hover/item:bg-white/60 transition-all duration-300"
         initial={{ scale: 0 }}
         animate={inView ? { scale: 1 } : {}}
@@ -43,7 +43,7 @@ function CapabilityBullet({ text, delay }: { text: string; delay: number }) {
       <span className="font-body text-[15px] text-white/30 leading-relaxed group-hover/item:text-white/60 transition-colors duration-300">
         {text}
       </span>
-    </motion.li>
+    </m.li>
   )
 }
 
@@ -52,7 +52,7 @@ function OutcomeCard({ work, delay, setCursorState }: { work: Service['works'][0
   const inView = useInView(ref, { once: true, margin: '-40px' })
 
   return (
-    <motion.div
+    <m.div
       ref={ref}
       className="group/work relative flex flex-col gap-3 py-4 border-b border-white/[0.04] last:border-0 hover:bg-white/[0.015] -mx-6 px-6 rounded-lg transition-colors duration-300 cursor-none"
       initial={{ opacity: 0, rotateY: 8, filter: 'blur(4px)' }}
@@ -73,7 +73,7 @@ function OutcomeCard({ work, delay, setCursorState }: { work: Service['works'][0
         <div className="h-px w-6 bg-white/[0.08] group-hover/work:w-10 transition-all duration-500" />
         <span className="font-mono text-[10px] font-medium tracking-widest uppercase text-white/50">{work.result}</span>
       </div>
-    </motion.div>
+    </m.div>
   )
 }
 
@@ -133,14 +133,14 @@ export default function ServiceCard({ service, index, onDetailClick }: ServiceCa
       />
 
       {/* Background Phase Number — counter-scrolls for depth */}
-      <motion.div
+      <m.div
         className="absolute -right-[5%] top-1/2 font-display font-bold pointer-events-none select-none"
         style={{ fontSize: '30vw', opacity: 0.015, color: 'white', lineHeight: 0.8, y: bgNumberY, translateY: '-50%', willChange: 'transform' }}
       >
         0{service.number}
-      </motion.div>
+      </m.div>
 
-      <motion.div
+      <m.div
         style={{ scale, opacity, y: yOffset, willChange: 'transform, opacity' }}
         className="w-full h-full flex flex-col justify-center"
       >
@@ -152,7 +152,7 @@ export default function ServiceCard({ service, index, onDetailClick }: ServiceCa
 
             {/* Left Column: Title & Intro — slides in from left */}
             <div className="lg:col-span-4 flex flex-col z-10">
-              <motion.div
+              <m.div
                 className="flex items-center gap-4 mb-6"
                 initial={{ opacity: 0, x: -30 }}
                 animate={titleInView ? { opacity: 1, x: 0 } : {}}
@@ -161,15 +161,15 @@ export default function ServiceCard({ service, index, onDetailClick }: ServiceCa
                 <span className="font-mono text-[11px] tracking-[0.25em] uppercase text-white/40">
                   Phase {service.number}
                 </span>
-                <motion.div
+                <m.div
                   className="h-[1px] w-12 origin-left bg-white/10"
                   initial={{ scaleX: 0 }}
                   animate={titleInView ? { scaleX: 1 } : {}}
                   transition={{ duration: 0.8, delay: 0.3, ease: EASE }}
                 />
-              </motion.div>
+              </m.div>
 
-              <motion.div
+              <m.div
                 className="mb-6"
                 initial={{ opacity: 0, filter: 'blur(16px)', y: 20 }}
                 animate={titleInView ? { opacity: 1, filter: 'blur(0px)', y: 0 } : {}}
@@ -178,18 +178,18 @@ export default function ServiceCard({ service, index, onDetailClick }: ServiceCa
                 <h3 className="font-display font-bold text-[clamp(28px,3.5vw,48px)] text-white/90 tracking-[-0.03em] leading-[1]">
                   {service.name}
                 </h3>
-              </motion.div>
+              </m.div>
 
-              <motion.p
+              <m.p
                 className="font-body text-[15px] md:text-[16px] text-white/30 leading-[1.7] mb-10 max-w-md"
                 initial={{ opacity: 0, y: 20 }}
                 animate={titleInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.8, delay: 0.45, ease: EASE }}
               >
                 {service.tagline} {service.desc}
-              </motion.p>
+              </m.p>
 
-              <motion.div
+              <m.div
                 className="mt-auto"
                 initial={{ opacity: 0, y: 16 }}
                 animate={titleInView ? { opacity: 1, y: 0 } : {}}
@@ -207,25 +207,25 @@ export default function ServiceCard({ service, index, onDetailClick }: ServiceCa
                     <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 transition-transform duration-300" />
                   </div>
                 </button>
-              </motion.div>
+              </m.div>
             </div>
 
             {/* Middle Column: Capabilities — bullets type in one by one */}
             <div className="lg:col-span-4 flex flex-col mt-10 lg:mt-0 lg:pl-8 relative z-10">
-              <motion.div
+              <m.div
                 className="hidden lg:block absolute left-0 top-0 bottom-0 w-px bg-white/[0.04] origin-top"
                 initial={{ scaleY: 0 }}
                 animate={titleInView ? { scaleY: 1 } : {}}
                 transition={{ duration: 1, delay: 0.3, ease: EASE }}
               />
-              <motion.span
+              <m.span
                 className="font-mono text-[10px] text-white/20 tracking-wider uppercase mb-8 block border-b border-white/[0.04] pb-3"
                 initial={{ opacity: 0 }}
                 animate={titleInView ? { opacity: 1 } : {}}
                 transition={{ duration: 0.5, delay: 0.4, ease: EASE }}
               >
                 Core Capabilities
-              </motion.span>
+              </m.span>
               <ul className="flex flex-col gap-6">
                 {service.helps.map((help, i) => (
                   <CapabilityBullet key={i} text={help} delay={0.5 + i * 0.15} />
@@ -235,20 +235,20 @@ export default function ServiceCard({ service, index, onDetailClick }: ServiceCa
 
             {/* Right Column: Outcomes — cards flip in */}
             <div className="lg:col-span-4 flex flex-col mt-10 lg:mt-0 lg:pl-10 relative z-10">
-              <motion.div
+              <m.div
                 className="hidden lg:block absolute left-0 top-0 bottom-0 w-px bg-white/[0.04] origin-top"
                 initial={{ scaleY: 0 }}
                 animate={titleInView ? { scaleY: 1 } : {}}
                 transition={{ duration: 1, delay: 0.5, ease: EASE }}
               />
-              <motion.span
+              <m.span
                 className="font-mono text-[10px] text-white/20 tracking-[0.2em] uppercase mb-8 block border-b border-white/[0.04] pb-4"
                 initial={{ opacity: 0 }}
                 animate={titleInView ? { opacity: 1 } : {}}
                 transition={{ duration: 0.5, delay: 0.6, ease: EASE }}
               >
                 Proven Outcomes
-              </motion.span>
+              </m.span>
               <div className="flex flex-col gap-6">
                 {service.works.map((work, i) => (
                   <OutcomeCard key={i} work={work} delay={0.7 + i * 0.2} setCursorState={setCursorState} />
@@ -257,7 +257,7 @@ export default function ServiceCard({ service, index, onDetailClick }: ServiceCa
             </div>
           </div>
         </div>
-      </motion.div>
+      </m.div>
     </div>
   )
 }

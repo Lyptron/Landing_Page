@@ -1,5 +1,5 @@
 'use client'
-import { motion, useScroll, useSpring } from 'framer-motion'
+import { m, useScroll, useSpring } from 'framer-motion'
 import { usePathname } from 'next/navigation'
 import { toLogicalPathname } from '@/lib/portalPath'
 
@@ -17,7 +17,7 @@ export default function ScrollProgress() {
   }
 
   return (
-    <motion.div
+    <m.div
       className="fixed top-0 left-0 right-0 h-[1.5px] origin-left z-200 pointer-events-none"
       style={{
         scaleX,

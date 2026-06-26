@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { m, AnimatePresence } from 'framer-motion'
 import { Menu, X, ArrowRight } from 'lucide-react'
 import { useCursor } from '../providers/CursorProvider'
 import { usePathname } from 'next/navigation'
@@ -154,7 +154,7 @@ export default function Nav() {
 
   return (
     <>
-      <motion.header
+      <m.header
         className={`fixed top-0 left-0 right-0 z-100 transition-all duration-500 ${
           scrolled
             ? 'h-16 bg-[rgba(5,5,5,0.85)] border-b border-white/5 backdrop-blur-sm'
@@ -229,12 +229,12 @@ export default function Nav() {
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
-      </motion.header>
+      </m.header>
 
       {/* Mobile drawer */}
       <AnimatePresence>
         {mobileMenuOpen && (
-          <motion.div
+          <m.div
             role="dialog"
             aria-modal="true"
             aria-label="Main navigation"
@@ -256,7 +256,7 @@ export default function Nav() {
 
             <div className="flex flex-col gap-1">
               {navItems.map((item, idx) => (
-                <motion.a
+                <m.a
                   key={item.name}
                   href={item.href}
                   onClick={(e) => handleScrollTo(e, item.href)}
@@ -266,11 +266,11 @@ export default function Nav() {
                   transition={{ duration: 0.5, delay: 0.1 + idx * 0.06, ease: [0.22, 1, 0.36, 1] }}
                 >
                   {item.name}
-                </motion.a>
+                </m.a>
               ))}
             </div>
 
-            <motion.div
+            <m.div
               className="mt-10"
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
@@ -283,8 +283,8 @@ export default function Nav() {
                 Start a Project
                 <ArrowRight className="w-5 h-5" />
               </button>
-            </motion.div>
-          </motion.div>
+            </m.div>
+          </m.div>
         )}
       </AnimatePresence>
     </>

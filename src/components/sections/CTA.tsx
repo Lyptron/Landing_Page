@@ -1,6 +1,6 @@
 'use client'
 import { useRef, useState } from 'react'
-import { motion, useInView } from 'framer-motion'
+import { m, useInView } from 'framer-motion'
 import MagneticButton from '../ui/MagneticButton'
 import { useCursor } from '../providers/CursorProvider'
 import { Clock, MessageCircle, Shield } from 'lucide-react'
@@ -101,55 +101,55 @@ export default function CTA() {
 
         {/* Left: Messaging — word-by-word build */}
         <div ref={headlineRef} className="flex flex-col gap-6">
-          <motion.span
+          <m.span
             className="font-mono text-[11px] tracking-[0.25em] uppercase text-white/50"
             initial={{ opacity: 0, y: 12 }}
             animate={headlineInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.7, delay: 0.1, ease: EASE }}
           >
             Let&apos;s Build Together
-          </motion.span>
+          </m.span>
 
           <h2 className="font-display font-bold text-[clamp(28px,5.5vw,72px)] leading-[0.95] tracking-[-0.04em]">
-            <motion.span
+            <m.span
               className="text-white/90 inline-block"
               initial={{ opacity: 0, filter: 'blur(16px)', y: 20 }}
               animate={headlineInView ? { opacity: 1, filter: 'blur(0px)', y: 0 } : {}}
               transition={{ duration: 1.2, delay: 0.2, ease: EASE }}
             >
               Have an idea?{' '}
-            </motion.span>
-            <motion.span
+            </m.span>
+            <m.span
               className="text-white/45 inline-block"
               initial={{ opacity: 0, filter: 'blur(16px)', y: 20 }}
               animate={headlineInView ? { opacity: 1, filter: 'blur(0px)', y: 0 } : {}}
               transition={{ duration: 1.2, delay: 0.5, ease: EASE }}
             >
               Let&apos;s talk about{' '}
-            </motion.span>
-            <motion.span
+            </m.span>
+            <m.span
               className="text-white/90 inline-block"
               initial={{ opacity: 0, filter: 'blur(16px)', y: 20 }}
               animate={headlineInView ? { opacity: 1, filter: 'blur(0px)', y: 0 } : {}}
               transition={{ duration: 1.2, delay: 0.8, ease: EASE }}
             >
               making it real.
-            </motion.span>
+            </m.span>
           </h2>
 
-          <motion.p
+          <m.p
             className="font-body text-[15px] md:text-[17px] text-white/35 leading-[1.7] max-w-md"
             initial={{ opacity: 0, y: 20 }}
             animate={headlineInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.6, ease: EASE }}
           >
             Whether you have a detailed spec or just a napkin sketch — we&apos;ll help you figure out the right approach, timeline, and investment. Zero obligation.
-          </motion.p>
+          </m.p>
 
           {/* Trust points — spring pop in */}
           <div className="flex flex-wrap gap-5 mt-2">
             {TRUST_POINTS.map((point, i) => (
-              <motion.div
+              <m.div
                 key={point.text}
                 className="flex items-center gap-2 text-white/25"
                 initial={{ opacity: 0, scale: 0.5, y: 10 }}
@@ -158,12 +158,12 @@ export default function CTA() {
               >
                 {point.icon}
                 <span className="font-mono text-[11px] tracking-wide">{point.text}</span>
-              </motion.div>
+              </m.div>
             ))}
           </div>
 
           {/* Social proof */}
-          <motion.div
+          <m.div
             className="mt-4 pt-6 border-t border-white/[0.04]"
             initial={{ opacity: 0, y: 12 }}
             animate={headlineInView ? { opacity: 1, y: 0 } : {}}
@@ -172,11 +172,11 @@ export default function CTA() {
             <p className="font-body text-[14px] text-white/25 leading-relaxed">
               Trusted by <span className="text-white/50">50+ founders &amp; teams</span> across SaaS, mobile, AI, and e-commerce. We respond within 24 hours.
             </p>
-          </motion.div>
+          </m.div>
         </div>
 
         {/* Right: Form — tilts in from below */}
-        <motion.div
+        <m.div
           ref={formContainerRef}
           className="rounded-2xl p-7 md:p-9 relative overflow-hidden group"
           style={{
@@ -193,22 +193,22 @@ export default function CTA() {
           <div className="absolute inset-0 bg-linear-to-b from-white/[0.012] to-transparent pointer-events-none rounded-[inherit]" />
 
           <div className="relative z-10 mb-6">
-            <motion.h3
+            <m.h3
               className="font-display font-semibold text-[20px] text-white/80 mb-1.5"
               initial={{ opacity: 0, y: 10 }}
               animate={formInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: 0.4, ease: EASE }}
             >
               Book your free call
-            </motion.h3>
-            <motion.p
+            </m.h3>
+            <m.p
               className="font-body text-[13px] text-white/25"
               initial={{ opacity: 0 }}
               animate={formInView ? { opacity: 1 } : {}}
               transition={{ duration: 0.5, delay: 0.5, ease: EASE }}
             >
               Takes 2 minutes. We&apos;ll get back to you within 24h.
-            </motion.p>
+            </m.p>
           </div>
 
           <form
@@ -217,7 +217,7 @@ export default function CTA() {
             onSubmit={handleSubmit}
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <motion.div
+              <m.div
                 className="flex flex-col gap-1.5"
                 initial={{ opacity: 0, y: 12 }}
                 animate={formInView ? { opacity: 1, y: 0 } : {}}
@@ -235,8 +235,8 @@ export default function CTA() {
                   onChange={e => setFormData({ ...formData, firstName: e.target.value })}
                   className="w-full bg-white/[0.025] border border-white/[0.06] rounded-lg px-4 py-3 text-sm text-white/80 placeholder:text-white/15 focus:outline-none focus:border-white/15 transition-colors"
                 />
-              </motion.div>
-              <motion.div
+              </m.div>
+              <m.div
                 className="flex flex-col gap-1.5"
                 initial={{ opacity: 0, y: 12 }}
                 animate={formInView ? { opacity: 1, y: 0 } : {}}
@@ -254,10 +254,10 @@ export default function CTA() {
                   onChange={e => setFormData({ ...formData, lastName: e.target.value })}
                   className="w-full bg-white/[0.025] border border-white/[0.06] rounded-lg px-4 py-3 text-sm text-white/80 placeholder:text-white/15 focus:outline-none focus:border-white/15 transition-colors"
                 />
-              </motion.div>
+              </m.div>
             </div>
 
-            <motion.div
+            <m.div
               className="flex flex-col gap-1.5"
               initial={{ opacity: 0, y: 12 }}
               animate={formInView ? { opacity: 1, y: 0 } : {}}
@@ -276,9 +276,9 @@ export default function CTA() {
                 onChange={e => setFormData({ ...formData, email: e.target.value })}
                 className="w-full bg-white/[0.025] border border-white/[0.06] rounded-lg px-4 py-3 text-sm text-white/80 placeholder:text-white/15 focus:outline-none focus:border-white/15 transition-colors"
               />
-            </motion.div>
+            </m.div>
 
-            <motion.div
+            <m.div
               className="flex flex-col gap-1.5"
               initial={{ opacity: 0, y: 12 }}
               animate={formInView ? { opacity: 1, y: 0 } : {}}
@@ -308,9 +308,9 @@ export default function CTA() {
                   <svg className="w-4 h-4 text-white/25" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"/></svg>
                 </div>
               </div>
-            </motion.div>
+            </m.div>
 
-            <motion.div
+            <m.div
               className="flex flex-col gap-1.5"
               initial={{ opacity: 0, y: 12 }}
               animate={formInView ? { opacity: 1, y: 0 } : {}}
@@ -326,9 +326,9 @@ export default function CTA() {
                 placeholder="A quick summary of your idea, timeline, or budget range..."
                 className="w-full bg-white/[0.025] border border-white/[0.06] rounded-lg px-4 py-3 text-sm text-white/80 placeholder:text-white/15 focus:outline-none focus:border-white/15 transition-colors resize-none"
               />
-            </motion.div>
+            </m.div>
 
-            <motion.div
+            <m.div
               className="pt-1"
               initial={{ opacity: 0, y: 12 }}
               animate={formInView ? { opacity: 1, y: 0 } : {}}
@@ -342,18 +342,18 @@ export default function CTA() {
                   {submitError}
                 </p>
               )}
-            </motion.div>
+            </m.div>
 
-            <motion.p
+            <m.p
               className="font-body text-[11px] text-white/15 text-center mt-1"
               initial={{ opacity: 0 }}
               animate={formInView ? { opacity: 1 } : {}}
               transition={{ duration: 0.5, delay: 0.9, ease: EASE }}
             >
               No spam, no sales pitch. Just a conversation about your project.
-            </motion.p>
+            </m.p>
           </form>
-        </motion.div>
+        </m.div>
       </div>
     </section>
   )

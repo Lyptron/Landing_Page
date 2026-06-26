@@ -1,12 +1,12 @@
 'use client'
 import { useRef } from 'react'
 import dynamic from 'next/dynamic'
-import { motion, useScroll, useTransform, useInView } from 'framer-motion'
+import { m, useScroll, useTransform, useInView } from 'framer-motion'
 import { useLowPerfMode } from '@/hooks/useLowPerfMode'
 
 // Three.js + R3F are ~600KB minified — only fetched and rendered on
 // desktops that can actually handle the wireframe globe. Skipped entirely
-// on phones, touch devices, and prefers-reduced-motion.
+// on phones, touch devices, and prefers-reduced-m.
 const WhoWeAreCanvas = dynamic(() => import('../canvas/WhoWeAreCanvas'), {
   ssr: false,
   loading: () => null,
@@ -44,7 +44,7 @@ function StatBlock({ stat, index }: { stat: typeof STATS[0]; index: number }) {
   const inView = useInView(ref, { once: true, margin: '-40px' })
 
   return (
-    <motion.div
+    <m.div
       ref={ref}
       className="relative md:text-center"
       initial={{ opacity: 0, scale: 1.4, filter: 'blur(12px)' }}
@@ -54,7 +54,7 @@ function StatBlock({ stat, index }: { stat: typeof STATS[0]; index: number }) {
       {index > 0 && <div className="hidden md:block absolute left-0 top-1/2 -translate-y-1/2 w-px h-10 bg-white/[0.04]" />}
       <span className="font-display font-bold text-[28px] md:text-[34px] text-white/80 tracking-tight leading-none block">{stat.value}</span>
       <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-white/20 mt-1.5 block">{stat.label}</span>
-    </motion.div>
+    </m.div>
   )
 }
 
@@ -66,7 +66,7 @@ function PrincipleCard({ principle, index }: { principle: typeof PRINCIPLES[0]; 
   const origin = origins[index]
 
   return (
-    <motion.div
+    <m.div
       ref={ref}
       className="group rounded-2xl p-6 md:p-8 transition-all duration-500 hover:bg-gold/[0.03]"
       style={{
@@ -77,31 +77,31 @@ function PrincipleCard({ principle, index }: { principle: typeof PRINCIPLES[0]; 
       animate={inView ? { opacity: 1, x: 0, y: 0, rotate: 0, scale: 1 } : {}}
       transition={{ duration: 1, delay: 0.1 + index * 0.15, ease: EASE }}
     >
-      <motion.span
+      <m.span
         className="font-mono text-[10px] text-white/20 tracking-[0.2em] uppercase block mb-4"
         initial={{ opacity: 0 }}
         animate={inView ? { opacity: 1 } : {}}
         transition={{ duration: 0.5, delay: 0.4 + index * 0.15, ease: EASE }}
       >
         {principle.number}
-      </motion.span>
-      <motion.h3
+      </m.span>
+      <m.h3
         className="font-display font-semibold text-[18px] text-white/80 tracking-tight mb-3 group-hover:text-white/90 transition-colors duration-300"
         initial={{ opacity: 0, y: 10 }}
         animate={inView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.6, delay: 0.5 + index * 0.15, ease: EASE }}
       >
         {principle.title}
-      </motion.h3>
-      <motion.p
+      </m.h3>
+      <m.p
         className="font-body text-[14px] text-white/25 leading-relaxed group-hover:text-white/35 transition-colors duration-300"
         initial={{ opacity: 0, y: 8 }}
         animate={inView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.6, delay: 0.6 + index * 0.15, ease: EASE }}
       >
         {principle.desc}
-      </motion.p>
-    </motion.div>
+      </m.p>
+    </m.div>
   )
 }
 
@@ -136,7 +136,7 @@ export default function WhoWeAre() {
       style={{ background: '#050505' }}
     >
       {/* 3D Globe — static scale, no scroll-linked zoom */}
-      <motion.div
+      <m.div
         className="absolute top-0 right-0 translate-x-[30%] -translate-y-[20%] w-[800px] h-[800px] md:translate-x-[25%] md:-translate-y-[15%] md:w-[1100px] md:h-[1100px] pointer-events-none z-0"
         style={{ 
           scale: 1.1, 
@@ -144,7 +144,7 @@ export default function WhoWeAre() {
         }}
       >
         {sectionInView && !lowPerf && <WhoWeAreCanvas />}
-      </motion.div>
+      </m.div>
 
       {/* Warm spotlight */}
       <div className="absolute inset-0 pointer-events-none">
@@ -165,7 +165,7 @@ export default function WhoWeAre() {
       <div className="relative z-10 w-full px-6 md:px-12 lg:px-[120px]">
 
         {/* Divider line — draws on scroll */}
-        <motion.div
+        <m.div
           className="h-px w-full mb-16 origin-left"
           style={{ background: 'linear-gradient(90deg, rgba(255,255,255,0.08), rgba(255,255,255,0.06) 50%, transparent)' }}
           initial={{ scaleX: 0 }}
@@ -178,46 +178,46 @@ export default function WhoWeAre() {
 
           {/* Label + Headline — word-by-word build */}
           <div ref={headlineRef} className="flex flex-col gap-8">
-            <motion.span
+            <m.span
               className="font-mono text-[11px] uppercase tracking-[0.25em] text-white/50"
               initial={{ opacity: 0, y: 12 }}
               animate={headlineInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.7, delay: 0.1, ease: EASE }}
             >
               Who We Are
-            </motion.span>
+            </m.span>
 
             <h2 className="font-display font-bold text-[clamp(28px,5vw,68px)] leading-[0.97] tracking-[-0.04em] max-w-[900px]">
-              <motion.span
+              <m.span
                 className="text-white/90 inline-block"
                 initial={{ opacity: 0, filter: 'blur(16px)', y: 16 }}
                 animate={headlineInView ? { opacity: 1, filter: 'blur(0px)', y: 0 } : {}}
                 transition={{ duration: 1.2, delay: 0.2, ease: EASE }}
               >
                 A product studio{' '}
-              </motion.span>
-              <motion.span
+              </m.span>
+              <m.span
                 className="text-white/35 inline-block"
                 initial={{ opacity: 0, filter: 'blur(16px)', y: 16 }}
                 animate={headlineInView ? { opacity: 1, filter: 'blur(0px)', y: 0 } : {}}
                 transition={{ duration: 1.2, delay: 0.5, ease: EASE }}
               >
                 for founders who need design, engineering &amp; strategy{' '}
-              </motion.span>
-              <motion.span
+              </m.span>
+              <m.span
                 className="text-white/90 inline-block"
                 initial={{ opacity: 0, filter: 'blur(16px)', y: 16 }}
                 animate={headlineInView ? { opacity: 1, filter: 'blur(0px)', y: 0 } : {}}
                 transition={{ duration: 1.2, delay: 0.85, ease: EASE }}
               >
                 under one roof.
-              </motion.span>
+              </m.span>
             </h2>
           </div>
 
           {/* Two-column description — left slides from left, right from right */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
-            <motion.p
+            <m.p
               ref={paraLeftRef}
               className="font-body text-[15px] md:text-[17px] text-white/30 leading-[1.7] max-w-[520px]"
               initial={{ opacity: 0, x: -40, filter: 'blur(6px)' }}
@@ -225,8 +225,8 @@ export default function WhoWeAre() {
               transition={{ duration: 1, delay: 0.1, ease: EASE }}
             >
               We are a specialized group of engineers and designers committed to delivering robust, reliable systems. We don&apos;t take shortcuts. We build codebases that scale, designs that engage, and AI pipelines that automate core operations.
-            </motion.p>
-            <motion.p
+            </m.p>
+            <m.p
               ref={paraRightRef}
               className="font-body text-[15px] md:text-[17px] text-white/30 leading-[1.7] max-w-[520px] hidden md:block"
               initial={{ opacity: 0, x: 40, filter: 'blur(6px)' }}
@@ -234,12 +234,12 @@ export default function WhoWeAre() {
               transition={{ duration: 1, delay: 0.2, ease: EASE }}
             >
               Every project we ship is production-ready, performance-audited, and built to last. From full-stack web platforms to native mobile apps to intelligent automation — we handle the hard engineering so you can focus on growth.
-            </motion.p>
+            </m.p>
           </div>
 
           {/* Principles — cards fan out from stacked */}
           <div ref={principlesRef} className="hidden md:block">
-            <motion.div
+            <m.div
               className="h-px w-full mb-12"
               style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.06) 15%, rgba(255,255,255,0.06) 85%, transparent)' }}
               initial={{ scaleX: 0 }}
@@ -255,7 +255,7 @@ export default function WhoWeAre() {
 
           {/* Stats — camera focus effect */}
           <div ref={statsRef}>
-            <motion.div
+            <m.div
               className="h-px w-full mb-12"
               style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.06) 15%, rgba(255,255,255,0.06) 85%, transparent)' }}
               initial={{ scaleX: 0 }}

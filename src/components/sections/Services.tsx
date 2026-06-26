@@ -1,6 +1,6 @@
 'use client'
 import { useState, useRef } from 'react'
-import { AnimatePresence, motion, useInView } from 'framer-motion'
+import { AnimatePresence, m, useInView } from 'framer-motion'
 import { services } from '@/data/services'
 import { Service } from '@/types'
 import ServiceCard from './ServiceCard'
@@ -41,7 +41,7 @@ export default function Services() {
         ref={headerRef}
         className="relative z-10 w-full px-6 md:px-12 lg:px-[120px] pt-32 md:pt-40 pb-12 md:pb-16"
       >
-        <motion.div
+        <m.div
           className="h-px w-full mb-10 origin-left"
           style={{ background: 'linear-gradient(90deg, rgba(255,255,255,0.08), rgba(255,255,255,0.06) 50%, transparent)' }}
           initial={{ scaleX: 0 }}
@@ -50,32 +50,32 @@ export default function Services() {
         />
 
         <div className="flex flex-col gap-6">
-          <motion.span
+          <m.span
             className="font-mono text-[11px] tracking-[0.25em] uppercase text-white/50"
             initial={{ opacity: 0, y: 12 }}
             animate={headerInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.7, delay: 0.2, ease: EASE }}
           >
             Capabilities
-          </motion.span>
+          </m.span>
 
-          <motion.h2
+          <m.h2
             className="font-display font-bold text-[clamp(28px,5vw,68px)] leading-[0.97] tracking-[-0.04em] max-w-[800px]"
             initial={{ opacity: 0, filter: 'blur(12px)', y: 10 }}
             animate={headerInView ? { opacity: 1, filter: 'blur(0px)', y: 0 } : {}}
             transition={{ duration: 1.4, delay: 0.3, ease: EASE }}
           >
             <span className="text-white/90">What we do</span>
-          </motion.h2>
+          </m.h2>
 
-          <motion.p
+          <m.p
             className="font-body text-[15px] md:text-[17px] text-white/30 max-w-[520px] leading-[1.7]"
             initial={{ opacity: 0, y: 16 }}
             animate={headerInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.5, ease: EASE }}
           >
             Six disciplines. One team. Every project draws from the full depth of our engineering and design capabilities — scroll through our story.
-          </motion.p>
+          </m.p>
         </div>
       </div>
 

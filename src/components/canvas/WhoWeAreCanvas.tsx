@@ -1,4 +1,5 @@
 'use client'
+import '@/lib/suppress-warnings'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { useRef } from 'react'
 import type { Mesh } from 'three'

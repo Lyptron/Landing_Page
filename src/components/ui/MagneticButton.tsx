@@ -1,6 +1,6 @@
 'use client'
 import { useRef, useCallback } from 'react'
-import { motion } from 'framer-motion'
+import { m } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { useCursor } from '../providers/CursorProvider'
 
@@ -93,7 +93,7 @@ export default function MagneticButton({
       onMouseLeave={handleMouseLeave}
       className="inline-block"
     >
-      <motion.div
+      <m.div
         whileTap={{ scale: 0.97 }}
         transition={{ duration: 0.1 }}
       >
@@ -105,7 +105,7 @@ export default function MagneticButton({
         >
           {children}
         </Tag>
-      </motion.div>
+      </m.div>
     </div>
   )
 }

@@ -1,10 +1,10 @@
-import '@/lib/suppress-warnings'
 import { Inter, IBM_Plex_Mono } from 'next/font/google'
 import localFont from 'next/font/local'
 import { GoogleAnalytics } from '@next/third-parties/google'
 import { LenisProvider } from '@/components/providers/LenisProvider'
 import { CursorProvider } from '@/components/providers/CursorProvider'
-import Cursor from '@/components/ui/Cursor'
+import CursorMount from '@/components/ui/CursorMount'
+import { LazyMotion, domAnimation } from 'framer-motion'
 import ScrollProgress from '@/components/layout/ScrollProgress'
 import Nav from '@/components/layout/Nav'
 import GlowOrbs from '@/components/ui/GlowOrbs'
@@ -37,20 +37,27 @@ const satoshi = localFont({
   ],
   variable: '--font-satoshi',
   display: 'swap',
+  // Only preload the most-used weights for first paint; the rest fetch on demand.
+  preload: true,
 })
 
+// Inter is used for body copy in a few places — let it load on demand rather
+// than blocking first paint with multiple weights preloaded.
 const inter = Inter({
   subsets: ['latin'],
   weight: ['300', '400', '500'],
   variable: '--font-inter',
   display: 'swap',
+  preload: false,
 })
 
+// IBM Plex Mono is only used for small labels / eyebrows — not critical for paint.
 const ibmPlexMono = IBM_Plex_Mono({
   subsets: ['latin'],
   weight: ['400', '500'],
   variable: '--font-ibm-plex-mono',
   display: 'swap',
+  preload: false,
 })
 
 const NO_FLASH_SCRIPT = `(function () {
@@ -91,7 +98,7 @@ const SITE_URL = 'https://lyptron.com'
 const SITE_NAME = 'Lyptron'
 const TITLE = 'Lyptron — Web, SaaS, Mobile & AI Product Studio'
 const DESCRIPTION =
-  'Lyptron is a product studio that designs and ships high-performance websites, SaaS platforms, mobile apps, and AI automation for ambitious founders and growing teams.'
+  'Lyptron is a product studio that designs and ships high-performance websites, SaaS platforms, mobile apps, and AI automation for founders.'
 const KEYWORDS = [
   'digital agency',
   'web development agency',
@@ -151,7 +158,6 @@ export const metadata = {
   icons: {
     icon: [
       { url: '/images/favicon.ico', sizes: '32x32' },
-      { url: '/images/favicon.svg', type: 'image/svg+xml' },
       { url: '/images/favicon-96x96.png', sizes: '96x96', type: 'image/png' }
     ],
     apple: [
@@ -185,6 +191,9 @@ export const metadata = {
     email: false,
     address: false,
     telephone: false,
+  },
+  verification: {
+    google: '88ed57b69239e942',
   },
 }
 
@@ -250,6 +259,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        {/* Warm DNS + TLS to Google Analytics before its script tag actually runs. */}
+        {GA_ID && (
+          <>
+            <link rel="preconnect" href="https://www.googletagmanager.com" />
+            <link rel="dns-prefetch" href="https://www.google-analytics.com" />
+          </>
+        )}
         <script
           dangerouslySetInnerHTML={{ __html: NO_FLASH_SCRIPT }}
         />
@@ -259,15 +275,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className={`${satoshi.variable} ${inter.variable} ${ibmPlexMono.variable} bg-bg text-[--text-primary] antialiased`}>
-        <LenisProvider>
-          <CursorProvider>
-            <GlowOrbs />
-            <Cursor />
-            <ScrollProgress />
-            <Nav />
-            {children}
-          </CursorProvider>
-        </LenisProvider>
+        {/* LazyMotion + domAnimation lets the marketing pages' <m.* /> components
+            ship only the basic animation features instead of the full motion bundle.
+            Admin/client portal pages that use <motion.* /> directly are unaffected. */}
+        <LazyMotion features={domAnimation} strict={false}>
+          <LenisProvider>
+            <CursorProvider>
+              <GlowOrbs />
+              <CursorMount />
+              <ScrollProgress />
+              <Nav />
+              {children}
+            </CursorProvider>
+          </LenisProvider>
+        </LazyMotion>
         {GA_ID && <GoogleAnalytics gaId={GA_ID} />}
       </body>
     </html>
