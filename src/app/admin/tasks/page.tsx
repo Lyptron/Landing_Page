@@ -257,7 +257,7 @@ export default function TasksPage() {
                         whileHover={{ borderColor: 'var(--cp-cyan-border)' }}
                       >
                         <div className="flex items-start justify-between gap-2 mb-1.5">
-                          <div className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-[0.1em]" style={{ color: 'var(--cp-text-muted)' }}>
+                          <div className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-widest" style={{ color: 'var(--cp-text-muted)' }}>
                             <TypeIcon className="w-3 h-3" /> {TYPE_META[task.type]?.label || 'General'}
                           </div>
                           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">

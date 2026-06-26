@@ -48,7 +48,7 @@ export default function Modal({ open, onClose, title, subtitle, children, width 
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[100]"
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-100"
             aria-hidden="true"
           />
           <motion.div
@@ -62,7 +62,7 @@ export default function Modal({ open, onClose, title, subtitle, children, width 
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: -10 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className={`fixed top-[50%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-full ${width} mx-4 z-[101] overflow-hidden focus:outline-none`}
+            className={`fixed top-[50%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-full ${width} mx-4 z-101 overflow-hidden focus:outline-none`}
             style={{
               background: 'var(--cp-surface, #FFFFFF)',
               border: '1px solid var(--cp-border, rgba(0,0,0,0.08))',

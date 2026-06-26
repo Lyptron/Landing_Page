@@ -304,7 +304,7 @@ export default function FounderHub() {
             ) : approvals.map((a) => (
               <div key={a.id} className="p-3 rounded-xl" style={{ border: '1px solid var(--cp-border-soft)' }}>
                 <div className="flex justify-between items-start mb-1">
-                  <span className="text-[9px] font-mono text-(--cp-text-faint) uppercase tracking-[0.1em]">{a.type || 'Approval'}</span>
+                  <span className="text-[9px] font-mono text-(--cp-text-faint) uppercase tracking-widest">{a.type || 'Approval'}</span>
                   <span className="text-[9px] text-(--cp-text-faint)">{a.projects?.name || ''}</span>
                 </div>
                 <p className="text-[12px] text-(--cp-text-secondary) font-medium mb-2">{a.title}</p>
@@ -382,7 +382,7 @@ export default function FounderHub() {
                   <p className="text-[10px] text-(--cp-text-faint) mt-0.5">{item.target_quarter || '-'}{item.department ? ` · ${item.department}` : ''}</p>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                  <button onClick={() => cycleRoadmapStatus(item)} className={`px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-[0.1em] border ${roadmapStatusStyle(item.status)}`}>
+                  <button onClick={() => cycleRoadmapStatus(item)} className={`px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-widest border ${roadmapStatusStyle(item.status)}`}>
                     {item.status.replace('_', ' ')}
                   </button>
                   <button onClick={() => removeRoadmapItem(item.id)} className="p-1 rounded-lg text-(--cp-text-faint) hover:text-(--cp-red) hover:bg-(--cp-red-soft) transition-all opacity-0 group-hover:opacity-100"><Trash2 className="w-3 h-3" /></button>
@@ -412,7 +412,7 @@ export default function FounderHub() {
                   <p className="text-[10px] text-(--cp-text-faint) mt-0.5">{item.target_quarter || '-'}{item.department ? ` · ${item.department}` : ''}</p>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                  <button onClick={() => cycleRoadmapStatus(item)} className={`px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-[0.1em] border ${roadmapStatusStyle(item.status)}`}>
+                  <button onClick={() => cycleRoadmapStatus(item)} className={`px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-widest border ${roadmapStatusStyle(item.status)}`}>
                     {item.status.replace('_', ' ')}
                   </button>
                   <button onClick={() => removeRoadmapItem(item.id)} className="p-1 rounded-lg text-(--cp-text-faint) hover:text-(--cp-red) hover:bg-(--cp-red-soft) transition-all opacity-0 group-hover:opacity-100"><Trash2 className="w-3 h-3" /></button>

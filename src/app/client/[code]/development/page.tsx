@@ -126,7 +126,7 @@ export default function ClientDevelopmentPage() {
                         <a
                           href={dep.url}
                           target="_blank"
-                          rel="noreferrer"
+                          rel="noopener noreferrer"
                           className="group flex items-center justify-between gap-2 mt-1"
                         >
                           <span className="text-[12px] truncate transition-colors group-hover:underline" style={{ color: 'var(--cp-cyan)' }}>{dep.url}</span>

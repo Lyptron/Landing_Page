@@ -64,7 +64,7 @@ export default function ProjectDocumentsPage() {
             </div>
             <div className="flex items-center gap-2">
               {d.file_url && (
-                <a href={d.file_url} target="_blank" rel="noreferrer" className="p-1.5 text-(--cp-cyan) hover:text-(--cp-cyan-strong) transition-colors">
+                <a href={d.file_url} target="_blank" rel="noopener noreferrer" className="p-1.5 text-(--cp-cyan) hover:text-(--cp-cyan-strong) transition-colors">
                   <ExternalLink className="w-3.5 h-3.5" />
                 </a>
               )}

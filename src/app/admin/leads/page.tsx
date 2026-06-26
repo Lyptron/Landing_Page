@@ -227,7 +227,7 @@ export default function LeadsPage() {
                       <td className="px-4 py-3 text-[12px] whitespace-nowrap" style={{ color: 'var(--cp-text-muted)' }}>{l.source || '-'}</td>
                       <td className="px-4 py-3 text-[12px] whitespace-nowrap" style={{ color: 'var(--cp-text-muted)' }}>{l.owner || '-'}</td>
                       <td className="px-4 py-3 whitespace-nowrap">
-                        <span className="px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-[0.1em]" style={{ color: pStyle.color, background: pStyle.bg, border: `1px solid ${pStyle.border}` }}>{pStyle.label}</span>
+                        <span className="px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-widest" style={{ color: pStyle.color, background: pStyle.bg, border: `1px solid ${pStyle.border}` }}>{pStyle.label}</span>
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap">
                         <span className="flex items-center gap-1 text-[12px] font-mono" style={{ color: qualityColor(l.quality_score) }}>
@@ -237,13 +237,13 @@ export default function LeadsPage() {
                       <td className="px-4 py-3 text-[12px] font-mono whitespace-nowrap" style={{ color: 'var(--cp-text-muted)' }}>{l.probability ?? 0}%</td>
                       <td className="px-4 py-3 whitespace-nowrap">
                         {urgency ? (
-                          <span className="px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-[0.1em]" style={{ color: urgency.color, background: urgency.bg, border: `1px solid ${urgency.border}` }}>{urgency.label}</span>
+                          <span className="px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-widest" style={{ color: urgency.color, background: urgency.bg, border: `1px solid ${urgency.border}` }}>{urgency.label}</span>
                         ) : (
                           <span className="text-[11px]" style={{ color: 'var(--cp-text-faint)' }}>—</span>
                         )}
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap">
-                        <span className="px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-[0.1em]" style={{ color: sla.color, background: sla.bg, border: `1px solid ${sla.border}` }}>{sla.label}</span>
+                        <span className="px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-widest" style={{ color: sla.color, background: sla.bg, border: `1px solid ${sla.border}` }}>{sla.label}</span>
                       </td>
                       {isFounder && (
                         <td className="px-4 py-3 whitespace-nowrap">

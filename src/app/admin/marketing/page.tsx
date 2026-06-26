@@ -271,7 +271,7 @@ export default function MarketingDashboard() {
                     <p className="text-[11px] text-(--cp-text-faint) font-mono truncate">{lead.contact}</p>
                   </div>
                   <div className="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
-                    <span className="text-[10px] uppercase tracking-[0.1em] font-bold px-2 py-0.5 rounded bg-(--cp-surface-strong) text-(--cp-text-muted)">{lead.stage}</span>
+                    <span className="text-[10px] uppercase tracking-widest font-bold px-2 py-0.5 rounded bg-(--cp-surface-strong) text-(--cp-text-muted)">{lead.stage}</span>
                     <span className="text-[9px] font-bold uppercase tracking-[0.08em] px-2 py-0.5 rounded-md" style={{ color: pStyle.color, background: pStyle.bg, border: `1px solid ${pStyle.border}` }}>
                       {pStyle.label}
                     </span>

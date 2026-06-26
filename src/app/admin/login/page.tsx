@@ -163,7 +163,7 @@ export default function AdminLoginPage() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.8, duration: 1 }}
-        className="text-[11px] mt-8 font-mono tracking-[0.1em] relative z-10"
+        className="text-[11px] mt-8 font-mono tracking-widest relative z-10"
         style={{ color: 'var(--cp-text-faint)' }}
       >
         LYPTRON ADMIN

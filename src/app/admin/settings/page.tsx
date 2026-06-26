@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import { motion } from 'framer-motion'
+import Image from 'next/image'
 import {
   User,
   Building2,
@@ -257,7 +258,7 @@ export default function SettingsPage() {
   return (
     <div className="flex flex-col gap-8">
       <div>
-        <h1 className="font-display text-3xl font-bold bg-gradient-to-r from-(--cp-text) via-(--cp-text) to-(--cp-text-muted) bg-clip-text text-transparent tracking-tight mb-1">Settings</h1>
+        <h1 className="font-display text-3xl font-bold bg-linear-to-r from-(--cp-text) via-(--cp-text) to-(--cp-text-muted) bg-clip-text text-transparent tracking-tight mb-1">Settings</h1>
         <p className="text-(--cp-text-faint) text-[13px]">Manage your agency preferences, client access codes, and integrations.</p>
       </div>
 
@@ -305,9 +306,9 @@ export default function SettingsPage() {
 
                 <div className="flex flex-col gap-6">
                   <div className="flex items-center gap-6">
-                    <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500/20 via-purple-500/20 to-fuchsia-500/20 border border-(--cp-border) flex items-center justify-center shrink-0 overflow-hidden">
+                    <div className="w-20 h-20 rounded-2xl bg-linear-to-br from-blue-500/20 via-purple-500/20 to-fuchsia-500/20 border border-(--cp-border) flex items-center justify-center shrink-0 overflow-hidden relative">
                       {logoUrl ? (
-                        <img src={logoUrl} alt="Agency Logo" className="w-full h-full object-contain p-2" />
+                        <Image src={logoUrl} alt="Agency Logo" fill sizes="80px" className="object-contain p-2" />
                       ) : (
                         <span className="font-display font-bold text-3xl text-(--cp-text)">L</span>
                       )}
@@ -533,9 +534,9 @@ export default function SettingsPage() {
                 </div>
 
                 <div className="flex items-center gap-6 mb-8">
-                  <div className="w-20 h-20 rounded-2xl p-0.5" style={{ background: 'linear-gradient(135deg, rgba(29,126,245,0.6), rgba(139,92,246,0.6))' }}>
+                  <div className="w-20 h-20 rounded-2xl p-0.5 relative" style={{ background: 'linear-gradient(135deg, rgba(29,126,245,0.6), rgba(139,92,246,0.6))' }}>
                     {user?.avatar_url ? (
-                      <img src={user.avatar_url} alt="" className="w-full h-full rounded-2xl object-cover" />
+                      <Image src={user.avatar_url} alt="" fill sizes="80px" className="rounded-2xl object-cover" />
                     ) : (
                       <div className="w-full h-full rounded-2xl flex items-center justify-center" style={{ background: 'var(--cp-bg)' }}>
                         <span className="text-2xl font-bold text-(--cp-text)">{user?.name?.charAt(0)?.toUpperCase() || 'A'}</span>

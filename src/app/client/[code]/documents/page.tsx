@@ -148,7 +148,7 @@ export default function DocumentsPage() {
                 <a
                   href={doc.file_url || '#'}
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                   key={doc.id}
                   className="group flex items-center justify-between p-4 transition-colors hover:bg-(--cp-bg-soft)"
                 >

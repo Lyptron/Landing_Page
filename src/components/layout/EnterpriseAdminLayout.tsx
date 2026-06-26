@@ -33,6 +33,8 @@ import { canAccessRoute } from '@/lib/adminRoles'
 import { LyptronLogo, LyptronMark } from '@/components/ui/LyptronLogo'
 import ThemeToggle from '@/components/admin/ThemeToggle'
 
+import Image from 'next/image'
+
 const NAV_GROUPS = [
   {
     label: 'Founder',
@@ -200,7 +202,7 @@ export default function EnterpriseAdminLayout({ children }: { children: React.Re
       <motion.aside
         initial={false}
         animate={{ width: sidebarOpen ? 248 : 68 }}
-        className="relative z-20 h-screen flex-shrink-0 hidden md:flex flex-col"
+        className="relative z-20 h-screen shrink-0 hidden md:flex flex-col"
         style={{
           background: 'var(--cp-bg-elevated)',
           borderRight: '1px solid var(--cp-border-soft)',
@@ -234,14 +236,20 @@ export default function EnterpriseAdminLayout({ children }: { children: React.Re
           {sidebarOpen && user && (
             <div className="flex items-center gap-2.5 px-2 py-1.5">
               <div
-                className="w-7 h-7 rounded-full overflow-hidden shrink-0 flex items-center justify-center"
+                className="w-7 h-7 rounded-full overflow-hidden shrink-0 flex items-center justify-center relative"
                 style={{
                   background: 'var(--cp-cyan-soft)',
                   border: '1px solid var(--cp-cyan-border)',
                 }}
               >
                 {user.avatar_url ? (
-                  <img src={user.avatar_url} alt="" className="w-full h-full object-cover" />
+                  <Image
+                    src={user.avatar_url}
+                    alt=""
+                    fill
+                    sizes="28px"
+                    className="object-cover"
+                  />
                 ) : (
                   <span
                     className="text-[10px] font-semibold"
@@ -400,14 +408,14 @@ export default function EnterpriseAdminLayout({ children }: { children: React.Re
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setCommandPaletteOpen(false)}
-              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[100]"
+              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-100"
             />
             <motion.div
               initial={{ opacity: 0, scale: 0.96, y: -20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.96, y: -20 }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="fixed top-[15%] left-1/2 -translate-x-1/2 w-full max-w-lg z-[101] overflow-hidden"
+              className="fixed top-[15%] left-1/2 -translate-x-1/2 w-full max-w-lg z-101 overflow-hidden"
               style={{
                 background: 'var(--cp-bg-elevated)',
                 border: '1px solid var(--cp-border)',

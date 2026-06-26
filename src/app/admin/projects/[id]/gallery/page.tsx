@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import Image from 'next/image'
 import { Image as ImageIcon, Plus, Trash2 } from 'lucide-react'
 import { insertGalleryImage } from '@/lib/db'
 import { supabase } from '@/lib/supabase'
@@ -43,7 +44,7 @@ export default function ProjectGalleryPage() {
         {gallery.map(g => (
           <div key={g.id} className="rounded-xl overflow-hidden aspect-video relative group border border-(--cp-border-soft)" style={{ background: 'var(--cp-bg-soft)' }}>
             {g.image_url ? (
-              <img src={g.image_url} alt={g.title} className="w-full h-full object-cover" />
+              <Image src={g.image_url} alt={g.title} fill className="object-cover" sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 250px" />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
                 <ImageIcon className="w-6 h-6 text-(--cp-text-faint)" />

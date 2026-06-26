@@ -299,7 +299,7 @@ export default function ProjectOverviewPage() {
                   <div className="flex items-center gap-1 shrink-0">
                     <button
                       onClick={() => toggleAnnouncement(a)}
-                      className="px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase tracking-[0.1em] transition-colors cursor-pointer"
+                      className="px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase tracking-widest transition-colors cursor-pointer"
                       style={a.is_active ? { color: 'var(--cp-emerald)', background: 'var(--cp-emerald-soft)' } : { color: 'var(--cp-text-faint)', background: 'var(--cp-bg-soft)' }}
                     >
                       {a.is_active ? 'Active' : 'Hidden'}

@@ -392,7 +392,7 @@ export default function ProjectsPage() {
                         {/* Health badge + access code */}
                         <div className="flex items-center justify-between mb-2">
                           <span
-                            className="flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-semibold uppercase tracking-[0.1em]"
+                            className="flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-semibold uppercase tracking-widest"
                             style={{
                               color: hMeta.color,
                               background: hMeta.soft,
@@ -605,7 +605,7 @@ export default function ProjectsPage() {
                     </td>
                     <td className="p-3">
                       <span
-                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-semibold uppercase tracking-[0.1em]"
+                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-semibold uppercase tracking-widest"
                         style={{
                           color: hMeta.color,
                           background: hMeta.soft,

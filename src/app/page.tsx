@@ -1,7 +1,5 @@
-'use client'
 import dynamic from 'next/dynamic'
 import { CHAPTER_IDS } from '@/lib/constants'
-import { useChapterProgress } from '@/hooks/useChapterProgress'
 import Hero from '@/components/sections/Hero'
 import SectionDivider from '@/components/ui/SectionDivider'
 import ChapterDots from '@/components/layout/ChapterDots'
@@ -17,13 +15,10 @@ const CTA = dynamic(() => import('@/components/sections/CTA'))
 const Footer = dynamic(() => import('@/components/layout/Footer'))
 
 export default function Home() {
-  const chapterIds = CHAPTER_IDS.map((c) => c.id)
-  const activeChapter = useChapterProgress(chapterIds)
-
   return (
     <main className="relative min-h-screen bg-bg text-[--text-primary] overflow-x-hidden">
       {/* Chapter Vertical Dots */}
-      <ChapterDots activeChapter={activeChapter} chapterIds={CHAPTER_IDS} />
+      <ChapterDots chapterIds={CHAPTER_IDS} />
 
       {/* Chapter 1: Hero */}
       <Hero />

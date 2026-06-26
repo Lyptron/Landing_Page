@@ -27,8 +27,7 @@ export function LyptronMark({ size = 42, className = '' }: { size?: number; clas
         width={imageSize}
         height={imageSize}
         unoptimized
-        className="w-[75%] h-[75%] object-contain rounded-full"
-        style={{ width: '75%', height: '75%' }}
+        className="object-contain rounded-full"
       />
     </div>
   )

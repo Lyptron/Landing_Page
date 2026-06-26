@@ -170,7 +170,7 @@ function ProjectRow({ project, index }: { project: typeof projects[0]; index: nu
 
         {/* Mockup — rotates in from side */}
         <motion.div
-          style={{ y: mockupY }}
+          style={{ y: mockupY, willChange: 'transform' }}
           className={isReversed ? 'lg:[direction:ltr]' : ''}
         >
           <motion.div

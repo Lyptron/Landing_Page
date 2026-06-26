@@ -56,7 +56,7 @@ export default function DeliverablesPage() {
                   <a
                     href={item.file_url || '#'}
                     target="_blank"
-                    rel="noreferrer"
+                    rel="noopener noreferrer"
                     className="cp-btn-primary flex-1 py-2.5 text-[12.5px] flex items-center justify-center gap-1.5"
                   >
                     <Download className="w-3.5 h-3.5" /> Download
@@ -64,7 +64,7 @@ export default function DeliverablesPage() {
                   <a
                     href={item.file_url || '#'}
                     target="_blank"
-                    rel="noreferrer"
+                    rel="noopener noreferrer"
                     className="cp-btn-secondary p-2.5 flex items-center justify-center"
                     aria-label="Open in new tab"
                   >

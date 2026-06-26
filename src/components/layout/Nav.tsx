@@ -182,7 +182,6 @@ export default function Nav() {
               width={38}
               height={38}
               unoptimized
-              style={{ width: 'auto', height: '38px' }}
               className="rounded-lg"
             />
             <LyptronLogo trigger={logoScrambleTrigger} />

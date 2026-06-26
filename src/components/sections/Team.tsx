@@ -196,8 +196,8 @@ export default function Team() {
         onBlur={() => setIsPaused(false)}
       >
         {/* Edge fades */}
-        <div className="absolute left-0 top-0 bottom-0 w-32 md:w-48 bg-gradient-to-r from-[#050505] to-transparent z-20 pointer-events-none" aria-hidden="true" />
-        <div className="absolute right-0 top-0 bottom-0 w-32 md:w-48 bg-gradient-to-l from-[#050505] to-transparent z-20 pointer-events-none" aria-hidden="true" />
+        <div className="absolute left-0 top-0 bottom-0 w-32 md:w-48 bg-linear-to-r from-[#050505] to-transparent z-20 pointer-events-none" aria-hidden="true" />
+        <div className="absolute right-0 top-0 bottom-0 w-32 md:w-48 bg-linear-to-l from-[#050505] to-transparent z-20 pointer-events-none" aria-hidden="true" />
 
         <div ref={trackRef} className="flex flex-row overflow-x-auto snap-x snap-mandatory scrollbar-none gap-6 w-full md:w-max py-4 px-6 md:px-0 items-center md:items-stretch">
           {tripled.map((member, i) => {

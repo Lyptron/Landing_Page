@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import Image from 'next/image'
 import { Plus, X, Search, Briefcase } from 'lucide-react'
 import { assignTeamMember, removeTeamFromProject } from '@/lib/db'
 import { supabase } from '@/lib/supabase'
@@ -112,10 +113,10 @@ export default function ProjectTeamPage() {
             <>
               <div className="fixed inset-0 z-30" onClick={() => setDropdownOpen(false)} />
               <div 
-                className="absolute right-0 mt-2 w-72 rounded-xl p-3 z-40 border border-white/[0.05] shadow-2xl flex flex-col gap-2.5"
+                className="absolute right-0 mt-2 w-72 rounded-xl p-3 z-40 border border-white/5 shadow-2xl flex flex-col gap-2.5"
                 style={{ background: 'var(--cp-bg-elevated)' }}
               >
-                <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-(--cp-border) bg-white/[0.015]">
+                <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-(--cp-border) bg-white/1.5">
                   <Search className="w-3.5 h-3.5 text-(--cp-text-faint)" />
                   <input
                     type="text"
@@ -133,7 +134,7 @@ export default function ProjectTeamPage() {
                       <button
                         key={m.id}
                         onClick={() => handleAssign(m.id)}
-                        className="flex items-center gap-2.5 w-full text-left p-2 rounded-lg hover:bg-white/[0.025] hover:text-(--cp-text) transition-all cursor-pointer text-(--cp-text-muted)"
+                        className="flex items-center gap-2.5 w-full text-left p-2 rounded-lg hover:bg-white/2.5 hover:text-(--cp-text) transition-all cursor-pointer text-(--cp-text-muted)"
                       >
                         <div 
                           className="w-7 h-7 rounded-full shrink-0 flex items-center justify-center font-mono text-[9px] font-bold text-white"
@@ -171,7 +172,7 @@ export default function ProjectTeamPage() {
             return (
               <div 
                 key={m.id} 
-                className="cp-card p-4.5 flex flex-col gap-4 relative group transition-all duration-300 hover:border-(--cp-cyan-border) hover:bg-white/[0.015]"
+                className="cp-card p-4.5 flex flex-col gap-4 relative group transition-all duration-300 hover:border-(--cp-cyan-border) hover:bg-white/1.5"
               >
                 {/* Remove button (visible on hover) */}
                 <button
@@ -193,7 +194,7 @@ export default function ProjectTeamPage() {
                     }}
                   >
                     {m.image_url ? (
-                      <img src={m.image_url} alt="" className="w-full h-full object-cover rounded-full" />
+                      <Image src={m.image_url} alt={m.name || ''} fill className="object-cover rounded-full" sizes="44px" />
                     ) : (
                       <span className="font-mono text-[14px] font-bold text-white">{m.initials}</span>
                     )}
@@ -213,7 +214,7 @@ export default function ProjectTeamPage() {
                       value={m.role_on_project || ''}
                       onChange={e => handleUpdateRole(m.id, e.target.value)}
                       placeholder="e.g. Lead Frontend"
-                      className="w-full bg-white/[0.015] border border-white/[0.05] rounded-lg px-3 py-2 text-[12px] text-(--cp-text) outline-none focus:border-(--cp-cyan-border) transition-colors pr-8 font-medium"
+                      className="w-full bg-white/1.5 border border-white/5 rounded-lg px-3 py-2 text-[12px] text-(--cp-text) outline-none focus:border-(--cp-cyan-border) transition-colors pr-8 font-medium"
                     />
                     {updatingId === m.id && (
                       <div className="absolute right-2.5 w-3.5 h-3.5 border border-(--cp-border) border-t-(--cp-cyan) rounded-full animate-spin" />
@@ -227,7 +228,7 @@ export default function ProjectTeamPage() {
                     {m.expertise.slice(0, 3).map((exp: string) => (
                       <span 
                         key={exp} 
-                        className="text-[9.5px] px-2 py-0.5 rounded bg-white/[0.02] border border-white/[0.04] text-(--cp-text-muted) font-medium"
+                        className="text-[9.5px] px-2 py-0.5 rounded bg-white/2 border border-white/4 text-(--cp-text-muted) font-medium"
                       >
                         {exp}
                       </span>

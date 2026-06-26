@@ -135,13 +135,13 @@ export default function ServiceCard({ service, index, onDetailClick }: ServiceCa
       {/* Background Phase Number — counter-scrolls for depth */}
       <motion.div
         className="absolute -right-[5%] top-1/2 font-display font-bold pointer-events-none select-none"
-        style={{ fontSize: '30vw', opacity: 0.015, color: 'white', lineHeight: 0.8, y: bgNumberY, translateY: '-50%' }}
+        style={{ fontSize: '30vw', opacity: 0.015, color: 'white', lineHeight: 0.8, y: bgNumberY, translateY: '-50%', willChange: 'transform' }}
       >
         0{service.number}
       </motion.div>
 
       <motion.div
-        style={{ scale, opacity, y: yOffset }}
+        style={{ scale, opacity, y: yOffset, willChange: 'transform, opacity' }}
         className="w-full h-full flex flex-col justify-center"
       >
         <div

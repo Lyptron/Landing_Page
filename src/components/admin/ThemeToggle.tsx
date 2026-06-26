@@ -76,7 +76,7 @@ export default function ThemeToggle() {
           <Tooltip.Content
             side="bottom"
             sideOffset={8}
-            className="px-2.5 py-1.5 rounded-lg text-[11px] font-medium z-[200] whitespace-nowrap"
+            className="px-2.5 py-1.5 rounded-lg text-[11px] font-medium z-200 whitespace-nowrap"
             style={{ background: 'var(--cp-text)', color: 'var(--cp-bg)' }}
           >
             {reason} · right-click for settings

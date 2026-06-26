@@ -61,7 +61,7 @@ export default function MeetingsPage() {
                     <a
                       href={meet.link}
                       target="_blank"
-                      rel="noreferrer"
+                      rel="noopener noreferrer"
                       className="cp-btn-primary flex items-center justify-center gap-2 w-full py-2.5 text-[12.5px]"
                     >
                       Join Meeting <ExternalLink className="w-3.5 h-3.5" />
@@ -97,7 +97,7 @@ export default function MeetingsPage() {
                       <a
                         href={meet.recording_url || meet.recording}
                         target="_blank"
-                        rel="noreferrer"
+                        rel="noopener noreferrer"
                         className="cp-btn-secondary flex items-center gap-1.5 px-4 py-2 text-[12px] shrink-0"
                       >
                         <PlayCircle className="w-3.5 h-3.5" /> Watch

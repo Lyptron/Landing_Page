@@ -280,10 +280,10 @@ export default function SubscriptionPlanningPage() {
                         </div>
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap">
-                        <span className={`px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-[0.1em] border ${statusStyle(s.status)}`}>{s.status}</span>
+                        <span className={`px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-widest border ${statusStyle(s.status)}`}>{s.status}</span>
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap">
-                        <span className={`px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-[0.1em] border ${priorityStyle(s.priority)}`}>{s.priority}</span>
+                        <span className={`px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-widest border ${priorityStyle(s.priority)}`}>{s.priority}</span>
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap">
                         <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">

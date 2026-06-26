@@ -93,6 +93,7 @@ const LOGOS = [
 
 export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null)
+  const sectionRectRef = useRef<DOMRect | null>(null)
   const glowRef = useRef<HTMLDivElement>(null)
   const [storyStep, setStoryStep] = useState(0)
 
@@ -107,9 +108,18 @@ export default function Hero() {
   const rafRef = useRef<number | null>(null)
   const lastPosRef = useRef<{ x: number; y: number } | null>(null)
 
+  const updateSectionRect = useCallback(() => {
+    if (sectionRef.current) {
+      sectionRectRef.current = sectionRef.current.getBoundingClientRect()
+    }
+  }, [])
+
   const onMove = useCallback((e: MouseEvent) => {
     if (!sectionRef.current) return
-    const r = sectionRef.current.getBoundingClientRect()
+    if (!sectionRectRef.current) {
+      sectionRectRef.current = sectionRef.current.getBoundingClientRect()
+    }
+    const r = sectionRectRef.current
     lastPosRef.current = { x: e.clientX - r.left, y: e.clientY - r.top }
     if (rafRef.current != null) return
     rafRef.current = requestAnimationFrame(() => {
@@ -132,12 +142,15 @@ export default function Hero() {
         window.matchMedia('(prefers-reduced-motion: reduce)').matches
       ) return
     }
+    updateSectionRect()
+    window.addEventListener('resize', updateSectionRect, { passive: true })
     el.addEventListener('mousemove', onMove, { passive: true })
     return () => {
+      window.removeEventListener('resize', updateSectionRect)
       el.removeEventListener('mousemove', onMove)
       if (rafRef.current != null) cancelAnimationFrame(rafRef.current)
     }
-  }, [onMove])
+  }, [onMove, updateSectionRect])
 
   return (
     <section
@@ -240,7 +253,7 @@ export default function Hero() {
       </div>
 
       {/* Mouse follow glow — softer to match minimal aesthetic */}
-      <div ref={glowRef} className="absolute inset-0 z-[1] pointer-events-none" />
+      <div ref={glowRef} className="absolute inset-0 z-1 pointer-events-none" />
 
       {/* Top accent line */}
       <motion.div className="absolute top-0 left-0 right-0 h-px z-30"

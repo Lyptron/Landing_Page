@@ -14,8 +14,9 @@ const CursorContext = createContext<CursorContextProps>({
 
 export const CursorProvider = ({ children }: { children: React.ReactNode }) => {
   const [cursorState, setCursorState] = useState<CursorState>('default')
+  const value = React.useMemo(() => ({ cursorState, setCursorState }), [cursorState])
   return (
-    <CursorContext.Provider value={{ cursorState, setCursorState }}>
+    <CursorContext.Provider value={value}>
       {children}
     </CursorContext.Provider>
   )

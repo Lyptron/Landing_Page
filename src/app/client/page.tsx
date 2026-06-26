@@ -48,7 +48,7 @@ function ClientLoginGate() {
       {/* Soft accent ambient — fixed to viewport */}
       <div
         aria-hidden
-        className="pointer-events-none fixed -top-[20%] -right-[10%] w-200 h-200 rounded-full z-0"
+        className="pointer-events-none fixed top-[-20%] right-[-10%] w-200 h-200 rounded-full z-0"
         style={{ background: 'radial-gradient(circle, rgba(79,70,229,0.05) 0%, transparent 70%)' }}
       />
 
@@ -142,7 +142,7 @@ function ClientLoginGate() {
               </div>
 
               <h2
-                className="font-display text-[28px] sm:text-[34px] font-bold tracking-[-0.025em] mt-3 mb-2 leading-[1.05]"
+                className="font-display text-[28px] sm:text-[34px] font-bold tracking-tight mt-3 mb-2 leading-[1.05]"
                 style={{ color: 'var(--cp-text)' }}
               >
                 Enter your access code.

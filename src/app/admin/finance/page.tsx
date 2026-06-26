@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState, useMemo } from 'react'
 import dynamic from 'next/dynamic'
+import Image from 'next/image'
 import { Plus, Receipt, Wallet, TrendingDown, Trash2, Users2, Search, ArrowUpDown, Activity, Percent } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { fetchInvoices, fetchAllPayments, insertInvoice, fetchExpenses, insertExpense, deleteExpense, fetchTeamMembers, updateTeamMember, fetchSubscriptions, fetchProjects } from '@/lib/db'
@@ -363,12 +364,12 @@ export default function FinanceHubPage() {
                   <div>
                     <div className="flex justify-between items-start mb-2">
                       <div className="flex items-center gap-1.5">
-                        <span className="text-[9.5px] font-mono text-(--cp-text-faint) uppercase tracking-[0.1em]">{inv.invoice_number}</span>
+                        <span className="text-[9.5px] font-mono text-(--cp-text-faint) uppercase tracking-widest">{inv.invoice_number}</span>
                         <span className={`px-1.5 py-0.5 rounded text-[8px] font-mono ${inv.isPayment ? 'bg-(--cp-cyan-soft) text-(--cp-cyan) border border-(--cp-cyan-border)' : 'bg-white/[0.02] text-(--cp-text-muted) border border-white/[0.05]'}`}>
                           {inv.isPayment ? 'Project' : 'Invoice'}
                         </span>
                       </div>
-                      <span className={`px-2 py-0.5 rounded-md text-[8px] font-bold uppercase tracking-[0.1em] border ${statusStyle(inv.status)}`}>{inv.status}</span>
+                      <span className={`px-2 py-0.5 rounded-md text-[8px] font-bold uppercase tracking-widest border ${statusStyle(inv.status)}`}>{inv.status}</span>
                     </div>
                     <h4 className="text-[13.5px] font-bold text-(--cp-text) truncate">{inv.client_name}</h4>
                     <p className="text-[11px] text-(--cp-text-muted) mt-1 line-clamp-2" title={inv.reason}>{inv.reason}</p>
@@ -586,7 +587,7 @@ export default function FinanceHubPage() {
                           }}
                         >
                           {m.image_url ? (
-                            <img src={m.image_url} alt="" className="w-full h-full object-cover rounded-full" />
+                            <Image src={m.image_url} alt={m.name || ''} fill className="object-cover rounded-full" sizes="44px" />
                           ) : (
                             <span>{m.initials}</span>
                           )}

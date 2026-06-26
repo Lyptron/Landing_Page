@@ -53,7 +53,7 @@ export default function ProjectMeetingsPage() {
             </div>
             <div className="flex items-center gap-2">
               {m.link && (
-                <a href={m.link} target="_blank" rel="noreferrer" className="text-[11.5px] text-(--cp-cyan) hover:underline">
+                <a href={m.link} target="_blank" rel="noopener noreferrer" className="text-[11.5px] text-(--cp-cyan) hover:underline">
                   Join Call
                 </a>
               )}

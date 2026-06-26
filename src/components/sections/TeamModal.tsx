@@ -55,7 +55,7 @@ export default function TeamModal({ member, onClose }: TeamModalProps) {
       {/* Backdrop */}
       <motion.div
         key="backdrop"
-        className="fixed inset-0 z-[100] bg-black/70 backdrop-blur-[12px]"
+        className="fixed inset-0 z-100 bg-black/70 backdrop-blur-[12px]"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -65,7 +65,7 @@ export default function TeamModal({ member, onClose }: TeamModalProps) {
       />
 
       {/* Modal */}
-      <div key="modal-content" className="fixed inset-0 z-[101] flex items-center justify-center pointer-events-none p-4 sm:p-8">
+      <div key="modal-content" className="fixed inset-0 z-101 flex items-center justify-center pointer-events-none p-4 sm:p-8">
         <motion.div
           ref={dialogRef}
           role="dialog"
@@ -105,7 +105,7 @@ export default function TeamModal({ member, onClose }: TeamModalProps) {
               backgroundSize: '24px 24px',
             }} />
             {/* Fade to right panel */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-[#0c0c0e]/80 md:to-[#0c0c0e] pointer-events-none" />
+            <div className="absolute inset-0 bg-linear-to-r from-transparent via-transparent to-[#0c0c0e]/80 md:to-[#0c0c0e] pointer-events-none" />
           </div>
 
           {/* Right — Content */}

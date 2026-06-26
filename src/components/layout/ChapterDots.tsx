@@ -1,3 +1,4 @@
+'use client'
 import { useCursor } from '../providers/CursorProvider'
 import { useChapterProgress } from '@/hooks/useChapterProgress'
 
@@ -22,7 +23,7 @@ export default function ChapterDots({ chapterIds }: ChapterDotsProps) {
   }
 
   return (
-    <div className="fixed right-[8px] top-1/2 -translate-y-1/2 z-[100] hidden md:flex flex-col gap-4 pointer-events-auto">
+    <div className="fixed right-2 top-1/2 -translate-y-1/2 z-100 hidden md:flex flex-col gap-4 pointer-events-auto">
       {chapterIds.map((chapter) => {
         const isActive = activeChapter === chapter.id
         return (

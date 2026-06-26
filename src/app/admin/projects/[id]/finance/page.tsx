@@ -40,7 +40,7 @@ export default function ProjectFinancePage() {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => toggleStatus(p)}
-                className={`px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase tracking-[0.1em] border transition-colors cursor-pointer ${
+                className={`px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase tracking-widest border transition-colors cursor-pointer ${
                   p.status === 'paid'
                     ? 'bg-(--cp-emerald-soft) border-(--cp-emerald-border) text-(--cp-emerald)'
                     : 'bg-(--cp-amber-soft) border-(--cp-amber-border) text-(--cp-amber)'

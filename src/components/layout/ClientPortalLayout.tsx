@@ -215,7 +215,7 @@ export default function ClientPortalLayout({
     <div className="client-shell client-shell-bg min-h-screen flex relative">
       {/* Desktop Sidebar */}
       <aside
-        className="relative z-20 h-screen w-65 flex-shrink-0 hidden lg:flex flex-col sticky top-0"
+        className="z-20 h-screen w-65 shrink-0 hidden lg:flex flex-col sticky top-0"
         style={{ background: 'var(--cp-bg-elevated)', borderRight: '1px solid var(--cp-border-soft)' }}
       >
         <SidebarContent project={project} groups={groups} pathname={pathname} onExit={handleExit} />

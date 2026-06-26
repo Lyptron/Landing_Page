@@ -26,11 +26,12 @@ export default function MagneticButton({
   disabled = false,
 }: MagneticButtonProps) {
   const ref = useRef<HTMLDivElement>(null)
+  const rectRef = useRef<DOMRect | null>(null)
   const { setCursorState } = useCursor()
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    if (!ref.current) return
-    const rect = ref.current.getBoundingClientRect()
+    if (!ref.current || !rectRef.current) return
+    const rect = rectRef.current
     const dx = e.clientX - (rect.left + rect.width  / 2)
     const dy = e.clientY - (rect.top  + rect.height / 2)
     const dist = Math.sqrt(dx * dx + dy * dy)
@@ -41,6 +42,7 @@ export default function MagneticButton({
 
   const handleMouseLeave = useCallback(() => {
     setCursorState('default')
+    rectRef.current = null
     if (!ref.current) return
     ref.current.style.transform = 'translate(0,0)'
     ref.current.style.transition = 'transform 0.4s cubic-bezier(0.34,1.56,0.64,1)'
@@ -49,6 +51,9 @@ export default function MagneticButton({
 
   const handleMouseEnter = useCallback(() => {
     setCursorState('cta')
+    if (ref.current) {
+      rectRef.current = ref.current.getBoundingClientRect()
+    }
   }, [setCursorState])
 
   const baseClass = cn(

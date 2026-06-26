@@ -13,7 +13,7 @@ const ONBOARDING_STAGES = ['Backlog', 'Design', 'Development', 'Review', 'Comple
 function TierPill({ tier }: { tier: string | null | undefined }) {
   const s = clientTierStyle(tier)
   return (
-    <span className="inline-flex px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-[0.1em] border" style={{ color: s.color, background: s.bg, borderColor: s.border }}>
+    <span className="inline-flex px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-widest border" style={{ color: s.color, background: s.bg, borderColor: s.border }}>
       {s.label}
     </span>
   )
@@ -220,7 +220,7 @@ export default function ClientsPage() {
                     <span className="text-[10px] truncate" style={{ color: 'var(--cp-text-faint)' }}>{client.email}</span>
                   </div>
                   <div className="col-span-2">
-                    <span className={`inline-flex px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-[0.1em] border ${statusStyle(client.status)}`}>{client.status || 'New'}</span>
+                    <span className={`inline-flex px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-widest border ${statusStyle(client.status)}`}>{client.status || 'New'}</span>
                   </div>
                   <div className="col-span-2">
                     {isFounder ? (
@@ -258,7 +258,7 @@ export default function ClientsPage() {
                 </div>
                 <div>
                   <h2 className="text-[16px] font-bold" style={{ color: 'var(--cp-text)' }}>{selectedClient.company}</h2>
-                  <span className={`inline-flex px-2 py-0.5 rounded-md text-[8px] font-bold uppercase tracking-[0.1em] border mt-0.5 ${statusStyle(selectedClient.status)}`}>{selectedClient.status || 'New'}</span>
+                  <span className={`inline-flex px-2 py-0.5 rounded-md text-[8px] font-bold uppercase tracking-widest border mt-0.5 ${statusStyle(selectedClient.status)}`}>{selectedClient.status || 'New'}</span>
                 </div>
               </div>
               <button onClick={() => setSelectedClient(null)} className="p-1.5 rounded-lg transition-colors hover:bg-(--cp-bg-soft) hover:text-(--cp-text)" style={{ color: 'var(--cp-text-faint)' }}>
@@ -334,7 +334,7 @@ export default function ClientsPage() {
                     {documents.map((d) => (
                       <div key={d.id} className="flex items-center justify-between gap-2 text-[12px]">
                         <span className="truncate" style={{ color: 'var(--cp-text-secondary)' }}>{d.title}</span>
-                        <span className="shrink-0 px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-[0.1em] border bg-(--cp-bg-soft) text-(--cp-text-muted) border-(--cp-border)">{d.type || 'File'}</span>
+                        <span className="shrink-0 px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-widest border bg-(--cp-bg-soft) text-(--cp-text-muted) border-(--cp-border)">{d.type || 'File'}</span>
                       </div>
                     ))}
                   </div>
@@ -381,7 +381,7 @@ export default function ClientsPage() {
                           <p className="truncate" style={{ color: 'var(--cp-text-secondary)' }}>{m.title}</p>
                           <p className="text-[10px] mt-0.5" style={{ color: 'var(--cp-text-faint)' }}>{m.meeting_date ? new Date(m.meeting_date).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' }) : '-'}{m.meeting_time ? ` · ${m.meeting_time}` : ''}</p>
                         </div>
-                        <span className={`shrink-0 px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-[0.1em] border ${m.type === 'past' ? 'bg-(--cp-bg-soft) text-(--cp-text-faint) border-(--cp-border)' : 'bg-(--cp-cyan-soft) text-(--cp-cyan) border-(--cp-cyan-border)'}`}>{m.type === 'past' ? 'Past' : 'Upcoming'}</span>
+                        <span className={`shrink-0 px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-widest border ${m.type === 'past' ? 'bg-(--cp-bg-soft) text-(--cp-text-faint) border-(--cp-border)' : 'bg-(--cp-cyan-soft) text-(--cp-cyan) border-(--cp-cyan-border)'}`}>{m.type === 'past' ? 'Past' : 'Upcoming'}</span>
                       </div>
                     ))}
                   </div>

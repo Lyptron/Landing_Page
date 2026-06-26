@@ -337,6 +337,7 @@ export default function Process() {
           y: glowY,
           background: 'radial-gradient(ellipse at center, rgba(255,250,235,0.02) 0%, transparent 70%)',
           top: '20%',
+          willChange: 'transform',
         }}
       />
 

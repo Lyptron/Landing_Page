@@ -190,7 +190,7 @@ export default function CTA() {
           transition={{ duration: 1.2, delay: 0.2, ease: EASE }}
         >
           {/* Top sheen */}
-          <div className="absolute inset-0 bg-gradient-to-b from-white/[0.012] to-transparent pointer-events-none rounded-[inherit]" />
+          <div className="absolute inset-0 bg-linear-to-b from-white/[0.012] to-transparent pointer-events-none rounded-[inherit]" />
 
           <div className="relative z-10 mb-6">
             <motion.h3
@@ -223,7 +223,7 @@ export default function CTA() {
                 animate={formInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.5, delay: 0.5, ease: EASE }}
               >
-                <label htmlFor="cta-first-name" className="font-mono text-[10px] text-white/25 tracking-[0.1em] uppercase">First Name</label>
+                <label htmlFor="cta-first-name" className="font-mono text-[10px] text-white/25 tracking-widest uppercase">First Name</label>
                 <input
                   id="cta-first-name"
                   name="firstName"
@@ -242,7 +242,7 @@ export default function CTA() {
                 animate={formInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.5, delay: 0.55, ease: EASE }}
               >
-                <label htmlFor="cta-last-name" className="font-mono text-[10px] text-white/25 tracking-[0.1em] uppercase">Last Name</label>
+                <label htmlFor="cta-last-name" className="font-mono text-[10px] text-white/25 tracking-widest uppercase">Last Name</label>
                 <input
                   id="cta-last-name"
                   name="lastName"
@@ -263,7 +263,7 @@ export default function CTA() {
               animate={formInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.5, delay: 0.6, ease: EASE }}
             >
-              <label htmlFor="cta-email" className="font-mono text-[10px] text-white/25 tracking-[0.1em] uppercase">Email</label>
+              <label htmlFor="cta-email" className="font-mono text-[10px] text-white/25 tracking-widest uppercase">Email</label>
               <input
                 id="cta-email"
                 name="email"
@@ -275,7 +275,6 @@ export default function CTA() {
                 value={formData.email}
                 onChange={e => setFormData({ ...formData, email: e.target.value })}
                 className="w-full bg-white/[0.025] border border-white/[0.06] rounded-lg px-4 py-3 text-sm text-white/80 placeholder:text-white/15 focus:outline-none focus:border-white/15 transition-colors"
-                suppressHydrationWarning
               />
             </motion.div>
 
@@ -285,7 +284,7 @@ export default function CTA() {
               animate={formInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.5, delay: 0.65, ease: EASE }}
             >
-              <label htmlFor="cta-project-type" className="font-mono text-[10px] text-white/25 tracking-[0.1em] uppercase">What are you building?</label>
+              <label htmlFor="cta-project-type" className="font-mono text-[10px] text-white/25 tracking-widest uppercase">What are you building?</label>
               <div className="relative">
                 <select
                   id="cta-project-type"
@@ -317,7 +316,7 @@ export default function CTA() {
               animate={formInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.5, delay: 0.7, ease: EASE }}
             >
-              <label htmlFor="cta-description" className="font-mono text-[10px] text-white/25 tracking-[0.1em] uppercase">Tell us more <span className="text-white/12">(optional)</span></label>
+              <label htmlFor="cta-description" className="font-mono text-[10px] text-white/25 tracking-widest uppercase">Tell us more <span className="text-white/12">(optional)</span></label>
               <textarea
                 id="cta-description"
                 name="description"

@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Image as ImageIcon, X, ImageOff } from 'lucide-react'
+import Image from 'next/image'
 import { fetchGallery } from '@/lib/db'
 import { PageHeader, EmptyState, Loading } from '@/components/portal/PortalUI'
 import { useClientPortalProject } from '@/hooks/useClientPortalProject'
@@ -65,7 +66,14 @@ export default function ClientGalleryPage() {
                       style={{ background: 'var(--cp-surface)' }}
                     >
                       {(img.image_url || img.url) ? (
-                        <img src={img.image_url || img.url} alt={img.title} className="w-full h-full object-cover" />
+                        <Image
+                          src={img.image_url || img.url}
+                          alt={img.title}
+                          fill
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                          className="object-cover"
+                          loading="lazy"
+                        />
                       ) : (
                         <div className="absolute inset-0 flex items-center justify-center">
                           <ImageIcon className="w-6 h-6" style={{ color: 'var(--cp-text-faint)' }} />
@@ -94,7 +102,7 @@ export default function ClientGalleryPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex flex-col"
+            className="fixed inset-0 z-100 flex flex-col"
             style={{ background: 'rgba(5,9,16,0.92)', backdropFilter: 'blur(6px)' }}
           >
             <div className="flex items-center justify-between p-5">
@@ -116,7 +124,14 @@ export default function ClientGalleryPage() {
                 style={{ background: 'var(--cp-surface)' }}
               >
                 {selectedImage.url ? (
-                  <img src={selectedImage.url} alt={selectedImage.title} className="w-full h-full object-contain" />
+                  <Image
+                    src={selectedImage.url}
+                    alt={selectedImage.title}
+                    fill
+                    sizes="(max-width: 1200px) 100vw, 1024px"
+                    className="object-contain"
+                    priority
+                  />
                 ) : (
                   <ImageIcon className="w-20 h-20" style={{ color: 'var(--cp-text-faint)' }} />
                 )}

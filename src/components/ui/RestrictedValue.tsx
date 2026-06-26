@@ -39,7 +39,7 @@ export default function RestrictedValue({ value, format = 'currency', currency =
       <Tooltip.Root>
         <Tooltip.Trigger asChild>
           <span
-            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-[0.1em] cursor-default ${className}`}
+            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-widest cursor-default ${className}`}
             style={{ background: 'var(--cp-bg-soft, #F4F4F5)', border: '1px solid var(--cp-border-soft, rgba(0,0,0,0.05))', color: 'var(--cp-text-faint, rgba(24,24,27,0.30))' }}
           >
             <Lock className="w-2.5 h-2.5" /> Restricted
@@ -49,7 +49,7 @@ export default function RestrictedValue({ value, format = 'currency', currency =
           <Tooltip.Content
             side="top"
             sideOffset={6}
-            className="px-2.5 py-1.5 rounded-lg text-[11px] font-medium z-[200]"
+            className="px-2.5 py-1.5 rounded-lg text-[11px] font-medium z-200"
             style={{ background: 'var(--cp-text)', color: 'var(--cp-bg)' }}
           >
             Founder access only

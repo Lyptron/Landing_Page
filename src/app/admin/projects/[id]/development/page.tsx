@@ -75,7 +75,7 @@ export default function ProjectDevelopmentPage() {
                 <span className={`w-2 h-2 rounded-full shrink-0 ${d.status === 'success' ? 'bg-(--cp-emerald)' : d.status === 'failed' ? 'bg-(--cp-red)' : 'bg-(--cp-cyan) animate-pulse'}`} />
                 <div>
                   <span className="text-[13px] block font-semibold text-(--cp-text)">{d.environment}{d.version && ` v${d.version}`}</span>
-                  {d.url && <a href={d.url} target="_blank" rel="noreferrer" className="text-[10.5px] text-(--cp-cyan) hover:underline truncate block max-w-50">{d.url}</a>}
+                  {d.url && <a href={d.url} target="_blank" rel="noopener noreferrer" className="text-[10.5px] text-(--cp-cyan) hover:underline truncate block max-w-50">{d.url}</a>}
                 </div>
               </div>
               <div className="flex items-center gap-2 shrink-0">

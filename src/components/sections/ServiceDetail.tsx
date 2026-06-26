@@ -63,7 +63,7 @@ export default function ServiceDetail({ service, onClose }: ServiceDetailProps) 
     <>
       {/* Backdrop */}
       <motion.div
-        className="fixed inset-0 z-[100] bg-black/70 backdrop-blur-[8px]"
+        className="fixed inset-0 z-100 bg-black/70 backdrop-blur-[8px]"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -72,7 +72,7 @@ export default function ServiceDetail({ service, onClose }: ServiceDetailProps) 
       />
 
       {/* Modal */}
-      <div className="fixed inset-0 z-[101] flex items-center justify-center p-4 md:p-6 overflow-hidden pointer-events-none">
+      <div className="fixed inset-0 z-101 flex items-center justify-center p-4 md:p-6 overflow-hidden pointer-events-none">
         <motion.div
           ref={dialogRef}
           role="dialog"

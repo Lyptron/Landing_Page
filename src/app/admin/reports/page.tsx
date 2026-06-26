@@ -152,7 +152,7 @@ function ReportTable({ headers, rows, onExport }: { headers: string[]; rows: Rea
 
 function Pill({ label, color, bg, border }: { label: string; color: string; bg: string; border: string }) {
   return (
-    <span className="px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-[0.1em] border" style={{ color, background: bg, borderColor: border }}>
+    <span className="px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-widest border" style={{ color, background: bg, borderColor: border }}>
       {label}
     </span>
   )

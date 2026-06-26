@@ -368,7 +368,7 @@ export default function AdminDashboard() {
                   <select
                     value={proj.status}
                     onChange={(e) => updateStatusHandler(proj.id, e.target.value)}
-                    className="px-3 py-1 rounded-lg text-[10px] uppercase tracking-[0.1em] font-semibold outline-none cursor-pointer [&>option]:bg-(--cp-bg-elevated) [&>option]:text-(--cp-text)"
+                    className="px-3 py-1 rounded-lg text-[10px] uppercase tracking-widest font-semibold outline-none cursor-pointer [&>option]:bg-(--cp-bg-elevated) [&>option]:text-(--cp-text)"
                     style={{
                       background:
                         proj.status === 'in-progress'

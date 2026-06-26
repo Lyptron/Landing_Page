@@ -22,9 +22,9 @@ export default function Footer() {
   return (
     <footer
       role="contentinfo"
-      className="w-full py-8 border-t border-white/[0.04] bg-[#050505] text-white/20 font-mono text-xs select-none z-10 relative"
+      className="w-full py-8 border-t border-white/4 bg-bg text-white/20 font-mono text-xs select-none z-10 relative"
     >
-      <div className="w-full px-6 md:px-[120px] flex flex-col md:flex-row items-center justify-between gap-4">
+      <div className="w-full px-6 md:px-30 flex flex-col md:flex-row items-center justify-between gap-4">
         <div className="tracking-wider uppercase">
           &copy; {new Date().getFullYear()} Lyptron. All rights reserved.
         </div>
