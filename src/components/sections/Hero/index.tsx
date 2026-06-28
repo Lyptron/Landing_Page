@@ -97,9 +97,11 @@ export default function Hero() {
   const glowRef = useRef<HTMLDivElement>(null)
   const [storyStep, setStoryStep] = useState(0)
 
+  // Timeline compressed from 2400/4800ms — the real H1 (LCP element) was
+  // staying invisible for ~4.8s while these timers ran, which tanked LCP.
   useEffect(() => {
-    const timer1 = setTimeout(() => setStoryStep(1), 2400)
-    const timer2 = setTimeout(() => setStoryStep(2), 4800)
+    const timer1 = setTimeout(() => setStoryStep(1), 500)
+    const timer2 = setTimeout(() => setStoryStep(2), 1100)
     return () => { clearTimeout(timer1); clearTimeout(timer2) }
   }, [])
 

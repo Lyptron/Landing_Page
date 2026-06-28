@@ -23,9 +23,22 @@ export default function Team() {
   const cooldownTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const { setCursorState } = useCursor()
 
-  // Marquee tripling — frozen reference so React doesn't recreate the
-  // array (and thus the DOM nodes) every render.
-  const tripled = useMemo(() => [...team, ...team, ...team], [])
+  // The 2 extra clone sets only exist to wrap the desktop infinite marquee
+  // (setupMarquee bails under 768px). Mobile gets the real list only, which
+  // cuts ~12 cards x ~10 nested divs each off the DOM for most visitors.
+  const [isDesktop, setIsDesktop] = useState(false)
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 768px)')
+    setIsDesktop(mq.matches)
+    const onChange = () => setIsDesktop(mq.matches)
+    mq.addEventListener('change', onChange)
+    return () => mq.removeEventListener('change', onChange)
+  }, [])
+
+  const tripled = useMemo(
+    () => (isDesktop ? [...team, ...team, ...team] : team),
+    [isDesktop]
+  )
 
   const handleCardClick = useCallback((member: TeamMember) => {
     if (clickCooldown.current) return
