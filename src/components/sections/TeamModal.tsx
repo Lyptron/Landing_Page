@@ -55,7 +55,7 @@ export default function TeamModal({ member, onClose }: TeamModalProps) {
       {/* Backdrop */}
       <m.div
         key="backdrop"
-        className="fixed inset-0 z-100 bg-black/70 backdrop-blur-[12px]"
+        className="fixed inset-0 z-100 bg-black/70 backdrop-blur-md"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -72,7 +72,7 @@ export default function TeamModal({ member, onClose }: TeamModalProps) {
           aria-modal="true"
           aria-labelledby={titleId}
           tabIndex={-1}
-          className="pointer-events-auto w-full max-w-[900px] overflow-hidden flex flex-col md:flex-row h-auto md:h-[560px] rounded-[16px] relative cursor-none focus:outline-none"
+          className="pointer-events-auto w-full max-w-225 overflow-hidden flex flex-col md:flex-row h-auto md:h-140 rounded-2xl relative cursor-none focus:outline-none"
           style={{
             background: 'linear-gradient(160deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)',
             border: '1px solid rgba(255,255,255,0.07)',
@@ -85,7 +85,7 @@ export default function TeamModal({ member, onClose }: TeamModalProps) {
           onMouseEnter={() => setCursorState('default')}
         >
           {/* Left — Portrait */}
-          <div className="w-full md:w-[40%] h-[260px] md:h-full relative shrink-0 bg-[#0a0a0c]">
+          <div className="w-full md:w-[40%] h-65 md:h-full relative shrink-0 bg-[#0a0a0c]">
             {member.image ? (
               <Image 
                 src={member.image} 
@@ -96,7 +96,7 @@ export default function TeamModal({ member, onClose }: TeamModalProps) {
               />
             ) : (
               <div className="absolute inset-0 flex items-center justify-center">
-                <span className="font-display font-bold text-[100px] text-white/[0.04] tracking-tight">{member.initials}</span>
+                <span className="font-display font-bold text-[100px] text-white/4 tracking-tight">{member.initials}</span>
               </div>
             )}
             {/* Grid texture */}
@@ -116,7 +116,7 @@ export default function TeamModal({ member, onClose }: TeamModalProps) {
               type="button"
               onClick={onClose}
               aria-label={`Close ${member.name} profile`}
-              className="absolute top-5 right-5 w-9 h-9 rounded-full flex items-center justify-center bg-white/[0.02] hover:bg-white/[0.05] border border-white/[0.06] hover:border-white/[0.12] transition-all duration-300 group z-10 cursor-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/40"
+              className="absolute top-5 right-5 w-9 h-9 rounded-full flex items-center justify-center bg-white/2 hover:bg-white/5 border border-white/6 hover:border-white/12 transition-all duration-300 group z-10 cursor-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/40"
               onMouseEnter={() => setCursorState('cta')}
               onMouseLeave={() => setCursorState('default')}
             >
@@ -157,7 +157,7 @@ export default function TeamModal({ member, onClose }: TeamModalProps) {
               className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6"
             >
               <div>
-                <span className="font-mono text-[10px] tracking-[0.15em] uppercase text-white/25 mb-4 block border-b border-white/[0.05] pb-2">
+                <span className="font-mono text-[10px] tracking-[0.15em] uppercase text-white/25 mb-4 block border-b border-white/5 pb-2">
                   Core Disciplines
                 </span>
                 <ul className="flex flex-col gap-3">
@@ -171,7 +171,7 @@ export default function TeamModal({ member, onClose }: TeamModalProps) {
               </div>
 
               <div>
-                <span className="font-mono text-[10px] tracking-[0.15em] uppercase text-white/25 mb-4 block border-b border-white/[0.05] pb-2">
+                <span className="font-mono text-[10px] tracking-[0.15em] uppercase text-white/25 mb-4 block border-b border-white/5 pb-2">
                   Specializations
                 </span>
                 <ul className="flex flex-col gap-3">

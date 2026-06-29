@@ -40,7 +40,7 @@ export default function NotFound() {
         <div className="flex flex-wrap items-center justify-center gap-3 mt-2">
           <Link
             href="/"
-            className="px-6 py-3 rounded-lg font-body font-medium text-[13px] text-[#050505] transition-colors"
+            className="px-6 py-3 rounded-lg font-body font-medium text-[13px] text-bg transition-colors"
             style={{ background: '#c0a060' }}
           >
             Back to home

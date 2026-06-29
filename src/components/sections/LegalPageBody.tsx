@@ -17,7 +17,7 @@ export default function LegalPageBody({ title, lastUpdated, intro, sections }: L
   return (
     <>
       <main className="relative w-full bg-bg text-white pt-32 md:pt-44 pb-24">
-        <div className="w-full max-w-[760px] mx-auto px-6 md:px-12">
+        <div className="w-full max-w-190 mx-auto px-6 md:px-12">
           <nav aria-label="Breadcrumb" className="mb-8">
             <ol className="flex items-center gap-2 font-mono text-[11px] text-white/30 uppercase tracking-wider">
               <li><Link href="/" className="hover:text-white/60 transition-colors">Home</Link></li>
@@ -45,7 +45,7 @@ export default function LegalPageBody({ title, lastUpdated, intro, sections }: L
           <div className="flex flex-col gap-10">
             {sections.map((section) => (
               <section key={section.heading}>
-                <h2 className="font-display font-semibold text-[20px] text-white/80 mb-4 border-b border-white/[0.06] pb-3">
+                <h2 className="font-display font-semibold text-[20px] text-white/80 mb-4 border-b border-white/6 pb-3">
                   {section.heading}
                 </h2>
                 <div className="flex flex-col gap-3">

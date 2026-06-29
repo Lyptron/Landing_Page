@@ -1,13 +1,7 @@
 'use client'
 import { useRef, useEffect } from 'react'
-import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { Check, ArrowRight, Sparkles } from 'lucide-react'
 import { useCursor } from '../providers/CursorProvider'
-
-if (typeof window !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger)
-}
 
 const BOOKING_EMAIL = 'hello@lyptron.com'
 const bookCall = (subject: string) => {
@@ -55,26 +49,36 @@ export default function Pricing() {
   useEffect(() => {
     const el = sectionRef.current
     if (!el) return
+    let cancelled = false
+    let ctx: { revert: () => void } | null = null
 
-    const ctx = gsap.context(() => {
-      ScrollTrigger.create({
-        trigger: el,
-        start: 'top 75%',
-        once: true,
-        onEnter: () => {
-          gsap.fromTo('.pricing-header > *',
-            { opacity: 0, y: 24, filter: 'blur(8px)' },
-            { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.8, stagger: 0.1, ease: 'power3.out' }
-          )
-          gsap.fromTo('.pricing-card',
-            { opacity: 0, y: 80, rotationX: 6, filter: 'blur(8px)', transformPerspective: 800 },
-            { opacity: 1, y: 0, rotationX: 0, filter: 'blur(0px)', duration: 1, stagger: 0.15, ease: 'power3.out', delay: 0.25 }
-          )
-        }
-      })
-    }, el)
+    Promise.all([import('gsap'), import('gsap/ScrollTrigger')]).then(([{ gsap }, { ScrollTrigger }]) => {
+      if (cancelled) return
+      gsap.registerPlugin(ScrollTrigger)
 
-    return () => ctx.revert()
+      ctx = gsap.context(() => {
+        ScrollTrigger.create({
+          trigger: el,
+          start: 'top 75%',
+          once: true,
+          onEnter: () => {
+            gsap.fromTo('.pricing-header > *',
+              { opacity: 0, y: 24, filter: 'blur(8px)' },
+              { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.8, stagger: 0.1, ease: 'power3.out' }
+            )
+            gsap.fromTo('.pricing-card',
+              { opacity: 0, y: 80, rotationX: 6, filter: 'blur(8px)', transformPerspective: 800 },
+              { opacity: 1, y: 0, rotationX: 0, filter: 'blur(0px)', duration: 1, stagger: 0.15, ease: 'power3.out', delay: 0.25 }
+            )
+          }
+        })
+      }, el)
+    })
+
+    return () => {
+      cancelled = true
+      ctx?.revert()
+    }
   }, [])
 
   return (
@@ -99,7 +103,7 @@ export default function Pricing() {
       {/* Noise grain */}
       <div className="absolute inset-0 opacity-[0.018] pointer-events-none" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.75%22 numOctaves=%224%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")' }} />
 
-      <div className="relative z-10 w-full px-6 md:px-12 lg:px-[120px]">
+      <div className="relative z-10 w-full px-6 md:px-12 lg:px-30">
 
         {/* Header */}
         <div className="pricing-header flex flex-col items-center text-center gap-5 mb-16 md:mb-20">
@@ -109,7 +113,7 @@ export default function Pricing() {
             Simple, honest pricing
           </h2>
 
-          <p className="font-body text-[15px] md:text-[17px] text-white/35 max-w-[560px] leading-[1.7] mt-1">
+          <p className="font-body text-[15px] md:text-[17px] text-white/35 max-w-140 leading-[1.7] mt-1">
             No hidden fees, no surprise invoices. You know exactly what you&apos;re paying for before we write a single line of code. Every project starts with a free scoping call.
           </p>
         </div>
@@ -119,7 +123,7 @@ export default function Pricing() {
           {PRICING_TIERS.map((tier, idx) => (
             <div
               key={idx}
-              className={`pricing-card group relative overflow-hidden transition-all duration-500 shrink-0 snap-center w-[82vw] sm:w-[340px] lg:w-auto ${tier.popular ? 'lg:-mt-3 lg:mb-[-12px]' : ''}`}
+              className={`pricing-card group relative overflow-hidden transition-all duration-500 shrink-0 snap-center w-[82vw] sm:w-85 lg:w-auto ${tier.popular ? 'lg:-mt-3 lg:-mb-3' : ''}`}
               style={{
                 background: `linear-gradient(160deg, ${tier.glow} 0%, rgba(255,255,255,0.008) 100%)`,
                 border: `1px solid ${tier.popular ? `${tier.accent}25` : 'rgba(255,255,255,0.05)'}`,
@@ -137,7 +141,7 @@ export default function Pricing() {
               {/* Popular badge */}
               {tier.popular && (
                 <div
-                  className="absolute top-0 left-0 right-0 h-[2px]"
+                  className="absolute top-0 left-0 right-0 h-0.5"
                   style={{ background: `linear-gradient(90deg, transparent, ${tier.accent}, transparent)` }}
                 />
               )}
@@ -162,7 +166,7 @@ export default function Pricing() {
                   </p>
                 </div>
 
-                <div className="mb-8 pb-7 border-b border-white/[0.05]">
+                <div className="mb-8 pb-7 border-b border-white/5">
                   <span className="font-mono text-[10px] text-white/25 uppercase tracking-wider block mb-2">
                     {tier.suffix}
                   </span>
@@ -202,7 +206,7 @@ export default function Pricing() {
                   <button
                     type="button"
                     onClick={() => bookCall(`Book a free call — ${tier.name}`)}
-                    className="group/btn w-full flex items-center justify-center gap-2 py-3 rounded-lg font-body font-medium text-[13px] transition-all duration-300 cursor-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/40"
+                    className="group/btn w-full flex items-center justify-center gap-2 py-3 rounded-lg font-body font-medium text-[13px] transition-all duration-300 cursor-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/40"
                     style={{
                       background: tier.popular ? tier.accent : 'rgba(255,255,255,0.04)',
                       color: tier.popular ? '#050505' : 'rgba(255,255,255,0.5)',
@@ -259,7 +263,7 @@ export default function Pricing() {
             <button
               type="button"
               onClick={() => bookCall('Custom project — let\'s talk scope')}
-              className="group/btn shrink-0 flex items-center gap-2.5 px-7 py-3.5 rounded-lg font-body font-medium text-[13px] text-white/70 transition-all duration-300 cursor-none hover:text-white hover:bg-white/[0.06] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/40"
+              className="group/btn shrink-0 flex items-center gap-2.5 px-7 py-3.5 rounded-lg font-body font-medium text-[13px] text-white/70 transition-all duration-300 cursor-none hover:text-white hover:bg-white/6 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/40"
               style={{ border: '1px solid rgba(255,255,255,0.08)' }}
               onMouseEnter={() => setCursorState('hover')}
               onMouseLeave={() => setCursorState('default')}

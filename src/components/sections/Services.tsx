@@ -39,7 +39,7 @@ export default function Services() {
       {/* Section intro */}
       <div
         ref={headerRef}
-        className="relative z-10 w-full px-6 md:px-12 lg:px-[120px] pt-32 md:pt-40 pb-12 md:pb-16"
+        className="relative z-10 w-full px-6 md:px-12 lg:px-30 pt-32 md:pt-40 pb-12 md:pb-16"
       >
         <m.div
           className="h-px w-full mb-10 origin-left"
@@ -60,7 +60,7 @@ export default function Services() {
           </m.span>
 
           <m.h2
-            className="font-display font-bold text-[clamp(28px,5vw,68px)] leading-[0.97] tracking-[-0.04em] max-w-[800px]"
+            className="font-display font-bold text-[clamp(28px,5vw,68px)] leading-[0.97] tracking-[-0.04em] max-w-200"
             initial={{ opacity: 0, filter: 'blur(12px)', y: 10 }}
             animate={headerInView ? { opacity: 1, filter: 'blur(0px)', y: 0 } : {}}
             transition={{ duration: 1.4, delay: 0.3, ease: EASE }}
@@ -69,7 +69,7 @@ export default function Services() {
           </m.h2>
 
           <m.p
-            className="font-body text-[15px] md:text-[17px] text-white/30 max-w-[520px] leading-[1.7]"
+            className="font-body text-[15px] md:text-[17px] text-white/30 max-w-130 leading-[1.7]"
             initial={{ opacity: 0, y: 16 }}
             animate={headerInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.5, ease: EASE }}
@@ -92,8 +92,8 @@ export default function Services() {
       </div>
 
       {/* Bottom stats bar */}
-      <div className="relative z-10 w-full px-6 md:px-12 lg:px-[120px] py-12 md:py-20">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-8 pt-8 border-t border-white/[0.06]">
+      <div className="relative z-10 w-full px-6 md:px-12 lg:px-30 py-12 md:py-20">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-8 pt-8 border-t border-white/6">
           <div className="flex flex-wrap justify-center sm:justify-start gap-6 sm:gap-10 md:gap-16">
             {[
               { label: 'Shipped', value: '50+' },

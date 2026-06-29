@@ -17,7 +17,7 @@ export default function ServicePageBody({ service, faqs }: ServicePageBodyProps)
   return (
     <>
       <main className="relative w-full bg-bg text-white pt-32 md:pt-44 pb-24">
-        <div className="w-full max-w-[1100px] mx-auto px-6 md:px-12">
+        <div className="w-full max-w-275 mx-auto px-6 md:px-12">
           {/* Breadcrumb */}
           <nav aria-label="Breadcrumb" className="mb-8">
             <ol className="flex items-center gap-2 font-mono text-[11px] text-white/30 uppercase tracking-wider">
@@ -28,7 +28,7 @@ export default function ServicePageBody({ service, faqs }: ServicePageBodyProps)
           </nav>
 
           {/* Hero */}
-          <header className="mb-16 max-w-[760px]">
+          <header className="mb-16 max-w-190">
             <span className="font-mono text-[11px] tracking-[0.25em] uppercase text-white/50 block mb-6">
               {service.tagline}
             </span>
@@ -42,7 +42,7 @@ export default function ServicePageBody({ service, faqs }: ServicePageBodyProps)
 
           {/* What's included */}
           <section className="mb-16">
-            <h2 className="font-display font-semibold text-[22px] text-white/80 mb-6 border-b border-white/[0.06] pb-4">
+            <h2 className="font-display font-semibold text-[22px] text-white/80 mb-6 border-b border-white/6 pb-4">
               What&apos;s included
             </h2>
             <ul className="flex flex-col gap-5">
@@ -57,7 +57,7 @@ export default function ServicePageBody({ service, faqs }: ServicePageBodyProps)
 
           {/* Results */}
           <section className="mb-16">
-            <h2 className="font-display font-semibold text-[22px] text-white/80 mb-6 border-b border-white/[0.06] pb-4">
+            <h2 className="font-display font-semibold text-[22px] text-white/80 mb-6 border-b border-white/6 pb-4">
               Recent results
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -80,12 +80,12 @@ export default function ServicePageBody({ service, faqs }: ServicePageBodyProps)
 
           {/* For you */}
           <section className="mb-16">
-            <h2 className="font-display font-semibold text-[22px] text-white/80 mb-6 border-b border-white/[0.06] pb-4">
+            <h2 className="font-display font-semibold text-[22px] text-white/80 mb-6 border-b border-white/6 pb-4">
               This is for you if you need
             </h2>
             <ul className="flex flex-col gap-3">
               {service.forYou.map((item) => (
-                <li key={item} className="font-body text-[15px] text-white/45 leading-relaxed pl-5 border-l border-white/[0.08]">
+                <li key={item} className="font-body text-[15px] text-white/45 leading-relaxed pl-5 border-l border-white/8">
                   {item}
                 </li>
               ))}
@@ -94,14 +94,14 @@ export default function ServicePageBody({ service, faqs }: ServicePageBodyProps)
 
           {/* Stack */}
           <section className="mb-16">
-            <h2 className="font-display font-semibold text-[22px] text-white/80 mb-6 border-b border-white/[0.06] pb-4">
+            <h2 className="font-display font-semibold text-[22px] text-white/80 mb-6 border-b border-white/6 pb-4">
               Tech stack
             </h2>
             <div className="flex flex-wrap gap-2">
               {service.stack.map((item) => (
                 <span
                   key={item}
-                  className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02] font-mono text-[11px] text-white/45 tracking-wider uppercase"
+                  className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-white/8 bg-white/2 font-mono text-[11px] text-white/45 tracking-wider uppercase"
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-white/25" />
                   {item}
@@ -112,7 +112,7 @@ export default function ServicePageBody({ service, faqs }: ServicePageBodyProps)
 
           {/* FAQ */}
           <section className="mb-16">
-            <h2 className="font-display font-semibold text-[22px] text-white/80 mb-6 border-b border-white/[0.06] pb-4">
+            <h2 className="font-display font-semibold text-[22px] text-white/80 mb-6 border-b border-white/6 pb-4">
               Frequently asked questions
             </h2>
             <div className="flex flex-col gap-6">
@@ -136,7 +136,7 @@ export default function ServicePageBody({ service, faqs }: ServicePageBodyProps)
             </div>
             <Link
               href="/#cta"
-              className="inline-flex items-center justify-center px-7 py-3 rounded-full bg-white text-[#050505] font-semibold text-[13px] tracking-[0.02em] hover:bg-white/90 transition-colors shrink-0"
+              className="inline-flex items-center justify-center px-7 py-3 rounded-full bg-white text-bg font-semibold text-[13px] tracking-[0.02em] hover:bg-white/90 transition-colors shrink-0"
             >
               Book a Free Call
             </Link>

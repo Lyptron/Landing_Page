@@ -54,7 +54,7 @@ function OutcomeCard({ work, delay, setCursorState }: { work: Service['works'][0
   return (
     <m.div
       ref={ref}
-      className="group/work relative flex flex-col gap-3 py-4 border-b border-white/[0.04] last:border-0 hover:bg-white/[0.015] -mx-6 px-6 rounded-lg transition-colors duration-300 cursor-none"
+      className="group/work relative flex flex-col gap-3 py-4 border-b border-white/4 last:border-0 hover:bg-white/1.5 -mx-6 px-6 rounded-lg transition-colors duration-300 cursor-none"
       initial={{ opacity: 0, rotateY: 8, filter: 'blur(4px)' }}
       animate={inView ? { opacity: 1, rotateY: 0, filter: 'blur(0px)' } : {}}
       transition={{ duration: 0.8, delay, ease: EASE }}
@@ -64,13 +64,13 @@ function OutcomeCard({ work, delay, setCursorState }: { work: Service['works'][0
     >
       <div className="flex items-center justify-between">
         <h4 className="font-display font-semibold text-[16px] text-white/70 group-hover/work:text-white/90 transition-colors">{work.name}</h4>
-        <span className="font-mono text-[9px] text-white/25 uppercase tracking-widest px-2 py-0.5 border border-white/[0.06] rounded-full group-hover/work:border-white/[0.12] transition-colors">
+        <span className="font-mono text-[9px] text-white/25 uppercase tracking-widest px-2 py-0.5 border border-white/6 rounded-full group-hover/work:border-white/12 transition-colors">
           {work.badge}
         </span>
       </div>
       <p className="font-body text-[14px] text-white/25 leading-relaxed">{work.desc}</p>
       <div className="flex items-center gap-2 mt-2">
-        <div className="h-px w-6 bg-white/[0.08] group-hover/work:w-10 transition-all duration-500" />
+        <div className="h-px w-6 bg-white/8 group-hover/work:w-10 transition-all duration-500" />
         <span className="font-mono text-[10px] font-medium tracking-widest uppercase text-white/50">{work.result}</span>
       </div>
     </m.div>
@@ -106,7 +106,7 @@ export default function ServiceCard({ service, index, onDetailClick }: ServiceCa
   return (
     <div
       ref={wrapperRef}
-      className="md:sticky md:top-0 w-[85vw] sm:w-[360px] md:w-full shrink-0 snap-center min-h-fit md:min-h-[70vh] flex items-center justify-center overflow-hidden py-8 md:py-16 rounded-2xl md:rounded-none border border-white/[0.04] md:border-none bg-surface/30 md:bg-transparent"
+      className="md:sticky md:top-0 w-[85vw] sm:w-90 md:w-full shrink-0 snap-center min-h-fit md:min-h-[70vh] flex items-center justify-center overflow-hidden py-8 md:py-16 rounded-2xl md:rounded-none border border-white/4 md:border-none bg-surface/30 md:bg-transparent"
       style={{
         backgroundColor: '#050505',
         borderTop: isMobile ? 'none' : '1px solid rgba(255,255,255,0.04)',
@@ -134,7 +134,7 @@ export default function ServiceCard({ service, index, onDetailClick }: ServiceCa
 
       {/* Background Phase Number — counter-scrolls for depth */}
       <m.div
-        className="absolute -right-[5%] top-1/2 font-display font-bold pointer-events-none select-none"
+        className="absolute right-[-5%] top-1/2 font-display font-bold pointer-events-none select-none"
         style={{ fontSize: '30vw', opacity: 0.015, color: 'white', lineHeight: 0.8, y: bgNumberY, translateY: '-50%', willChange: 'transform' }}
       >
         0{service.number}
@@ -146,7 +146,7 @@ export default function ServiceCard({ service, index, onDetailClick }: ServiceCa
       >
         <div
           ref={titleRef}
-          className="w-full px-6 md:px-12 lg:px-[120px] relative"
+          className="w-full px-6 md:px-12 lg:px-30 relative"
         >
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 xl:gap-24 relative">
 
@@ -162,7 +162,7 @@ export default function ServiceCard({ service, index, onDetailClick }: ServiceCa
                   Phase {service.number}
                 </span>
                 <m.div
-                  className="h-[1px] w-12 origin-left bg-white/10"
+                  className="h-px w-12 origin-left bg-white/10"
                   initial={{ scaleX: 0 }}
                   animate={titleInView ? { scaleX: 1 } : {}}
                   transition={{ duration: 0.8, delay: 0.3, ease: EASE }}
@@ -175,7 +175,7 @@ export default function ServiceCard({ service, index, onDetailClick }: ServiceCa
                 animate={titleInView ? { opacity: 1, filter: 'blur(0px)', y: 0 } : {}}
                 transition={{ duration: 1.2, delay: 0.2, ease: EASE }}
               >
-                <h3 className="font-display font-bold text-[clamp(28px,3.5vw,48px)] text-white/90 tracking-[-0.03em] leading-[1]">
+                <h3 className="font-display font-bold text-[clamp(28px,3.5vw,48px)] text-white/90 tracking-[-0.03em] leading-none">
                   {service.name}
                 </h3>
               </m.div>
@@ -202,7 +202,7 @@ export default function ServiceCard({ service, index, onDetailClick }: ServiceCa
                   onMouseLeave={() => setCursorState('default')}
                 >
                   <div className="absolute inset-0 border border-white/[0.07] rounded-full transition-all duration-300 group-hover/btn:bg-white group-hover/btn:border-white" />
-                  <div className="relative flex items-center gap-2 px-7 py-3 font-semibold text-[13px] text-white/35 group-hover/btn:text-[#050505] tracking-[0.02em] transition-colors duration-300">
+                  <div className="relative flex items-center gap-2 px-7 py-3 font-semibold text-[13px] text-white/35 group-hover/btn:text-bg tracking-[0.02em] transition-colors duration-300">
                     Explore Capabilities
                     <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 transition-transform duration-300" />
                   </div>
@@ -213,13 +213,13 @@ export default function ServiceCard({ service, index, onDetailClick }: ServiceCa
             {/* Middle Column: Capabilities — bullets type in one by one */}
             <div className="lg:col-span-4 flex flex-col mt-10 lg:mt-0 lg:pl-8 relative z-10">
               <m.div
-                className="hidden lg:block absolute left-0 top-0 bottom-0 w-px bg-white/[0.04] origin-top"
+                className="hidden lg:block absolute left-0 top-0 bottom-0 w-px bg-white/4 origin-top"
                 initial={{ scaleY: 0 }}
                 animate={titleInView ? { scaleY: 1 } : {}}
                 transition={{ duration: 1, delay: 0.3, ease: EASE }}
               />
               <m.span
-                className="font-mono text-[10px] text-white/20 tracking-wider uppercase mb-8 block border-b border-white/[0.04] pb-3"
+                className="font-mono text-[10px] text-white/20 tracking-wider uppercase mb-8 block border-b border-white/4 pb-3"
                 initial={{ opacity: 0 }}
                 animate={titleInView ? { opacity: 1 } : {}}
                 transition={{ duration: 0.5, delay: 0.4, ease: EASE }}
@@ -236,13 +236,13 @@ export default function ServiceCard({ service, index, onDetailClick }: ServiceCa
             {/* Right Column: Outcomes — cards flip in */}
             <div className="lg:col-span-4 flex flex-col mt-10 lg:mt-0 lg:pl-10 relative z-10">
               <m.div
-                className="hidden lg:block absolute left-0 top-0 bottom-0 w-px bg-white/[0.04] origin-top"
+                className="hidden lg:block absolute left-0 top-0 bottom-0 w-px bg-white/4 origin-top"
                 initial={{ scaleY: 0 }}
                 animate={titleInView ? { scaleY: 1 } : {}}
                 transition={{ duration: 1, delay: 0.5, ease: EASE }}
               />
               <m.span
-                className="font-mono text-[10px] text-white/20 tracking-[0.2em] uppercase mb-8 block border-b border-white/[0.04] pb-4"
+                className="font-mono text-[10px] text-white/20 tracking-[0.2em] uppercase mb-8 block border-b border-white/4 pb-4"
                 initial={{ opacity: 0 }}
                 animate={titleInView ? { opacity: 1 } : {}}
                 transition={{ duration: 0.5, delay: 0.6, ease: EASE }}

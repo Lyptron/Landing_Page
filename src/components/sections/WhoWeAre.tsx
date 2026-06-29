@@ -51,7 +51,7 @@ function StatBlock({ stat, index }: { stat: typeof STATS[0]; index: number }) {
       animate={inView ? { opacity: 1, scale: 1, filter: 'blur(0px)' } : {}}
       transition={{ duration: 0.9, delay: 0.1 + index * 0.12, ease: EASE }}
     >
-      {index > 0 && <div className="hidden md:block absolute left-0 top-1/2 -translate-y-1/2 w-px h-10 bg-white/[0.04]" />}
+      {index > 0 && <div className="hidden md:block absolute left-0 top-1/2 -translate-y-1/2 w-px h-10 bg-white/4" />}
       <span className="font-display font-bold text-[28px] md:text-[34px] text-white/80 tracking-tight leading-none block">{stat.value}</span>
       <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-white/20 mt-1.5 block">{stat.label}</span>
     </m.div>
@@ -68,7 +68,7 @@ function PrincipleCard({ principle, index }: { principle: typeof PRINCIPLES[0]; 
   return (
     <m.div
       ref={ref}
-      className="group rounded-2xl p-6 md:p-8 transition-all duration-500 hover:bg-gold/[0.03]"
+      className="group rounded-2xl p-6 md:p-8 transition-all duration-500 hover:bg-gold/3"
       style={{
         background: 'linear-gradient(160deg, rgba(214,179,112,0.04) 0%, rgba(214,179,112,0.01) 100%)',
         border: '1px solid rgba(214,179,112,0.1)',
@@ -137,7 +137,7 @@ export default function WhoWeAre() {
     >
       {/* 3D Globe — static scale, no scroll-linked zoom */}
       <m.div
-        className="absolute top-0 right-0 translate-x-[30%] -translate-y-[20%] w-[800px] h-[800px] md:translate-x-[25%] md:-translate-y-[15%] md:w-[1100px] md:h-[1100px] pointer-events-none z-0"
+        className="absolute top-0 right-0 translate-x-[30%] translate-y-[-20%] w-200 h-200 md:translate-x-[25%] md:translate-y-[-15%] md:w-275 md:h-275 pointer-events-none z-0"
         style={{ 
           scale: 1.1, 
           opacity: useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0.05, 0.15, 0.15, 0.05])
@@ -162,7 +162,7 @@ export default function WhoWeAre() {
       {/* Noise grain */}
       <div className="absolute inset-0 opacity-[0.018] pointer-events-none" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.75%22 numOctaves=%224%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")' }} />
 
-      <div className="relative z-10 w-full px-6 md:px-12 lg:px-[120px]">
+      <div className="relative z-10 w-full px-6 md:px-12 lg:px-30">
 
         {/* Divider line — draws on scroll */}
         <m.div
@@ -187,7 +187,7 @@ export default function WhoWeAre() {
               Who We Are
             </m.span>
 
-            <h2 className="font-display font-bold text-[clamp(28px,5vw,68px)] leading-[0.97] tracking-[-0.04em] max-w-[900px]">
+            <h2 className="font-display font-bold text-[clamp(28px,5vw,68px)] leading-[0.97] tracking-[-0.04em] max-w-225">
               <m.span
                 className="text-white/90 inline-block"
                 initial={{ opacity: 0, filter: 'blur(16px)', y: 16 }}
@@ -219,7 +219,7 @@ export default function WhoWeAre() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
             <m.p
               ref={paraLeftRef}
-              className="font-body text-[15px] md:text-[17px] text-white/30 leading-[1.7] max-w-[520px]"
+              className="font-body text-[15px] md:text-[17px] text-white/30 leading-[1.7] max-w-130"
               initial={{ opacity: 0, x: -40, filter: 'blur(6px)' }}
               animate={paraLeftInView ? { opacity: 1, x: 0, filter: 'blur(0px)' } : {}}
               transition={{ duration: 1, delay: 0.1, ease: EASE }}
@@ -228,7 +228,7 @@ export default function WhoWeAre() {
             </m.p>
             <m.p
               ref={paraRightRef}
-              className="font-body text-[15px] md:text-[17px] text-white/30 leading-[1.7] max-w-[520px] hidden md:block"
+              className="font-body text-[15px] md:text-[17px] text-white/30 leading-[1.7] max-w-130 hidden md:block"
               initial={{ opacity: 0, x: 40, filter: 'blur(6px)' }}
               animate={paraRightInView ? { opacity: 1, x: 0, filter: 'blur(0px)' } : {}}
               transition={{ duration: 1, delay: 0.2, ease: EASE }}

@@ -365,7 +365,7 @@ export default function FinanceHubPage() {
                     <div className="flex justify-between items-start mb-2">
                       <div className="flex items-center gap-1.5">
                         <span className="text-[9.5px] font-mono text-(--cp-text-faint) uppercase tracking-widest">{inv.invoice_number}</span>
-                        <span className={`px-1.5 py-0.5 rounded text-[8px] font-mono ${inv.isPayment ? 'bg-(--cp-cyan-soft) text-(--cp-cyan) border border-(--cp-cyan-border)' : 'bg-white/[0.02] text-(--cp-text-muted) border border-white/[0.05]'}`}>
+                        <span className={`px-1.5 py-0.5 rounded text-[8px] font-mono ${inv.isPayment ? 'bg-(--cp-cyan-soft) text-(--cp-cyan) border border-(--cp-cyan-border)' : 'bg-white/2 text-(--cp-text-muted) border border-white/5'}`}>
                           {inv.isPayment ? 'Project' : 'Invoice'}
                         </span>
                       </div>
@@ -453,7 +453,7 @@ export default function FinanceHubPage() {
                   <h3 className="text-[14px] font-bold text-(--cp-text-secondary) font-display tracking-wide uppercase">Payroll Control Center</h3>
                   <p className="text-[11px] text-(--cp-text-faint) mt-0.5">Real-time resource allocation and contract outflow analytics.</p>
                 </div>
-                <div className="flex items-center gap-1.5 text-[9px] font-mono tracking-widest uppercase text-(--cp-text-faint) bg-white/[0.02] border border-white/[0.04] px-2.5 py-1 rounded-md">
+                <div className="flex items-center gap-1.5 text-[9px] font-mono tracking-widest uppercase text-(--cp-text-faint) bg-white/2 border border-white/4 px-2.5 py-1 rounded-md">
                   <Activity className="w-3 h-3 text-(--cp-cyan) animate-pulse" /> Live Metrics synced
                 </div>
               </div>
@@ -489,7 +489,7 @@ export default function FinanceHubPage() {
                     <span className="flex items-center gap-1"><Percent className="w-3 h-3 text-(--cp-cyan)" /> BUDGET DISTRIBUTION SHARE</span>
                     <span>{membersWithSalary.length} funded roles</span>
                   </div>
-                  <div className="h-2.5 w-full rounded-full overflow-hidden flex bg-white/[0.04] border border-white/[0.02]">
+                  <div className="h-2.5 w-full rounded-full overflow-hidden flex bg-white/4 border border-white/2">
                     {teamMembers.map((m) => {
                       const salary = m.monthly_salary || 0
                       if (salary <= 0) return null
@@ -517,7 +517,7 @@ export default function FinanceHubPage() {
                       const accentColor = m.accent_color || '#818CF8'
                       return (
                         <div key={m.id} className="flex items-center gap-1.5 text-(--cp-text-muted)">
-                          <span className="w-2 h-2 rounded-full border border-white/[0.05]" style={{ backgroundColor: accentColor }} />
+                          <span className="w-2 h-2 rounded-full border border-white/5" style={{ backgroundColor: accentColor }} />
                           <span>{m.initials} ({pct.toFixed(0)}%)</span>
                         </div>
                       )
@@ -528,7 +528,7 @@ export default function FinanceHubPage() {
             </div>
 
             {/* Filter / Search Bar */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3 rounded-xl border border-(--cp-border-soft) bg-white/[0.005] backdrop-blur-md">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3 rounded-xl border border-(--cp-border-soft) bg-white/0.5 backdrop-blur-md">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-(--cp-text-faint)" />
                 <input
@@ -568,7 +568,7 @@ export default function FinanceHubPage() {
                   return (
                     <div 
                       key={m.id} 
-                      className="group cp-card p-4.5 flex flex-col gap-4 transition-all duration-300 hover:border-(--cp-cyan-border) hover:bg-white/[0.015] relative overflow-hidden"
+                      className="group cp-card p-4.5 flex flex-col gap-4 transition-all duration-300 hover:border-(--cp-cyan-border) hover:bg-white/1.5 relative overflow-hidden"
                       style={{
                         border: '1px solid var(--cp-border-soft)',
                       }}
@@ -604,7 +604,7 @@ export default function FinanceHubPage() {
                       {m.skills && m.skills.length > 0 && (
                         <div className="flex flex-wrap gap-1 mt-0.5">
                           {m.skills.slice(0, 3).map((s: string, idx: number) => (
-                            <span key={idx} className="px-2 py-0.5 rounded-md text-[8.5px] font-mono bg-white/[0.02] text-(--cp-text-muted) border border-white/[0.04]">
+                            <span key={idx} className="px-2 py-0.5 rounded-md text-[8.5px] font-mono bg-white/2 text-(--cp-text-muted) border border-white/4">
                               {s}
                             </span>
                           ))}
@@ -613,7 +613,7 @@ export default function FinanceHubPage() {
 
                       {/* Bio quotation if present */}
                       {m.bio && (
-                        <p className="text-[10px] text-(--cp-text-faint) italic line-clamp-1 leading-normal border-l-2 border-white/[0.05] pl-2 py-px">
+                        <p className="text-[10px] text-(--cp-text-faint) italic line-clamp-1 leading-normal border-l-2 border-white/5 pl-2 py-px">
                           &quot;{m.bio}&quot;
                         </p>
                       )}
@@ -621,7 +621,7 @@ export default function FinanceHubPage() {
                       {/* Stepper input container (Compensation Command Well) */}
                       <div className="flex flex-col gap-1.5 border-t border-(--cp-border-soft) pt-3.5 mt-0.5">
                         <span className="text-[9px] font-mono uppercase tracking-wider text-(--cp-text-faint)">Monthly Compensation</span>
-                        <div className="bg-white/[0.005] border border-white/[0.02] rounded-xl p-1">
+                        <div className="bg-white/0.5 border border-white/2 rounded-xl p-1">
                           <SalaryStepper
                             value={m.monthly_salary || 0}
                             onChange={(val) => updateSalary(m.id, val)}

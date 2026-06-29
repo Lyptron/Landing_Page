@@ -17,17 +17,34 @@ export default function TeamCard({ member, onClick }: TeamCardProps) {
   const { setCursorState } = useCursor()
   const cardRef = useRef<HTMLDivElement>(null)
   const rectRef = useRef<DOMRect | null>(null)
+  const rafRef = useRef<number | null>(null)
+  const pendingRef = useRef<{ x: number; y: number } | null>(null)
 
+  // Batch mousemove writes into a single rAF tick instead of mutating style
+  // on every raw event (which can fire 100+/sec) — keeps the tilt off the
+  // main thread's critical path while the carousel's GSAP ticker is running.
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current || !rectRef.current) return
+    if (!rectRef.current) return
     const rect = rectRef.current
-    const x = (e.clientX - rect.left) / rect.width - 0.5
-    const y = (e.clientY - rect.top) / rect.height - 0.5
-    cardRef.current.style.transform = `perspective(1000px) rotateX(${-y * 5}deg) rotateY(${x * 5}deg) scale3d(1.02, 1.02, 1.02)`
+    pendingRef.current = {
+      x: (e.clientX - rect.left) / rect.width - 0.5,
+      y: (e.clientY - rect.top) / rect.height - 0.5,
+    }
+    if (rafRef.current !== null) return
+    rafRef.current = requestAnimationFrame(() => {
+      rafRef.current = null
+      const pending = pendingRef.current
+      if (!pending || !cardRef.current) return
+      cardRef.current.style.transform = `perspective(1000px) rotateX(${-pending.y * 5}deg) rotateY(${pending.x * 5}deg) scale3d(1.02, 1.02, 1.02)`
+    })
   }, [])
 
   const handleMouseLeave = useCallback(() => {
     rectRef.current = null
+    if (rafRef.current !== null) {
+      cancelAnimationFrame(rafRef.current)
+      rafRef.current = null
+    }
     if (!cardRef.current) return
     cardRef.current.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)'
     cardRef.current.style.transition = 'all 0.8s cubic-bezier(0.16, 1, 0.3, 1)'
@@ -44,7 +61,7 @@ export default function TeamCard({ member, onClick }: TeamCardProps) {
   return (
     <div
       ref={cardRef}
-      className="team-card shrink-0 w-[300px] sm:w-[340px] h-[480px] cursor-none select-none relative rounded-[12px] overflow-hidden group"
+      className="team-card shrink-0 w-75 sm:w-85 h-120 cursor-none select-none relative rounded-xl overflow-hidden group"
       style={{
         transition: 'all 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
         transformStyle: 'preserve-3d',
@@ -68,7 +85,7 @@ export default function TeamCard({ member, onClick }: TeamCardProps) {
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className="font-display font-bold text-[80px] text-white/[0.04] tracking-tight select-none">{member.initials}</span>
+            <span className="font-display font-bold text-[80px] text-white/4 tracking-tight select-none">{member.initials}</span>
           </div>
         )}
         {/* Subtle grid texture */}
@@ -86,7 +103,7 @@ export default function TeamCard({ member, onClick }: TeamCardProps) {
 
       {/* Card Contents */}
       <div className="relative h-full p-8 flex flex-col items-start justify-end z-10 w-full">
-        <div className="flex flex-col w-full transform translate-y-3 group-hover:translate-y-0 transition-transform duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)]">
+        <div className="flex flex-col w-full transform translate-y-3 group-hover:translate-y-0 transition-transform duration-600 ease-[cubic-bezier(0.16,1,0.3,1)]">
           <span className="font-mono text-[9px] tracking-[0.25em] uppercase text-white/35 mb-3">
             {member.role}
           </span>
@@ -96,8 +113,8 @@ export default function TeamCard({ member, onClick }: TeamCardProps) {
         </div>
 
         {/* Hover reveal action */}
-        <div className="w-full overflow-hidden h-[24px] mt-4 opacity-0 group-hover:opacity-100 transition-all duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] flex items-center">
-          <div className="flex items-center gap-2 text-white/50 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-[600ms] delay-100 ease-[cubic-bezier(0.16,1,0.3,1)]">
+        <div className="w-full overflow-hidden h-6 mt-4 opacity-0 group-hover:opacity-100 transition-all duration-600 ease-[cubic-bezier(0.16,1,0.3,1)] flex items-center">
+          <div className="flex items-center gap-2 text-white/50 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-600 delay-100 ease-[cubic-bezier(0.16,1,0.3,1)]">
             <span className="font-mono text-[10px] tracking-widest uppercase">View Profile</span>
             <ArrowUpRight className="w-3.5 h-3.5" />
           </div>

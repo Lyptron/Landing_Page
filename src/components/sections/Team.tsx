@@ -1,7 +1,8 @@
 'use client'
 import { useEffect, useMemo, useRef, useState, useCallback } from 'react'
-import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import type { gsap } from 'gsap'
+
+type GsapInstance = typeof import('gsap')['gsap']
 import { AnimatePresence } from 'framer-motion'
 import { team } from '@/data/team'
 import { TeamMember } from '@/types'
@@ -9,15 +10,15 @@ import TeamCard from './TeamCard'
 import TeamModal from './TeamModal'
 import { useCursor } from '../providers/CursorProvider'
 
-if (typeof window !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger)
-}
-
 export default function Team() {
   const containerRef = useRef<HTMLDivElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
   const [isPaused, setIsPaused] = useState(false)
   const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null)
+  // gsap is dynamically imported on mount (below) instead of statically
+  // imported at module scope, so it's code-split into its own chunk rather
+  // than bundled into the page's initial JS.
+  const gsapRef = useRef<GsapInstance | null>(null)
   const animRef = useRef<gsap.core.Tween | null>(null)
   const clickCooldown = useRef(false)
   const cooldownTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -26,10 +27,11 @@ export default function Team() {
   // The 2 extra clone sets only exist to wrap the desktop infinite marquee
   // (setupMarquee bails under 768px). Mobile gets the real list only, which
   // cuts ~12 cards x ~10 nested divs each off the DOM for most visitors.
-  const [isDesktop, setIsDesktop] = useState(false)
+  const [isDesktop, setIsDesktop] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(min-width: 768px)').matches
+  )
   useEffect(() => {
     const mq = window.matchMedia('(min-width: 768px)')
-    setIsDesktop(mq.matches)
     const onChange = () => setIsDesktop(mq.matches)
     mq.addEventListener('change', onChange)
     return () => mq.removeEventListener('change', onChange)
@@ -65,6 +67,8 @@ export default function Team() {
   }, [setCursorState])
 
   const setupMarquee = useCallback(() => {
+    const gsap = gsapRef.current
+    if (!gsap) return
     if (typeof window !== 'undefined' && window.innerWidth < 768) return
     const track = trackRef.current
     if (!track) return
@@ -98,46 +102,55 @@ export default function Team() {
   useEffect(() => {
     const el = containerRef.current
     if (!el) return
+    let cancelled = false
+    let ctx: ReturnType<GsapInstance['context']> | null = null
 
     // gsap.context() scopes selectors to this section so multiple Team
     // mounts can't cross-fire animations, and revert() cleans up every
     // tween + ScrollTrigger created inside it.
-    const ctx = gsap.context(() => {
-      ScrollTrigger.create({
-        trigger: el,
-        start: 'top 75%',
-        once: true,
-        onEnter: () => {
-          gsap.fromTo('.team-header-line',
-            { scaleX: 0 },
-            { scaleX: 1, duration: 1, ease: 'power3.inOut' }
-          )
-          gsap.fromTo('.team-header-content > span, .team-header-content > p',
-            { opacity: 0, y: 20 },
-            { opacity: 1, y: 0, duration: 0.7, stagger: 0.08, ease: 'power3.out', delay: 0.2 }
-          )
-          gsap.fromTo('.team-split-left',
-            { opacity: 0, x: -40, filter: 'blur(12px)' },
-            { opacity: 1, x: 0, filter: 'blur(0px)', duration: 1, ease: 'power3.out', delay: 0.3 }
-          )
-          gsap.fromTo('.team-split-right',
-            { opacity: 0, x: 40, filter: 'blur(12px)' },
-            { opacity: 1, x: 0, filter: 'blur(0px)', duration: 1, ease: 'power3.out', delay: 0.45 }
-          )
-          gsap.fromTo('.team-card',
-            { opacity: 0, y: 40, scale: 0.95 },
-            {
-              opacity: 1, y: 0, scale: 1,
-              duration: 0.8, stagger: 0.06, ease: 'power3.out', delay: 0.4,
-              onComplete: () => setupMarquee(),
-            }
-          )
-        }
-      })
-    }, el)
+    Promise.all([import('gsap'), import('gsap/ScrollTrigger')]).then(([{ gsap }, { ScrollTrigger }]) => {
+      if (cancelled) return
+      gsap.registerPlugin(ScrollTrigger)
+      gsapRef.current = gsap
+
+      ctx = gsap.context(() => {
+        ScrollTrigger.create({
+          trigger: el,
+          start: 'top 75%',
+          once: true,
+          onEnter: () => {
+            gsap.fromTo('.team-header-line',
+              { scaleX: 0 },
+              { scaleX: 1, duration: 1, ease: 'power3.inOut' }
+            )
+            gsap.fromTo('.team-header-content > span, .team-header-content > p',
+              { opacity: 0, y: 20 },
+              { opacity: 1, y: 0, duration: 0.7, stagger: 0.08, ease: 'power3.out', delay: 0.2 }
+            )
+            gsap.fromTo('.team-split-left',
+              { opacity: 0, x: -40, filter: 'blur(12px)' },
+              { opacity: 1, x: 0, filter: 'blur(0px)', duration: 1, ease: 'power3.out', delay: 0.3 }
+            )
+            gsap.fromTo('.team-split-right',
+              { opacity: 0, x: 40, filter: 'blur(12px)' },
+              { opacity: 1, x: 0, filter: 'blur(0px)', duration: 1, ease: 'power3.out', delay: 0.45 }
+            )
+            gsap.fromTo('.team-card',
+              { opacity: 0, y: 40, scale: 0.95 },
+              {
+                opacity: 1, y: 0, scale: 1,
+                duration: 0.8, stagger: 0.06, ease: 'power3.out', delay: 0.4,
+                onComplete: () => setupMarquee(),
+              }
+            )
+          }
+        })
+      }, el)
+    })
 
     return () => {
-      ctx.revert()
+      cancelled = true
+      ctx?.revert()
       if (animRef.current) animRef.current.kill()
       // The cooldown timer fires after modal close; clear it on unmount
       // so React doesn't get a setState call on an unmounted tree.
@@ -149,7 +162,8 @@ export default function Team() {
   }, [setupMarquee])
 
   useEffect(() => {
-    if (!animRef.current) return
+    const gsap = gsapRef.current
+    if (!gsap || !animRef.current) return
     if (isPaused || selectedMember) {
       gsap.to(animRef.current, { timeScale: 0, duration: 0.5, ease: 'power2.out' })
     } else {
@@ -180,7 +194,7 @@ export default function Team() {
       <div className="absolute inset-0 opacity-[0.018] pointer-events-none" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.75%22 numOctaves=%224%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")' }} />
 
       {/* Header */}
-      <div className="relative z-10 w-full px-6 md:px-12 lg:px-[120px] mb-16 md:mb-20">
+      <div className="relative z-10 w-full px-6 md:px-12 lg:px-30 mb-16 md:mb-20">
         <div className="team-header-line h-px w-full mb-10 origin-left" style={{ background: 'linear-gradient(90deg, rgba(255,255,255,0.08), rgba(255,255,255,0.06) 50%, transparent)' }} />
 
         <div className="team-header-content flex flex-col gap-6">
@@ -191,7 +205,7 @@ export default function Team() {
             <span className="team-split-right inline-block text-white/90">behind the work</span>
           </h2>
 
-          <p className="font-body text-[15px] md:text-[17px] text-white/30 max-w-[520px] leading-[1.7]">
+          <p className="font-body text-[15px] md:text-[17px] text-white/30 max-w-130 leading-[1.7]">
             We do not outsource. Your product is engineered directly by specialists with deep expertise in full-stack architecture, systems design, and growth strategy.
           </p>
         </div>
@@ -209,8 +223,8 @@ export default function Team() {
         onBlur={() => setIsPaused(false)}
       >
         {/* Edge fades */}
-        <div className="absolute left-0 top-0 bottom-0 w-32 md:w-48 bg-linear-to-r from-[#050505] to-transparent z-20 pointer-events-none" aria-hidden="true" />
-        <div className="absolute right-0 top-0 bottom-0 w-32 md:w-48 bg-linear-to-l from-[#050505] to-transparent z-20 pointer-events-none" aria-hidden="true" />
+        <div className="absolute left-0 top-0 bottom-0 w-32 md:w-48 bg-linear-to-r from-bg to-transparent z-20 pointer-events-none" aria-hidden="true" />
+        <div className="absolute right-0 top-0 bottom-0 w-32 md:w-48 bg-linear-to-l from-bg to-transparent z-20 pointer-events-none" aria-hidden="true" />
 
         <div ref={trackRef} className="flex flex-row overflow-x-auto snap-x snap-mandatory scrollbar-none gap-6 w-full md:w-max py-4 px-6 md:px-0 items-center md:items-stretch">
           {tripled.map((member, i) => {

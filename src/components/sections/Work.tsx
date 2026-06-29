@@ -63,14 +63,14 @@ function DeviceMockup({ project }: { project: typeof projects[0] }) {
     return (
       <div className="relative flex items-center justify-center py-8 md:py-0">
         <div
-          className="relative w-[200px] sm:w-[220px] aspect-[9/19.5] rounded-[30px] border-[3px] border-white/[0.08] overflow-hidden"
+          className="relative w-50 sm:w-55 aspect-9/19.5 rounded-[30px] border-[3px] border-white/8 overflow-hidden"
           style={{
             background: '#0c0c0e',
             boxShadow: '0 40px 80px -20px rgba(255,255,255,0.03), 0 20px 40px rgba(0,0,0,0.6)',
           }}
         >
-          <div className="absolute top-2 left-1/2 -translate-x-1/2 w-16 h-[18px] bg-black rounded-full z-30 flex items-center justify-center">
-            <div className="w-2 h-2 rounded-full bg-white/[0.04] ring-1 ring-white/[0.06]" />
+          <div className="absolute top-2 left-1/2 -translate-x-1/2 w-16 h-4.5 bg-black rounded-full z-30 flex items-center justify-center">
+            <div className="w-2 h-2 rounded-full bg-white/4 ring-1 ring-white/6" />
           </div>
           <div className="w-full h-full rounded-[27px] bg-[#111114] flex items-center justify-center">
             <span className="font-mono text-[8px] text-white/8 uppercase tracking-widest">Preview</span>
@@ -83,20 +83,20 @@ function DeviceMockup({ project }: { project: typeof projects[0] }) {
   return (
     <div className="relative w-full">
       <div
-        className="group/browser relative w-full aspect-[16/10] overflow-hidden flex flex-col rounded-xl"
+        className="group/browser relative w-full aspect-16/10 overflow-hidden flex flex-col rounded-xl"
         style={{
           background: '#0a0a0c',
           border: '1px solid rgba(255,255,255,0.06)',
           boxShadow: '0 40px 80px -20px rgba(255,255,255,0.02), 0 24px 48px rgba(0,0,0,0.5)',
         }}
       >
-        <div className="h-9 w-full bg-white/[0.01] border-b border-white/[0.04] flex items-center px-4 select-none shrink-0">
+        <div className="h-9 w-full bg-white/1 border-b border-white/4 flex items-center px-4 select-none shrink-0">
           <div className="flex gap-1.5">
-            <div className="w-[6px] h-[6px] rounded-full bg-white/12" />
-            <div className="w-[6px] h-[6px] rounded-full bg-white/8" />
-            <div className="w-[6px] h-[6px] rounded-full bg-white/6" />
+            <div className="w-1.5 h-1.5 rounded-full bg-white/12" />
+            <div className="w-1.5 h-1.5 rounded-full bg-white/8" />
+            <div className="w-1.5 h-1.5 rounded-full bg-white/6" />
           </div>
-          <div className="ml-3 h-[18px] flex-1 max-w-[140px] rounded bg-white/[0.03] flex items-center px-2">
+          <div className="ml-3 h-4.5 flex-1 max-w-35 rounded bg-white/3 flex items-center px-2">
             <span className="font-mono text-[7px] text-white/12" aria-hidden="true">lyptron.com/{project.id}</span>
           </div>
         </div>
@@ -234,7 +234,7 @@ function ProjectRow({ project, index }: { project: typeof projects[0]; index: nu
 
           {/* Description — fade */}
           <m.p
-            className="font-body text-[15px] text-white/30 leading-relaxed max-w-[480px] mb-6"
+            className="font-body text-[15px] text-white/30 leading-relaxed max-w-120 mb-6"
             initial={{ opacity: 0, y: 16 }}
             animate={infoInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.3, ease: EASE }}
@@ -253,7 +253,7 @@ function ProjectRow({ project, index }: { project: typeof projects[0]; index: nu
               <m.div
                 key={stat.label}
                 variants={statChild}
-                className="flex flex-col gap-1.5 p-3 lg:p-4 rounded-xl border border-white/[0.04] bg-white/[0.015] hover:border-white/[0.08] transition-colors duration-300"
+                className="flex flex-col gap-1.5 p-3 lg:p-4 rounded-xl border border-white/4 bg-white/1.5 hover:border-white/8 transition-colors duration-300"
               >
                 <span className="font-mono text-[8px] lg:text-[9px] text-white/20 uppercase tracking-widest">
                   {stat.label}
@@ -304,11 +304,11 @@ function ProjectRow({ project, index }: { project: typeof projects[0]; index: nu
               aria-label={`Discuss a project like ${project.name}`}
               onMouseEnter={() => setCursorState('cta')}
               onMouseLeave={() => setCursorState('default')}
-              className="group/link self-start cursor-none flex items-center gap-3 text-white/30 hover:text-white/70 transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/40"
+              className="group/link self-start cursor-none flex items-center gap-3 text-white/30 hover:text-white/70 transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/40"
             >
               <span className="font-mono text-xs tracking-wider uppercase">View case study</span>
-              <div className="w-8 h-8 rounded-full border border-white/[0.08] flex items-center justify-center group-hover/link:border-white/[0.18] transition-all duration-300">
-                <ArrowUpRight className="w-3.5 h-3.5 group-hover/link:translate-x-[1px] group-hover/link:-translate-y-[1px] transition-transform duration-300" />
+              <div className="w-8 h-8 rounded-full border border-white/8 flex items-center justify-center group-hover/link:border-white/18 transition-all duration-300">
+                <ArrowUpRight className="w-3.5 h-3.5 group-hover/link:translate-x-px group-hover/link:-translate-y-px transition-transform duration-300" />
               </div>
             </button>
           </m.div>
@@ -345,7 +345,7 @@ export default function Work() {
       <div className="absolute inset-0 opacity-[0.018] pointer-events-none" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.75%22 numOctaves=%224%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")' }} />
 
       {/* Header — word-by-word */}
-      <div ref={headerRef} className="w-full px-6 md:px-12 lg:px-[120px] mb-20 md:mb-28 lg:mb-36">
+      <div ref={headerRef} className="w-full px-6 md:px-12 lg:px-30 mb-20 md:mb-28 lg:mb-36">
         <m.div
           className="h-px w-full mb-10 origin-left"
           style={{ background: 'linear-gradient(90deg, rgba(255,255,255,0.08), rgba(255,255,255,0.06) 50%, transparent)' }}
@@ -374,7 +374,7 @@ export default function Work() {
           </m.h2>
 
           <m.p
-            className="font-body text-[15px] md:text-[17px] text-white/30 max-w-[520px] leading-[1.7]"
+            className="font-body text-[15px] md:text-[17px] text-white/30 max-w-130 leading-[1.7]"
             initial={{ opacity: 0, y: 20 }}
             animate={headerInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.55, ease: EASE }}
@@ -385,7 +385,7 @@ export default function Work() {
       </div>
 
       {/* Projects with timeline dividers */}
-      <div className="w-full px-6 md:px-12 lg:px-[120px]">
+      <div className="w-full px-6 md:px-12 lg:px-30">
         {projects.map((project, idx) => (
           <div key={project.id}>
             <ProjectRow project={project} index={idx} />
@@ -397,14 +397,14 @@ export default function Work() {
       </div>
 
       {/* Bottom bar */}
-      <div className="w-full px-6 md:px-12 lg:px-[120px] mt-24 md:mt-32 lg:mt-40">
+      <div className="w-full px-6 md:px-12 lg:px-30 mt-24 md:mt-32 lg:mt-40">
         <m.div
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-60px' }}
           transition={{ duration: 0.8, ease: EASE }}
         >
-          <div className="flex flex-col md:flex-row items-center justify-between gap-8 pt-8 border-t border-white/[0.06]">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-8 pt-8 border-t border-white/6">
             <div className="flex flex-wrap justify-center md:justify-start gap-6 sm:gap-10 md:gap-16">
               {[
                 { label: 'Shipped', value: '50+' },
@@ -423,7 +423,7 @@ export default function Work() {
               onClick={scrollToCTA}
               onMouseEnter={() => setCursorState('cta')}
               onMouseLeave={() => setCursorState('default')}
-              className="group/btn cursor-none flex items-center gap-3 px-7 py-3 rounded-full border border-white/[0.07] hover:border-white/[0.15] hover:bg-white/[0.02] transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/40"
+              className="group/btn cursor-none flex items-center gap-3 px-7 py-3 rounded-full border border-white/[0.07] hover:border-white/15 hover:bg-white/2 transition-all duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/40"
             >
               <span className="font-mono text-[13px] text-white/35 group-hover/btn:text-white/60 tracking-[0.02em] transition-colors duration-300">
                 Discuss your project

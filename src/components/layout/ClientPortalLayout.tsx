@@ -133,7 +133,7 @@ function SidebarContent({ project, groups, pathname, onNavigate, onExit }: Sideb
       <div className="p-4 border-t" style={{ borderColor: 'var(--cp-border-soft)' }}>
         <button
           onClick={onExit}
-          className="flex items-center gap-3 px-3 py-2 rounded-[8px] text-[13px] font-medium transition-colors hover:text-(--cp-text) w-full text-left bg-transparent border-0 cursor-pointer"
+          className="flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] font-medium transition-colors hover:text-(--cp-text) w-full text-left bg-transparent border-0 cursor-pointer"
           style={{ color: 'var(--cp-text-muted)' }}
         >
           <LogOut className="w-4 h-4" />

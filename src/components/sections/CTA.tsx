@@ -97,7 +97,7 @@ export default function CTA() {
       {/* Noise */}
       <div className="absolute inset-0 opacity-[0.018] pointer-events-none" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.75%22 numOctaves=%224%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")' }} />
 
-      <div className="relative z-10 w-full px-6 md:px-12 lg:px-[120px] grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-20 items-start">
+      <div className="relative z-10 w-full px-6 md:px-12 lg:px-30 grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-20 items-start">
 
         {/* Left: Messaging — word-by-word build */}
         <div ref={headlineRef} className="flex flex-col gap-6">
@@ -164,7 +164,7 @@ export default function CTA() {
 
           {/* Social proof */}
           <m.div
-            className="mt-4 pt-6 border-t border-white/[0.04]"
+            className="mt-4 pt-6 border-t border-white/4"
             initial={{ opacity: 0, y: 12 }}
             animate={headlineInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.7, delay: 1.1, ease: EASE }}
@@ -233,7 +233,7 @@ export default function CTA() {
                   placeholder="Alex"
                   value={formData.firstName}
                   onChange={e => setFormData({ ...formData, firstName: e.target.value })}
-                  className="w-full bg-white/[0.025] border border-white/[0.06] rounded-lg px-4 py-3 text-sm text-white/80 placeholder:text-white/15 focus:outline-none focus:border-white/15 transition-colors"
+                  className="w-full bg-white/2.5 border border-white/6 rounded-lg px-4 py-3 text-sm text-white/80 placeholder:text-white/15 focus:outline-none focus:border-white/15 transition-colors"
                 />
               </m.div>
               <m.div
@@ -252,7 +252,7 @@ export default function CTA() {
                   placeholder="Johnson"
                   value={formData.lastName}
                   onChange={e => setFormData({ ...formData, lastName: e.target.value })}
-                  className="w-full bg-white/[0.025] border border-white/[0.06] rounded-lg px-4 py-3 text-sm text-white/80 placeholder:text-white/15 focus:outline-none focus:border-white/15 transition-colors"
+                  className="w-full bg-white/2.5 border border-white/6 rounded-lg px-4 py-3 text-sm text-white/80 placeholder:text-white/15 focus:outline-none focus:border-white/15 transition-colors"
                 />
               </m.div>
             </div>
@@ -274,7 +274,7 @@ export default function CTA() {
                 placeholder="alex@company.com"
                 value={formData.email}
                 onChange={e => setFormData({ ...formData, email: e.target.value })}
-                className="w-full bg-white/[0.025] border border-white/[0.06] rounded-lg px-4 py-3 text-sm text-white/80 placeholder:text-white/15 focus:outline-none focus:border-white/15 transition-colors"
+                className="w-full bg-white/2.5 border border-white/6 rounded-lg px-4 py-3 text-sm text-white/80 placeholder:text-white/15 focus:outline-none focus:border-white/15 transition-colors"
               />
             </m.div>
 
@@ -292,7 +292,7 @@ export default function CTA() {
                   required
                   value={formData.type}
                   onChange={e => setFormData({ ...formData, type: e.target.value })}
-                  className="w-full bg-white/[0.025] border border-white/[0.06] rounded-lg px-4 py-3 text-sm text-white/80 focus:outline-none focus:border-white/15 transition-colors appearance-none cursor-pointer"
+                  className="w-full bg-white/2.5 border border-white/6 rounded-lg px-4 py-3 text-sm text-white/80 focus:outline-none focus:border-white/15 transition-colors appearance-none cursor-pointer"
                   onMouseEnter={() => setCursorState('hover')}
                   onMouseLeave={() => setCursorState('default')}
                 >
@@ -324,7 +324,7 @@ export default function CTA() {
                 value={formData.description}
                 onChange={e => setFormData({ ...formData, description: e.target.value })}
                 placeholder="A quick summary of your idea, timeline, or budget range..."
-                className="w-full bg-white/[0.025] border border-white/[0.06] rounded-lg px-4 py-3 text-sm text-white/80 placeholder:text-white/15 focus:outline-none focus:border-white/15 transition-colors resize-none"
+                className="w-full bg-white/2.5 border border-white/6 rounded-lg px-4 py-3 text-sm text-white/80 placeholder:text-white/15 focus:outline-none focus:border-white/15 transition-colors resize-none"
               />
             </m.div>
 

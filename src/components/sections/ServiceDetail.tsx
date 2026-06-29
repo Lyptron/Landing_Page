@@ -63,7 +63,7 @@ export default function ServiceDetail({ service, onClose }: ServiceDetailProps) 
     <>
       {/* Backdrop */}
       <m.div
-        className="fixed inset-0 z-100 bg-black/70 backdrop-blur-[8px]"
+        className="fixed inset-0 z-100 bg-black/70 backdrop-blur-sm"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -79,7 +79,7 @@ export default function ServiceDetail({ service, onClose }: ServiceDetailProps) 
           aria-modal="true"
           aria-labelledby={titleId}
           tabIndex={-1}
-          className="w-full max-w-[920px] pointer-events-auto focus:outline-none"
+          className="w-full max-w-230 pointer-events-auto focus:outline-none"
           initial={{ opacity: 0, scale: 0.95, y: 12, filter: 'blur(8px)' }}
           animate={{ opacity: 1, scale: 1, y: 0, filter: 'blur(0px)' }}
           exit={{ opacity: 0, scale: 0.95, y: 12, filter: 'blur(8px)' }}
@@ -103,7 +103,7 @@ export default function ServiceDetail({ service, onClose }: ServiceDetailProps) 
                 type="button"
                 onClick={onClose}
                 aria-label="Close service details"
-                className="p-2.5 rounded-full border border-white/[0.07] hover:border-white/15 hover:bg-white/[0.03] text-white/60 hover:text-white transition-all duration-300 cursor-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/40"
+                className="p-2.5 rounded-full border border-white/[0.07] hover:border-white/15 hover:bg-white/3 text-white/60 hover:text-white transition-all duration-300 cursor-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/40"
                 onMouseEnter={() => setCursorState('hover')}
                 onMouseLeave={() => setCursorState('default')}
               >
@@ -120,17 +120,17 @@ export default function ServiceDetail({ service, onClose }: ServiceDetailProps) 
             </div>
 
             {/* Blank preview window — placeholder for images */}
-            <div className="w-full h-[200px] md:h-[260px] rounded-xl overflow-hidden relative mb-6"
+            <div className="w-full h-50 md:h-65 rounded-xl overflow-hidden relative mb-6"
               style={{ background: 'linear-gradient(135deg, #0e0e10 0%, #08080A 100%)', border: '1px solid rgba(255,255,255,0.05)' }}
             >
               {/* Browser chrome */}
               <div className="flex items-center gap-1.5 px-4 h-9" style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', background: 'rgba(255,255,255,0.01)' }}>
                 <div className="flex gap-1.5">
-                  <div className="w-[6px] h-[6px] rounded-full bg-white/12" />
-                  <div className="w-[6px] h-[6px] rounded-full bg-white/8" />
-                  <div className="w-[6px] h-[6px] rounded-full bg-white/6" />
+                  <div className="w-1.5 h-1.5 rounded-full bg-white/12" />
+                  <div className="w-1.5 h-1.5 rounded-full bg-white/8" />
+                  <div className="w-1.5 h-1.5 rounded-full bg-white/6" />
                 </div>
-                <div className="ml-3 h-[18px] flex-1 max-w-[160px] rounded bg-white/[0.03] flex items-center px-2">
+                <div className="ml-3 h-4.5 flex-1 max-w-40 rounded bg-white/3 flex items-center px-2">
                   <span className="font-mono text-[7px] text-white/12" aria-hidden="true">lyptron.com/services/{service.id}</span>
                 </div>
               </div>
@@ -140,7 +140,7 @@ export default function ServiceDetail({ service, onClose }: ServiceDetailProps) 
               </div>
             </div>
 
-            <p className="font-body text-[15px] text-white/30 leading-relaxed mb-4 border-b border-white/[0.04] pb-6">
+            <p className="font-body text-[15px] text-white/30 leading-relaxed mb-4 border-b border-white/4 pb-6">
               {service.desc}
             </p>
 
@@ -159,12 +159,12 @@ export default function ServiceDetail({ service, onClose }: ServiceDetailProps) 
               {/* Left: Stack & Results */}
               <div className="md:col-span-6 flex flex-col gap-8">
                 <div>
-                  <h4 className="font-mono text-[10px] text-white/20 uppercase tracking-wider block mb-4 border-b border-white/[0.04] pb-2">Tech Stack</h4>
+                  <h4 className="font-mono text-[10px] text-white/20 uppercase tracking-wider block mb-4 border-b border-white/4 pb-2">Tech Stack</h4>
                   <div className="flex flex-wrap gap-2">
                     {service.stack.map((item) => (
                       <span
                         key={item}
-                        className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-white/[0.06] bg-white/[0.02] font-mono text-[10px] text-white/40 tracking-wider uppercase"
+                        className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-white/6 bg-white/2 font-mono text-[10px] text-white/40 tracking-wider uppercase"
                       >
                         <span className="w-1.5 h-1.5 rounded-full bg-white/20" />
                         {item}
@@ -174,7 +174,7 @@ export default function ServiceDetail({ service, onClose }: ServiceDetailProps) 
                 </div>
 
                 <div>
-                  <h4 className="font-mono text-[10px] text-white/20 uppercase tracking-wider block mb-4 border-b border-white/[0.04] pb-2">Proven Results</h4>
+                  <h4 className="font-mono text-[10px] text-white/20 uppercase tracking-wider block mb-4 border-b border-white/4 pb-2">Proven Results</h4>
                   <div className="flex flex-col gap-4">
                     {service.works.map((work) => (
                       <div
@@ -200,7 +200,7 @@ export default function ServiceDetail({ service, onClose }: ServiceDetailProps) 
               {/* Right: Deliverables */}
               <div className="md:col-span-6 flex flex-col gap-8">
                 <div>
-                  <h4 className="font-mono text-[10px] text-white/20 uppercase tracking-wider block mb-4 border-b border-white/[0.04] pb-2">Deliverables & Benefits</h4>
+                  <h4 className="font-mono text-[10px] text-white/20 uppercase tracking-wider block mb-4 border-b border-white/4 pb-2">Deliverables & Benefits</h4>
                   <div className="flex flex-col gap-5">
                     {service.helps.map((help) => (
                       <div key={help} className="flex gap-3 items-start">

@@ -93,7 +93,7 @@ function ProcessCard({ step, idx }: { step: typeof processSteps[0]; idx: number 
 
         {/* Top accent line — tinted */}
         <m.div
-          className="absolute top-0 left-0 h-[1px]"
+          className="absolute top-0 left-0 h-px"
           style={{ background: `linear-gradient(90deg, ${color.tint}, transparent)` }}
           initial={{ width: '0%' }}
           animate={inView ? { width: '100%' } : {}}
@@ -156,7 +156,7 @@ function ProcessCard({ step, idx }: { step: typeof processSteps[0]; idx: number 
 
           {/* Description */}
           <m.p
-            className="font-body text-[14px] md:text-[15px] text-white/25 leading-[1.7] mb-8 max-w-[440px] group-hover:text-white/35 transition-colors duration-300"
+            className="font-body text-[14px] md:text-[15px] text-white/25 leading-[1.7] mb-8 max-w-110 group-hover:text-white/35 transition-colors duration-300"
             initial={{ opacity: 0, y: 12 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.7, delay: 0.55, ease: EASE }}
@@ -233,7 +233,7 @@ function StepConnector({ fromIdx }: { fromIdx: number }) {
 
   return (
     <div ref={ref} className="relative w-full py-6 md:py-10 z-20 hidden md:block">
-      <div className="relative flex items-center justify-center h-[80px]">
+      <div className="relative flex items-center justify-center h-20">
         {/* Vertical dashed line */}
         <m.div
           className="absolute left-1/2 -translate-x-1/2 w-px h-full origin-top"
@@ -332,7 +332,7 @@ export default function Process() {
     >
       {/* Background glow */}
       <m.div
-        className="absolute left-1/2 -translate-x-1/2 w-[700px] h-[700px] pointer-events-none"
+        className="absolute left-1/2 -translate-x-1/2 w-175 h-175 pointer-events-none"
         style={{
           y: glowY,
           background: 'radial-gradient(ellipse at center, rgba(255,250,235,0.02) 0%, transparent 70%)',
@@ -344,7 +344,7 @@ export default function Process() {
       {/* Noise */}
       <div className="absolute inset-0 opacity-[0.018] pointer-events-none" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.75%22 numOctaves=%224%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")' }} />
 
-      <div className="relative z-10 w-full px-6 md:px-12 lg:px-[120px]">
+      <div className="relative z-10 w-full px-6 md:px-12 lg:px-30">
 
         {/* Header — word-by-word */}
         <div ref={headerRef} className="mb-20 md:mb-28">
@@ -396,7 +396,7 @@ export default function Process() {
             </div>
 
             <m.p
-              className="font-body text-[15px] md:text-[17px] text-white/30 leading-[1.7] max-w-[480px] lg:text-right lg:ml-auto"
+              className="font-body text-[15px] md:text-[17px] text-white/30 leading-[1.7] max-w-120 lg:text-right lg:ml-auto"
               initial={{ opacity: 0, y: 20 }}
               animate={headerInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.8, delay: 0.6, ease: EASE }}

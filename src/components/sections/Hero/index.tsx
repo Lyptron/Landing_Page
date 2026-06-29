@@ -166,7 +166,7 @@ export default function Hero() {
 
         {/* Primary spotlight — warm white cone from above */}
         <div
-          className="absolute left-1/2 -translate-x-1/2 -top-[10%]"
+          className="absolute left-1/2 -translate-x-1/2 top-[-10%]"
           style={{
             width: '140%',
             height: '85%',
@@ -189,7 +189,7 @@ export default function Hero() {
 
         {/* Ultra-subtle warm edge glow at top center */}
         <div
-          className="absolute left-1/2 -translate-x-1/2 -top-[5%]"
+          className="absolute left-1/2 -translate-x-1/2 top-[-5%]"
           style={{
             width: '30%',
             height: '200px',
@@ -267,10 +267,10 @@ export default function Hero() {
       <div className="relative z-10">
 
         {/* ── HERO TEXT BLOCK ── */}
-        <div className="w-full max-w-[1440px] mx-auto px-6 md:px-12 lg:px-20 pt-28 md:pt-44">
+        <div className="w-full max-w-360 mx-auto px-6 md:px-12 lg:px-20 pt-28 md:pt-44">
 
           {/* Storytelling Headline — smooth crossfade transitions */}
-          <div className="relative min-h-[120px] md:min-h-[180px] lg:min-h-[200px] mb-7 w-full">
+          <div className="relative min-h-30 md:min-h-45 lg:min-h-50 mb-7 w-full">
             {/* Step 2 — main headline. Always present in the DOM so crawlers
                 and no-JS readers see the real H1 immediately; the animated
                 teasers below sit visually in front via z-index but are
@@ -334,13 +334,13 @@ export default function Hero() {
             transition={{ duration: 1.8, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
             className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 lg:gap-10 w-full pb-10 md:pb-20"
           >
-            <p className="font-body text-[15px] md:text-[17px] text-white/30 leading-[1.7] max-w-[520px]">
+            <p className="font-body text-[15px] md:text-[17px] text-white/30 leading-[1.7] max-w-130">
               A product studio for founders who need design, engineering and strategy under one roof — shipped on time, built to last.
             </p>
             <div className="flex flex-wrap items-center gap-3 shrink-0">
               <a href="#cta" className="relative group overflow-hidden rounded-full">
                 <div className="absolute inset-0 bg-white group-hover:bg-white/90 transition-colors duration-300" />
-                <div className="relative flex items-center gap-2 px-7 py-3 font-semibold text-[13px] text-[#050505] tracking-[0.02em]">
+                <div className="relative flex items-center gap-2 px-7 py-3 font-semibold text-[13px] text-bg tracking-[0.02em]">
                   Start a Project
                   <svg width="12" height="12" viewBox="0 0 14 14" fill="none" className="transition-transform duration-300 group-hover:translate-x-0.5"><path d="M2.5 7h9M7.5 3l4 4-4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                 </div>
@@ -353,19 +353,19 @@ export default function Hero() {
         </div>
 
         {/* ── SHOWCASE STRIP ── full bleed */}
-        <div className="w-full max-w-[1440px] mx-auto px-6 md:px-12 lg:px-20">
+        <div className="w-full max-w-360 mx-auto px-6 md:px-12 lg:px-20">
           <m.div className="h-px w-full mb-0"
                       style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.06) 15%, rgba(255,255,255,0.06) 85%, transparent)' }}
                       initial={{ scaleX: 0 }} animate={{ scaleX: 1 }}
                       transition={{ duration: 1.4, delay: 0.6, ease: EASE }} />
         </div>
 
-        <div className="w-full max-w-[1440px] mx-auto px-6 md:px-12 lg:px-20 py-6 md:py-14">
+        <div className="w-full max-w-360 mx-auto px-6 md:px-12 lg:px-20 py-6 md:py-14">
           <div className="flex overflow-x-auto lg:grid lg:grid-cols-3 gap-5 pb-8 snap-x snap-mandatory" style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
             {PROJECTS.map((p, i) => (
               <m.div
                 key={p.title}
-                className="group rounded-2xl overflow-hidden cursor-default shrink-0 w-[85vw] sm:w-[400px] lg:w-auto snap-center"
+                className="group rounded-2xl overflow-hidden cursor-default shrink-0 w-[85vw] sm:w-100 lg:w-auto snap-center"
                 style={{
                   background: 'linear-gradient(160deg, rgba(255,255,255,0.025) 0%, rgba(255,255,255,0.005) 100%)',
                   border: '1px solid rgba(255,255,255,0.06)',
@@ -387,17 +387,17 @@ export default function Hero() {
                 {/* Browser chrome */}
                 <div className="flex items-center gap-1.5 px-4 h-9" style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', background: 'rgba(255,255,255,0.01)' }}>
                   <div className="flex gap-1.5">
-                    <div className="w-[6px] h-[6px] rounded-full bg-white/12" />
-                    <div className="w-[6px] h-[6px] rounded-full bg-white/8" />
-                    <div className="w-[6px] h-[6px] rounded-full bg-white/6" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-white/12" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-white/8" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-white/6" />
                   </div>
-                  <div className="ml-3 h-[18px] flex-1 max-w-[120px] rounded bg-white/[0.03] flex items-center px-2">
+                  <div className="ml-3 h-4.5 flex-1 max-w-30 rounded bg-white/3 flex items-center px-2">
                     <span className="font-mono text-[7px] text-white/12">{p.url}</span>
                   </div>
                 </div>
 
                 {/* Preview area */}
-                <div className="aspect-[16/10] relative" style={{ background: 'linear-gradient(135deg, #0e0e10 0%, #08080A 100%)' }}>
+                <div className="aspect-16/10 relative" style={{ background: 'linear-gradient(135deg, #0e0e10 0%, #08080A 100%)' }}>
                   {/* Subtle inner glow */}
                   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700"
                        style={{ background: 'radial-gradient(circle at 50% 30%, rgba(255,255,255,0.02) 0%, transparent 50%)' }} />
@@ -414,9 +414,9 @@ export default function Hero() {
                         ))}
                       </div>
                       <div className="flex-1 rounded-lg p-2.5" style={{ background: 'rgba(255,255,255,0.015)', border: '1px solid rgba(255,255,255,0.035)' }}>
-                        <div className="flex items-end gap-[3px] h-full">
+                        <div className="flex items-end gap-0.75 h-full">
                           {p.bars.map((h, j) => (
-                            <div key={j} className="flex-1 rounded-t-[2px] transition-all duration-300"
+                            <div key={j} className="flex-1 rounded-t-xs transition-all duration-300"
                                  style={{ height: `${h}%`, background: j >= 8 ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.05)' }} />
                           ))}
                         </div>
@@ -432,8 +432,8 @@ export default function Hero() {
                           <div className="p-2.5 flex flex-col h-full">
                             <div className="h-2 w-16 rounded bg-white/8 mb-2" />
                             <div className="h-1.5 w-12 rounded bg-white/4 mb-3" />
-                            <div className="flex-1 rounded bg-white/[0.02] border border-white/4 flex items-center justify-center">
-                              <div className="w-10 h-12 rounded border border-white/8 bg-white/[0.02]" />
+                            <div className="flex-1 rounded bg-white/2 border border-white/4 flex items-center justify-center">
+                              <div className="w-10 h-12 rounded border border-white/8 bg-white/2" />
                             </div>
                           </div>
                         </div>
@@ -447,7 +447,7 @@ export default function Hero() {
                         <div className="flex-1 rounded-lg p-2.5" style={{ background: 'rgba(255,255,255,0.015)', border: '1px solid rgba(255,255,255,0.04)' }}>
                           <div className="grid grid-cols-2 gap-2 h-full">
                             {[...Array(4)].map((_, k) => (
-                              <div key={k} className="rounded bg-white/[0.02] border border-white/4" />
+                              <div key={k} className="rounded bg-white/2 border border-white/4" />
                             ))}
                           </div>
                         </div>
@@ -490,7 +490,7 @@ export default function Hero() {
         </div>
 
         {/* ── TRUST BAR ── */}
-        <div className="w-full max-w-[1440px] mx-auto px-6 md:px-12 lg:px-20 pb-12 md:pb-24">
+        <div className="w-full max-w-360 mx-auto px-6 md:px-12 lg:px-20 pb-12 md:pb-24">
           <m.div className="h-px w-full mb-10"
                       style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.06) 15%, rgba(255,255,255,0.06) 85%, transparent)' }}
                       initial={{ scaleX: 0 }} animate={{ scaleX: 1 }}
@@ -522,7 +522,7 @@ export default function Hero() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
               {TRUST.map((t, i) => (
                 <div key={i} className="relative text-left">
-                  {i > 0 && <div className="hidden md:block absolute -left-6 top-1/2 -translate-y-1/2 w-px h-10 bg-white/[0.04]" />}
+                  {i > 0 && <div className="hidden md:block absolute -left-6 top-1/2 -translate-y-1/2 w-px h-10 bg-white/4" />}
                   <span className="font-display font-bold text-[28px] md:text-[34px] text-white/80 tracking-tight leading-none block">{t.value}</span>
                   <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-white/20 mt-1.5 block">{t.label}</span>
                 </div>
@@ -534,7 +534,7 @@ export default function Hero() {
       </div>
 
       {/* Bottom fade */}
-      <div className="absolute bottom-0 left-0 right-0 h-[120px] z-20 pointer-events-none"
+      <div className="absolute bottom-0 left-0 right-0 h-30 z-20 pointer-events-none"
            style={{ background: 'linear-gradient(to top, #050505 0%, transparent 100%)' }} />
     </section>
   )
