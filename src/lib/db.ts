@@ -400,6 +400,19 @@ export async function uploadLogo(file: File) {
   return { data: bustUrl, error: null }
 }
 
+// Shared by admin + client gallery upload UI. Uploads to the 'project-gallery'
+// bucket (must be created in Supabase Dashboard → Storage, public, with an
+// insert policy scoped to authenticated admins and anon client-portal writes)
+// under a per-project folder so files from different projects never collide.
+export async function uploadGalleryImage(file: File, projectId: string) {
+  const ext = file.name.split('.').pop()
+  const path = `${projectId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`
+  const { error } = await supabase.storage.from('project-gallery').upload(path, file, { cacheControl: '3600' })
+  if (error) return { data: null, error }
+  const { data: urlData } = supabase.storage.from('project-gallery').getPublicUrl(path)
+  return { data: urlData.publicUrl, error: null }
+}
+
 export async function fetchAgencySettings() {
   return supabase.from('agency_settings').select('*').single()
 }

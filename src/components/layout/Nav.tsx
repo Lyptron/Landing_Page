@@ -176,13 +176,24 @@ export default function Nav() {
             }}
             onMouseLeave={() => setCursorState('default')}
           >
+            {/* Two pre-rendered variants swapped via the dark: variant (matches
+                [data-theme="dark"] on <html>, set pre-paint — no JS flicker).
+                Same artwork, line color only: white in dark mode, black in light. */}
             <Image
               src="/images/logo.gif"
               alt="Lyptron"
-              width={38}
+              width={31}
               height={38}
               unoptimized
-              className="rounded-lg"
+              className="rounded-lg hidden dark:block"
+            />
+            <Image
+              src="/images/logo-light.gif"
+              alt="Lyptron"
+              width={31}
+              height={38}
+              unoptimized
+              className="rounded-lg dark:hidden"
             />
             <LyptronLogo trigger={logoScrambleTrigger} />
           </button>

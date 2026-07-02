@@ -23,6 +23,7 @@ export const services: Service[] = [
       'A performance audit of your existing site',
     ],
     stack: ['Next.js', 'React', 'TypeScript', 'Node.js', 'PostgreSQL', 'Vercel'],
+    url: '/web-development',
   },
   {
     id: 'mobile-dev',
@@ -46,6 +47,7 @@ export const services: Service[] = [
       'Native feature sets built directly on top of React Native',
     ],
     stack: ['React Native', 'Expo', 'Swift', 'Kotlin', 'Redux Toolkit', 'Firebase'],
+    url: '/mobile-development',
   },
   {
     id: 'ai-automation',
@@ -69,6 +71,7 @@ export const services: Service[] = [
       'Semantic document processors using chunking frameworks',
     ],
     stack: ['Python', 'OpenAI', 'LangChain', 'Pinecone', 'FastAPI', 'AWS'],
+    url: '/ai-automation',
   },
   {
     id: 'ui-ux-design',
@@ -92,6 +95,7 @@ export const services: Service[] = [
       'Modern, highly polished wireframes ready to build',
     ],
     stack: ['Figma', 'Adobe CC', 'Principle', 'Spline', 'Tailwind', 'CSS'],
+    url: '/ui-ux-design',
   },
   {
     id: 'cloud-devops',
@@ -115,6 +119,7 @@ export const services: Service[] = [
       'Infrastructure as code templates using Terraform',
     ],
     stack: ['AWS', 'Docker', 'Terraform', 'Kubernetes', 'GitHub Actions', 'Datadog'],
+    url: '/cloud-infrastructure',
   },
   {
     id: 'brand-strategy',
@@ -138,5 +143,6 @@ export const services: Service[] = [
       'Tailored content calendars mapped to search intent',
     ],
     stack: ['Ahrefs', 'Semrush', 'Google Analytics', 'Notion', 'Hotjar', 'Screaming Frog'],
+    url: '/seo-services',
   }
 ]

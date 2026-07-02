@@ -17,7 +17,7 @@ export default function LegalPageBody({ title, lastUpdated, intro, sections }: L
   return (
     <>
       <main className="relative w-full bg-bg text-white pt-32 md:pt-44 pb-24">
-        <div className="w-full max-w-190 mx-auto px-6 md:px-12">
+        <div className="w-full px-6 md:px-12 lg:px-20 xl:px-28">
           <nav aria-label="Breadcrumb" className="mb-8">
             <ol className="flex items-center gap-2 font-mono text-[11px] text-white/30 uppercase tracking-wider">
               <li><Link href="/" className="hover:text-white/60 transition-colors">Home</Link></li>
@@ -33,14 +33,6 @@ export default function LegalPageBody({ title, lastUpdated, intro, sections }: L
             <p className="font-mono text-[11px] text-white/30 uppercase tracking-wider mb-6">Last updated: {lastUpdated}</p>
             <p className="font-body text-[15px] text-white/40 leading-relaxed">{intro}</p>
           </header>
-
-          <div
-            className="rounded-xl p-5 mb-12 font-body text-[13px] text-white/35 leading-relaxed"
-            style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)' }}
-          >
-            This document is a general template provided as a starting point and has not been reviewed by a lawyer.
-            It is not legal advice. Please have qualified counsel review it before relying on it for compliance purposes.
-          </div>
 
           <div className="flex flex-col gap-10">
             {sections.map((section) => (

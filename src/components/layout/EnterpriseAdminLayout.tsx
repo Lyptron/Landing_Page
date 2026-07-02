@@ -211,11 +211,13 @@ export default function EnterpriseAdminLayout({ children }: { children: React.Re
         {/* Brand header — unified mark + role subtitle */}
         <div className="px-5 pt-5 pb-4">
           {sidebarOpen ? (
-            <LyptronLogo subtitle={roleSubtitle(user?.role)} />
+            <Link href="/" aria-label="Lyptron home" className="flex min-w-0">
+              <LyptronLogo subtitle={roleSubtitle(user?.role)} />
+            </Link>
           ) : (
-            <div className="flex justify-center">
+            <Link href="/" aria-label="Lyptron home" className="flex justify-center">
               <LyptronMark size={30} />
-            </div>
+            </Link>
           )}
         </div>
 
@@ -303,7 +305,9 @@ export default function EnterpriseAdminLayout({ children }: { children: React.Re
               }}
             >
               <div className="px-5 pt-5 pb-4 flex items-center justify-between">
-                <LyptronLogo subtitle={roleSubtitle(user?.role)} />
+                <Link href="/" aria-label="Lyptron home" onClick={() => setMobileMenuOpen(false)} className="flex min-w-0">
+                  <LyptronLogo subtitle={roleSubtitle(user?.role)} />
+                </Link>
                 <button onClick={() => setMobileMenuOpen(false)} className="hover:text-(--cp-text) transition-colors" style={{ color: 'var(--cp-text-muted)' }}>
                   <X className="w-5 h-5" />
                 </button>

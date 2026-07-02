@@ -24,17 +24,6 @@ export const team: TeamMember[] = [
     image: '/images/Arjun.png',
   },
   {
-    id: 'sk',
-    initials: 'SK',
-    name: 'Suryakanth K',
-    role: 'Growth & Strategy',
-    skills: ['Growth Marketing', 'SEO', 'Data Analytics'],
-    bio: 'Suryakanth steers growth planning and marketing operations. He combines web data analytics, conversion optimization, and technical SEO strategies to scale organic traffic and expand our clients\' digital footprint.',
-    expertise: ['Search Engine Strategy', 'Conversion Optimization', 'Performance Analytics', 'B2B Client Strategy'],
-    accent: '#ffffff',
-    image: '/images/Suryakanth.png',
-  },
-  {
     id: 'lk',
     initials: 'LK',
     name: 'Lalith Kumar M R',

@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState, Suspense } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ArrowRight, ShieldCheck } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
@@ -59,7 +60,9 @@ function ClientLoginGate() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: EASE_OUT }}
         >
-          <LyptronLogo size={36} subtitle="Client Portal" textClassName="text-[18px]" />
+          <Link href="/" aria-label="Lyptron home" className="flex min-w-0">
+            <LyptronLogo size={36} subtitle="Client Portal" textClassName="text-[18px]" />
+          </Link>
         </motion.div>
         <motion.div
           initial={{ opacity: 0 }}

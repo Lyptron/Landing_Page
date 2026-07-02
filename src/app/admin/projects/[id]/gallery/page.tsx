@@ -1,8 +1,8 @@
 'use client'
 import { useState } from 'react'
 import Image from 'next/image'
-import { Image as ImageIcon, Plus, Trash2 } from 'lucide-react'
-import { insertGalleryImage } from '@/lib/db'
+import { Image as ImageIcon, Plus, Trash2, Upload } from 'lucide-react'
+import { insertGalleryImage, uploadGalleryImage } from '@/lib/db'
 import { supabase } from '@/lib/supabase'
 import Modal, { ModalInput } from '@/components/ui/Modal'
 import { useProject } from '../layout'
@@ -11,21 +11,45 @@ export default function ProjectGalleryPage() {
   const { projectId, gallery, setGallery } = useProject()
   const [modalOpen, setModalOpen] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [form, setForm] = useState({ title: '', image_url: '', week_label: '' })
+  const [uploadError, setUploadError] = useState<string | null>(null)
+  const [form, setForm] = useState({ title: '', week_label: '' })
+  const [file, setFile] = useState<File | null>(null)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+
+  function handleFileSelect(selected: File | null) {
+    setFile(selected)
+    setPreviewUrl((prev) => {
+      if (prev) URL.revokeObjectURL(prev)
+      return selected ? URL.createObjectURL(selected) : null
+    })
+  }
+
+  function closeModal() {
+    setModalOpen(false)
+    setForm({ title: '', week_label: '' })
+    handleFileSelect(null)
+    setUploadError(null)
+  }
 
   async function handleAdd() {
-    if (!form.title || !form.image_url) return
+    if (!form.title || !file) return
     setSaving(true)
+    setUploadError(null)
+    const { data: imageUrl, error: uploadErr } = await uploadGalleryImage(file, projectId)
+    if (uploadErr || !imageUrl) {
+      setUploadError(uploadErr?.message || 'Upload failed. Please try again.')
+      setSaving(false)
+      return
+    }
     const { data } = await insertGalleryImage({
       project_id: projectId,
       title: form.title,
-      image_url: form.image_url,
+      image_url: imageUrl,
       week_label: form.week_label || '',
     })
     if (data) setGallery(prev => [...prev, data])
-    setForm({ title: '', image_url: '', week_label: '' })
     setSaving(false)
-    setModalOpen(false)
+    closeModal()
   }
 
   async function handleDelete(id: string) {
@@ -65,15 +89,41 @@ export default function ProjectGalleryPage() {
         <Plus className="w-3.5 h-3.5" /> Add Image
       </button>
 
-      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title="Add Gallery Image" subtitle="Client sees this in Gallery.">
+      <Modal open={modalOpen} onClose={closeModal} title="Add Gallery Image" subtitle="Client sees this in Gallery.">
         <div className="flex flex-col gap-4">
           <ModalInput label="Title" value={form.title} onChange={v => setForm({ ...form, title: v })} placeholder="e.g. Dashboard Screenshot" required />
-          <ModalInput label="Image URL" value={form.image_url} onChange={v => setForm({ ...form, image_url: v })} placeholder="https://..." required />
+
+          <div className="flex flex-col gap-2">
+            <label className="text-[11px] font-semibold uppercase tracking-wider text-(--cp-text-muted)">
+              Image <span className="text-(--cp-red)">*</span>
+            </label>
+            <label
+              className="relative flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-(--cp-border) p-5 cursor-pointer hover:bg-(--cp-bg-soft) transition-colors overflow-hidden"
+              style={{ minHeight: previewUrl ? '160px' : 'auto' }}
+            >
+              <input
+                type="file"
+                accept="image/*"
+                className="absolute inset-0 opacity-0 cursor-pointer"
+                onChange={(e) => handleFileSelect(e.target.files?.[0] ?? null)}
+              />
+              {previewUrl ? (
+                <Image src={previewUrl} alt="Preview" fill className="object-cover" unoptimized />
+              ) : (
+                <>
+                  <Upload className="w-4 h-4 text-(--cp-text-faint)" />
+                  <span className="text-[12px] text-(--cp-text-faint)">Click to choose an image</span>
+                </>
+              )}
+            </label>
+            {uploadError && <span className="text-[11px] text-(--cp-red)" role="alert">{uploadError}</span>}
+          </div>
+
           <ModalInput label="Week Label" value={form.week_label} onChange={v => setForm({ ...form, week_label: v })} placeholder="e.g. Week 3" />
           <div className="flex justify-end gap-3 pt-4 border-t" style={{ borderColor: 'var(--cp-border-soft)' }}>
-            <button onClick={() => setModalOpen(false)} className="px-4 py-2 rounded-xl text-[12px] font-medium text-(--cp-text-muted) hover:text-(--cp-text)">Cancel</button>
-            <button onClick={handleAdd} disabled={saving || !form.title || !form.image_url} className="cp-btn-primary px-5 py-2 text-[12px] cursor-pointer">
-              {saving ? 'Adding...' : 'Add'}
+            <button onClick={closeModal} className="px-4 py-2 rounded-xl text-[12px] font-medium text-(--cp-text-muted) hover:text-(--cp-text)">Cancel</button>
+            <button onClick={handleAdd} disabled={saving || !form.title || !file} className="cp-btn-primary px-5 py-2 text-[12px] cursor-pointer">
+              {saving ? 'Uploading...' : 'Add'}
             </button>
           </div>
         </div>

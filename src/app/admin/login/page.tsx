@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react'
 import { signInWithPassword, signInWithGoogle } from '@/lib/supabase'
@@ -48,12 +49,14 @@ export default function AdminLoginPage() {
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-        className="flex items-center gap-3 mb-10 relative z-10"
+        className="mb-10 relative z-10"
       >
-        <LyptronMark size={36} />
-        <span className="font-display font-bold text-xl tracking-tight" style={{ color: 'var(--cp-text)' }}>
-          Lyptron<span style={{ color: 'var(--cp-cyan)' }}>.</span>
-        </span>
+        <Link href="/" aria-label="Lyptron home" className="flex items-center gap-3">
+          <LyptronMark size={36} />
+          <span className="font-display font-bold text-xl tracking-tight" style={{ color: 'var(--cp-text)' }}>
+            Lyptron<span style={{ color: 'var(--cp-cyan)' }}>.</span>
+          </span>
+        </Link>
       </motion.div>
 
       {/* Login Card */}

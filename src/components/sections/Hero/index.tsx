@@ -45,27 +45,22 @@ const TRUST = [
 const LOGOS = [
   {
     name: 'Vercel',
+    // Letterform paths are easy to get subtly wrong and render as garbled
+    // text — render the wordmark as real text next to the (simple,
+    // easy-to-verify) triangle glyph instead of hand-drawn letter paths.
     svg: (
-      <svg width="76" height="17" viewBox="0 0 76 17" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-        <path d="M12.9818 16.2952H0L6.49088 5.04018L12.9818 16.2952Z" />
-        <path d="M22.0628 12.019H25.8647C27.1738 12.019 28.2618 11.1166 28.2618 9.80854C28.2618 8.49842 27.1738 7.59814 25.8647 7.59814H22.0628V12.019ZM20.0387 16.2952V5.55621H25.8647C28.3248 5.55621 30.2849 7.4566 30.2849 9.80854C30.2849 11.6664 28.9329 13.2384 27.1708 13.8407L30.7301 16.2952H28.2917L24.8943 13.9317H22.0628V16.2952H20.0387Z" />
-        <path d="M37.3629 16.5161C33.8299 16.5161 31.0669 13.8266 31.0669 10.4285C31.0669 7.0305 33.8299 4.34094 37.3629 4.34094C40.6724 4.34094 43.3283 6.7454 43.6194 9.9405H41.5654C41.2583 7.8427 39.5293 6.22304 37.3629 6.22304C35.034 6.22304 33.149 8.1136 33.149 10.4285C33.149 12.7435 35.034 14.634 37.3629 14.634C39.5293 14.634 41.2583 13.0144 41.5654 10.9166H43.6194C43.3283 14.1117 40.6724 16.5161 37.3629 16.5161Z" />
-        <path d="M50.4578 16.2952H44.1353V5.55621H50.3648V7.48154H46.1593V9.89744H50.1417V11.8228H46.1593V14.3699H50.4578V16.2952Z" />
-        <path d="M53.1113 16.2952H51.0873V5.55621H53.1113V16.2952Z" />
-      </svg>
+      <span className="flex items-center gap-1.5">
+        <svg width="13" height="12" viewBox="0 0 13 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+          <path d="M6.5 0L13 12H0L6.5 0Z" />
+        </svg>
+        <span className="font-sans font-semibold text-[15px] tracking-tight leading-none">Vercel</span>
+      </span>
     )
   },
   {
     name: 'Stripe',
     svg: (
-      <svg width="49" height="20" viewBox="0 0 49 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-        <path d="M24.12 19.34C21.84 19.34 20.08 17.58 20.08 15.34C20.08 13.1 21.84 11.34 24.12 11.34C26.4 11.34 28.16 13.1 28.16 15.34C28.16 17.58 26.4 19.34 24.12 19.34ZM24.12 13.34C23.016 13.34 22.12 14.236 22.12 15.34C22.12 16.444 23.016 17.34 24.12 17.34C25.224 17.34 26.12 16.444 26.12 15.34C26.12 14.236 25.224 13.34 24.12 13.34Z" />
-        <path d="M3.76 19.34C1.64 19.34 0 17.7 0 15.58C0 14.02 0.88 12.78 2.24 12.18L3.6 11.58C4.36 11.26 4.76 10.94 4.76 10.42C4.76 9.82 4.24 9.42 3.52 9.42C2.72 9.42 2.2 9.94 2.12 10.66H0.12C0.2 9.02 1.56 7.66 3.6 7.66C5.64 7.66 7.08 8.9 7.08 10.66C7.08 12.02 6.16 13.14 4.96 13.66L3.6 14.26C2.8 14.58 2.48 14.94 2.48 15.46C2.48 16.14 3.04 16.58 3.84 16.58C4.72 16.58 5.32 15.98 5.48 15.06H7.48C7.32 16.86 5.84 19.34 3.76 19.34Z" />
-        <path d="M12.92 19.14C11.52 19.14 10.56 18.3 10.56 16.9V9.7H9.28V7.86H10.56V5.42L12.6 4.9V7.86H14.88V9.7H12.6V16.22C12.6 16.82 12.92 17.14 13.52 17.14H14.88V19.14H12.92Z" />
-        <path d="M34.8 19.34C33.68 19.34 32.72 18.86 32.2 18V25H30.16V11.54H32.08V12.66C32.6 11.82 33.56 11.34 34.68 11.34C36.96 11.34 38.72 13.1 38.72 15.34C38.72 17.58 36.96 19.34 34.8 19.34ZM34.44 13.34C33.336 13.34 32.44 14.236 32.44 15.34C32.44 16.444 33.336 17.34 34.44 17.34C35.544 17.34 36.44 16.444 36.44 15.34C36.44 14.236 35.544 13.34 34.44 13.34Z" />
-        <path d="M44.4 19.34C42.08 19.34 40.16 17.42 40.16 15.1C40.16 12.78 42.08 10.86 44.4 10.86C46.68 10.86 48.48 12.66 48.48 14.94V15.74H42.24C42.44 16.74 43.32 17.46 44.4 17.46C45.32 17.46 46 16.94 46.36 16.14H48.28C47.88 18 46.32 19.34 44.4 19.34ZM44.4 12.62C43.4 12.62 42.6 13.26 42.36 14.18H46.48C46.28 13.26 45.44 12.62 44.4 12.62Z" />
-        <path d="M16.5195 19.14V11.54H18.4395V12.7C18.8795 11.78 19.7995 11.34 20.8795 11.34C21.1995 11.34 21.4395 11.38 21.5595 11.42V13.34C21.3995 13.3 21.1195 13.26 20.7595 13.26C19.5195 13.26 18.5595 14.18 18.5595 15.62V19.14H16.5195Z" />
-      </svg>
+      <span className="font-sans font-bold text-[15px] tracking-tight leading-none">Stripe</span>
     )
   },
   {
@@ -77,18 +72,6 @@ const LOGOS = [
       </svg>
     )
   },
-  {
-    name: 'Figma',
-    svg: (
-      <svg width="14" height="20" viewBox="0 0 38 57" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M19 28.5C24.2467 28.5 28.5 24.2467 28.5 19C28.5 13.7533 24.2467 9.5 19 9.5H9.5V28.5H19Z" fill="#F24E1E"/>
-        <path d="M9.5 28.5C4.25329 28.5 0 24.2467 0 19C0 13.7533 4.25329 9.5 9.5 9.5H19V28.5H9.5Z" fill="#A259FF"/>
-        <path d="M19 47.5C24.2467 47.5 28.5 43.2467 28.5 38C28.5 32.7533 24.2467 28.5 19 28.5H9.5V47.5H19Z" fill="#1ABCFE"/>
-        <path d="M9.5 47.5C4.25329 47.5 0 43.2467 0 38C0 32.7533 4.25329 28.5 9.5 28.5H19V47.5H9.5Z" fill="#0ACF83"/>
-        <path d="M19 57C13.7533 57 9.5 52.7467 9.5 47.5V38H19C24.2467 38 28.5 42.2533 28.5 47.5C28.5 52.7467 24.2467 57 19 57Z" fill="#FF7262"/>
-      </svg>
-    )
-  }
 ]
 
 export default function Hero() {
@@ -501,14 +484,14 @@ export default function Hero() {
                       transition={{ duration: 0.8, delay: 1.1, ease: EASE }}
                       className="flex flex-wrap items-center justify-start gap-4 sm:gap-8 mb-12">
             <span className="font-mono text-[9px] uppercase tracking-[0.15em] text-white/15 shrink-0">Built with</span>
-            <div className="flex flex-wrap items-center gap-6 sm:gap-8 md:gap-10 opacity-60 grayscale hover:grayscale-0 transition-all duration-700">
+            <div className="flex flex-wrap items-center gap-7 sm:gap-10 md:gap-12">
               {LOGOS.map(logo => (
                 <div
                   key={logo.name}
                   role="img"
                   aria-label={`${logo.name} logo`}
                   title={logo.name}
-                  className="text-white hover:text-white transition-colors duration-300"
+                  className="text-white/70 hover:text-white opacity-80 hover:opacity-100 transition-all duration-300 [&_svg]:w-auto [&_svg]:h-5 sm:[&_svg]:h-6"
                 >
                   {logo.svg}
                 </div>

@@ -194,16 +194,16 @@ export default function WhoWeAre() {
                 animate={headlineInView ? { opacity: 1, filter: 'blur(0px)', y: 0 } : {}}
                 transition={{ duration: 1.2, delay: 0.2, ease: EASE }}
               >
-                A product studio{' '}
-              </m.span>
+                A product studio
+              </m.span>{' '}
               <m.span
                 className="text-white/35 inline-block"
                 initial={{ opacity: 0, filter: 'blur(16px)', y: 16 }}
                 animate={headlineInView ? { opacity: 1, filter: 'blur(0px)', y: 0 } : {}}
                 transition={{ duration: 1.2, delay: 0.5, ease: EASE }}
               >
-                for founders who need design, engineering &amp; strategy{' '}
-              </m.span>
+                for founders who need design, engineering &amp; strategy
+              </m.span>{' '}
               <m.span
                 className="text-white/90 inline-block"
                 initial={{ opacity: 0, filter: 'blur(16px)', y: 16 }}

@@ -9,26 +9,58 @@ import Image from 'next/image'
  * Uses the uploaded logo from Settings (via LogoContext) if available,
  * otherwise falls back to the static /images/logo.gif.
  */
-export function LyptronMark({ size = 42, className = '' }: { size?: number; className?: string }) {
+const DEFAULT_LOGO = '/images/logo.gif'
+const DEFAULT_LOGO_LIGHT = '/images/logo-light.gif'
+
+// Single universal size for the Lyptron mark across nav, admin, client,
+// login, and loading screens. Source artwork is 62x76 (aspect ~0.814).
+const MARK_WIDTH = 31
+const MARK_HEIGHT = 38
+
+export function LyptronMark({ className = '' }: { size?: number; className?: string }) {
   const src = useLogoUrl()
-  const imageSize = Math.round(size * 0.75)
+  // The default mark has a pre-rendered light-mode variant (white lines ->
+  // black) swapped via the dark: variant. An admin-uploaded custom logo is
+  // a single arbitrary image, so it's rendered as-is in both themes.
+  const isDefaultLogo = src === DEFAULT_LOGO
 
   return (
     <div
-      className={`relative shrink-0 rounded-full flex items-center justify-center bg-[#14120F] dark:bg-transparent transition-colors ${className}`}
+      className={`relative shrink-0 flex items-center justify-center ${className}`}
       style={{
-        width: size,
-        height: size,
+        width: MARK_WIDTH,
+        height: MARK_HEIGHT,
       }}
     >
-      <Image
-        src={src}
-        alt="Lyptron"
-        width={imageSize}
-        height={imageSize}
-        unoptimized
-        className="object-contain rounded-full"
-      />
+      {isDefaultLogo ? (
+        <>
+          <Image
+            src={DEFAULT_LOGO}
+            alt="Lyptron"
+            width={MARK_WIDTH}
+            height={MARK_HEIGHT}
+            unoptimized
+            className="object-contain hidden dark:block"
+          />
+          <Image
+            src={DEFAULT_LOGO_LIGHT}
+            alt="Lyptron"
+            width={MARK_WIDTH}
+            height={MARK_HEIGHT}
+            unoptimized
+            className="object-contain dark:hidden"
+          />
+        </>
+      ) : (
+        <Image
+          src={src}
+          alt="Lyptron"
+          width={MARK_WIDTH}
+          height={MARK_HEIGHT}
+          unoptimized
+          className="object-contain"
+        />
+      )}
     </div>
   )
 }

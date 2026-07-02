@@ -117,16 +117,16 @@ export default function CTA() {
               animate={headlineInView ? { opacity: 1, filter: 'blur(0px)', y: 0 } : {}}
               transition={{ duration: 1.2, delay: 0.2, ease: EASE }}
             >
-              Have an idea?{' '}
-            </m.span>
+              Have an idea?
+            </m.span>{' '}
             <m.span
               className="text-white/45 inline-block"
               initial={{ opacity: 0, filter: 'blur(16px)', y: 20 }}
               animate={headlineInView ? { opacity: 1, filter: 'blur(0px)', y: 0 } : {}}
               transition={{ duration: 1.2, delay: 0.5, ease: EASE }}
             >
-              Let&apos;s talk about{' '}
-            </m.span>
+              Let&apos;s talk about
+            </m.span>{' '}
             <m.span
               className="text-white/90 inline-block"
               initial={{ opacity: 0, filter: 'blur(16px)', y: 20 }}

@@ -1,17 +1,20 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Image as ImageIcon, X, ImageOff } from 'lucide-react'
+import { Image as ImageIcon, X, ImageOff, Upload } from 'lucide-react'
 import Image from 'next/image'
-import { fetchGallery } from '@/lib/db'
+import { fetchGallery, insertGalleryImage, uploadGalleryImage } from '@/lib/db'
 import { PageHeader, EmptyState, Loading } from '@/components/portal/PortalUI'
 import { useClientPortalProject } from '@/hooks/useClientPortalProject'
 
 async function loadGallery(projectId: string) {
   const { data } = await fetchGallery(projectId)
-  if (!data?.length) return { data: [] }
+  return { data: data ?? [] }
+}
+
+function groupByWeek(images: any[]) {
   const grouped: Record<string, any> = {}
-  data.forEach((img: any) => {
+  images.forEach((img: any) => {
     const key = img.week_label || 'General'
     if (!grouped[key]) {
       grouped[key] = {
@@ -22,19 +25,66 @@ async function loadGallery(projectId: string) {
     }
     grouped[key].images.push(img)
   })
-  return { data: Object.values(grouped) }
+  return Object.values(grouped)
 }
 
 export default function ClientGalleryPage() {
-  const { resource, loading } = useClientPortalProject(loadGallery)
-  const galleryData = resource ?? []
+  const { project, resource, loading } = useClientPortalProject<any[]>(loadGallery)
+  const projectId = project?.id ?? null
+  const [images, setImages] = useState<any[]>([])
   const [selectedImage, setSelectedImage] = useState<{ url: string; title: string } | null>(null)
+  const [uploading, setUploading] = useState(false)
+  const [uploadError, setUploadError] = useState<string | null>(null)
+
+  // Hydrate local image list once the hook returns the fetched data, so a
+  // client upload can prepend to it without re-fetching the whole gallery.
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (resource) setImages(resource)
+  }, [resource])
+
+  async function handleUpload(file: File | null) {
+    if (!file || !projectId) return
+    setUploading(true)
+    setUploadError(null)
+    const { data: imageUrl, error: uploadErr } = await uploadGalleryImage(file, projectId)
+    if (uploadErr || !imageUrl) {
+      setUploadError(uploadErr?.message || 'Upload failed. Please try again.')
+      setUploading(false)
+      return
+    }
+    const { data } = await insertGalleryImage({
+      project_id: projectId,
+      title: file.name.replace(/\.[^.]+$/, ''),
+      image_url: imageUrl,
+    })
+    if (data) setImages((prev) => [data, ...prev])
+    setUploading(false)
+  }
+
+  const galleryData = groupByWeek(images)
 
   if (loading) return <Loading />
 
   return (
     <div className="flex flex-col gap-10">
-      <PageHeader title="Project Gallery" description="Visual updates and screenshots from your project, organized by week." />
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+        <PageHeader title="Project Gallery" description="Visual updates and screenshots from your project, organized by week." />
+        <label
+          className="shrink-0 cp-btn-secondary px-4 py-2.5 text-[12.5px] flex items-center gap-1.5 cursor-pointer relative"
+        >
+          <input
+            type="file"
+            accept="image/*"
+            className="absolute inset-0 opacity-0 cursor-pointer"
+            disabled={uploading}
+            onChange={(e) => handleUpload(e.target.files?.[0] ?? null)}
+          />
+          <Upload className="w-3.5 h-3.5" />
+          {uploading ? 'Uploading…' : 'Upload Image'}
+        </label>
+      </div>
+      {uploadError && <p className="text-[12px]" style={{ color: 'var(--cp-red)' }} role="alert">{uploadError}</p>}
 
       {galleryData.length === 0 ? (
         <EmptyState

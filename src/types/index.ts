@@ -13,6 +13,7 @@ export interface Service {
   works:    { name: string; badge: string; desc: string; result: string }[]
   forYou:   string[]
   stack:    string[]
+  url?:     string
 }
 
 export interface Project {

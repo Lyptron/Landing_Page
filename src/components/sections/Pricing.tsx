@@ -1,6 +1,6 @@
 'use client'
 import { useRef, useEffect } from 'react'
-import { Check, ArrowRight, Sparkles } from 'lucide-react'
+import { Check, ArrowRight, Sparkles, Clock, Users } from 'lucide-react'
 import { useCursor } from '../providers/CursorProvider'
 
 const BOOKING_EMAIL = 'hello@lyptron.com'
@@ -8,37 +8,70 @@ const bookCall = (subject: string) => {
   window.location.href = `mailto:${BOOKING_EMAIL}?subject=${encodeURIComponent(subject)}`
 }
 
-// Prices are quoted in INR (Lyptron is based in India). The JSON-LD
-// `priceRange: "$$$"` in src/app/layout.tsx is a generic indicator and
-// does not need to match this currency.
 const PRICING_TIERS = [
   {
     name: 'Design & Prototyping',
-    price: '₹1.5L',
-    suffix: 'Starting from',
-    desc: 'Perfect for founders who need a polished brand identity, clean UI, and clickable prototypes before development begins.',
-    features: ['User Research & Wireframing', 'Custom Design System in Figma', 'Interactive Clickable Prototypes', 'Developer-Ready Handoff'],
+    tagline: 'Brand, UI & clickable prototypes',
+    desc: 'For founders who need a polished brand identity, clean UI system, and a stakeholder-ready clickable prototype before any development begins.',
+    bestFor: 'Founders validating concepts',
+    timeline: '2–3 weeks',
+    features: [
+      'User Research & Competitive Analysis',
+      'Low-fi Wireframes for all core flows',
+      'High-fidelity Responsive UI in Figma',
+      'Design Tokens & Component Library',
+      'Interactive Clickable Prototypes',
+      'Usability Testing — up to 3 rounds',
+      'Brand Identity & Style Guide',
+      'Developer-Ready Handoff Documentation',
+    ],
+    addons: 'Motion specs, illustration, icon set',
     accent: '#8ba4c0',
     glow: 'rgba(139,164,192,0.06)',
+    price: '000000',
   },
   {
     name: 'Web / SaaS Build',
-    price: '₹4.0L',
-    suffix: 'Starting from',
-    desc: 'For businesses ready to launch — we build your full product from frontend to backend, deployed and production-ready.',
-    features: ['Next.js & React Architecture', 'Serverless APIs & Database', 'SEO & Performance Optimized', 'Cloud Deployment & CI/CD'],
+    tagline: 'Full-stack, production-ready product',
+    desc: 'For businesses ready to launch — we build your full product from frontend to backend, deployed, monitored, and production-ready from day one.',
+    bestFor: 'Businesses launching a product',
+    timeline: '4–6 weeks',
+    features: [
+      'Everything in Design & Prototyping',
+      'Next.js + React Frontend Architecture',
+      'Serverless APIs & PostgreSQL Database',
+      'Auth, Billing (Stripe) & Admin Panel',
+      'SEO-Optimized Semantic Markup',
+      'Automated Testing & QA Suite',
+      'Cloud Deployment & CI/CD Pipeline',
+      'Performance Audit — Lighthouse 100',
+    ],
+    addons: 'AI integration, multi-language, CMS',
     accent: '#c0a060',
     glow: 'rgba(192,160,96,0.06)',
     popular: true,
+    price: '000000',
   },
   {
     name: 'Mobile App',
-    price: '₹5.0L',
-    suffix: 'Starting from',
-    desc: 'Launch on both iOS and Android with a single codebase — native feel, smooth animations, and App Store ready.',
-    features: ['React Native Cross-Platform', 'Custom Native Modules', 'App Store Submission', 'Push Notifications & Analytics'],
+    tagline: 'iOS & Android from one codebase',
+    desc: 'Launch simultaneously on iOS and Android with React Native — native performance, smooth animations, and App Store ready on both platforms.',
+    bestFor: 'Startups targeting mobile-first users',
+    timeline: '4–8 weeks',
+    features: [
+      'React Native Cross-Platform Architecture',
+      'Custom Native Modules & Device APIs',
+      'Offline Support & Local Data Caching',
+      'Push Notifications & In-App Messaging',
+      'In-App Purchase & Subscription Billing',
+      'Background Tasks & Location Services',
+      'App Store & Play Store Submission',
+      'Post-Launch Crash Monitoring',
+    ],
+    addons: 'Wearable sync, AR features, live maps',
     accent: '#a0b090',
     glow: 'rgba(160,176,144,0.06)',
+    price: '000000',
   },
 ]
 
@@ -101,20 +134,21 @@ export default function Pricing() {
       </div>
 
       {/* Noise grain */}
-      <div className="absolute inset-0 opacity-[0.018] pointer-events-none" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.75%22 numOctaves=%224%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")' }} />
+      <div
+        className="absolute inset-0 opacity-[0.018] pointer-events-none"
+        style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.75%22 numOctaves=%224%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")' }}
+      />
 
       <div className="relative z-10 w-full px-6 md:px-12 lg:px-30">
 
         {/* Header */}
         <div className="pricing-header flex flex-col items-center text-center gap-5 mb-16 md:mb-20">
           <span className="font-mono text-[11px] tracking-[0.25em] uppercase text-white/50">Investment</span>
-
           <h2 className="font-display font-bold text-[clamp(28px,5vw,68px)] text-white/90 tracking-[-0.04em] leading-[0.97]">
-            Simple, honest pricing
+            Pricing built around your project
           </h2>
-
           <p className="font-body text-[15px] md:text-[17px] text-white/35 max-w-140 leading-[1.7] mt-1">
-            No hidden fees, no surprise invoices. You know exactly what you&apos;re paying for before we write a single line of code. Every project starts with a free scoping call.
+            No two projects are the same, so we don&apos;t force one into a fixed price tag. Tell us your scope on a free call and we&apos;ll send a clear, itemized quote within 48 hours.
           </p>
         </div>
 
@@ -123,111 +157,132 @@ export default function Pricing() {
           {PRICING_TIERS.map((tier, idx) => (
             <div
               key={idx}
-              className={`pricing-card group relative overflow-hidden transition-all duration-500 shrink-0 snap-center w-[82vw] sm:w-85 lg:w-auto ${tier.popular ? 'lg:-mt-3 lg:-mb-3' : ''}`}
+              className="pricing-card group relative overflow-hidden transition-all duration-500 shrink-0 snap-center w-[82vw] sm:w-90 lg:w-auto flex flex-col"
               style={{
-                background: `linear-gradient(160deg, ${tier.glow} 0%, rgba(255,255,255,0.008) 100%)`,
-                border: `1px solid ${tier.popular ? `${tier.accent}25` : 'rgba(255,255,255,0.05)'}`,
+                background: 'rgba(255,255,255,0.016)',
+                border: '1px solid rgba(255,255,255,0.07)',
                 borderRadius: '16px',
               }}
               onMouseEnter={e => {
-                e.currentTarget.style.borderColor = `${tier.accent}40`
-                e.currentTarget.style.boxShadow = `0 16px 48px rgba(0,0,0,0.3), 0 0 0 1px ${tier.accent}15`
+                e.currentTarget.style.borderColor = `${tier.accent}45`
+                e.currentTarget.style.background = `linear-gradient(160deg, ${tier.glow} 0%, rgba(255,255,255,0.012) 100%)`
+                e.currentTarget.style.boxShadow = `0 20px 60px rgba(0,0,0,0.35), 0 0 0 1px ${tier.accent}12`
               }}
               onMouseLeave={e => {
-                e.currentTarget.style.borderColor = tier.popular ? `${tier.accent}25` : 'rgba(255,255,255,0.05)'
+                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)'
+                e.currentTarget.style.background = 'rgba(255,255,255,0.016)'
                 e.currentTarget.style.boxShadow = 'none'
               }}
             >
-              {/* Popular badge */}
+              {/* Accent top line — only for popular */}
               {tier.popular && (
                 <div
-                  className="absolute top-0 left-0 right-0 h-0.5"
-                  style={{ background: `linear-gradient(90deg, transparent, ${tier.accent}, transparent)` }}
+                  className="absolute top-0 left-0 right-0 h-px"
+                  style={{ background: `linear-gradient(90deg, transparent, ${tier.accent}80, transparent)` }}
                 />
               )}
 
-              <div className="p-7 lg:p-9 flex flex-col h-full">
-                {/* Popular tag */}
+              <div className="p-7 lg:p-8 flex flex-col flex-1">
+
+                {/* Popular badge */}
                 {tier.popular && (
                   <div className="flex items-center gap-1.5 mb-5">
-                    <Sparkles className="w-3.5 h-3.5" style={{ color: tier.accent }} />
-                    <span className="font-mono text-[10px] tracking-wider uppercase" style={{ color: tier.accent }}>
+                    <Sparkles className="w-3 h-3" style={{ color: tier.accent }} />
+                    <span className="font-mono text-[9px] tracking-[0.2em] uppercase" style={{ color: `${tier.accent}90` }}>
                       Most Popular
                     </span>
                   </div>
                 )}
 
-                <div className="mb-6">
-                  <h3 className="font-display font-semibold text-[20px] text-white/85 mb-2.5 tracking-tight group-hover:text-white transition-colors duration-300">
+                {/* Name + desc */}
+                <div className="mb-5">
+                  <h3 className="font-display font-semibold text-[20px] text-white/88 mb-2.5 tracking-tight group-hover:text-white transition-colors duration-300">
                     {tier.name}
                   </h3>
-                  <p className="font-body text-[13px] text-white/30 leading-[1.65] group-hover:text-white/40 transition-colors duration-300">
+                  <p className="font-body text-[13px] text-white/32 leading-[1.7] group-hover:text-white/42 transition-colors duration-300">
                     {tier.desc}
                   </p>
                 </div>
 
-                <div className="mb-8 pb-7 border-b border-white/5">
-                  <span className="font-mono text-[10px] text-white/25 uppercase tracking-wider block mb-2">
-                    {tier.suffix}
-                  </span>
-                  <div className="flex items-baseline gap-1.5">
-                    <span className="font-display font-bold text-[40px] text-white/85 tracking-tighter group-hover:text-white transition-colors duration-300">
-                      {tier.price}
+                {/* Meta row: best for + timeline */}
+                <div className="flex items-center gap-4 mb-6 pb-5 border-b border-white/5">
+                  <div className="flex items-center gap-1.5">
+                    <Users className="w-3 h-3 shrink-0" style={{ color: `${tier.accent}80` }} />
+                    <span className="font-mono text-[10px] text-white/30 tracking-wide">
+                      {tier.bestFor}
+                    </span>
+                  </div>
+                  <div className="w-px h-3 bg-white/10" />
+                  <div className="flex items-center gap-1.5">
+                    <Clock className="w-3 h-3 shrink-0" style={{ color: `${tier.accent}80` }} />
+                    <span className="font-mono text-[10px] text-white/30 tracking-wide">
+                      {tier.timeline}
                     </span>
                   </div>
                 </div>
 
-                <div className="flex-1">
-                  <span className="font-mono text-[10px] text-white/20 uppercase tracking-[0.15em] block mb-4">
+                {/* What's included */}
+                <div className="flex-1 mb-6">
+                  <span className="font-mono text-[9px] text-white/20 uppercase tracking-[0.2em] block mb-4">
                     What&apos;s Included
                   </span>
-                  <ul className="flex flex-col gap-3.5">
+                  <ul className="flex flex-col gap-3">
                     {tier.features.map((feature, fIdx) => (
                       <li key={fIdx} className="flex items-start gap-3">
                         <div
                           className="mt-0.5 w-4 h-4 rounded-full flex items-center justify-center shrink-0"
                           style={{
                             background: `${tier.accent}12`,
-                            border: `1px solid ${tier.accent}25`,
+                            border: `1px solid ${tier.accent}28`,
                           }}
                         >
-                          <Check className="w-2.5 h-2.5" style={{ color: `${tier.accent}` }} />
+                          <Check className="w-2.5 h-2.5" style={{ color: tier.accent }} />
                         </div>
-                        <span className="font-body text-[14px] text-white/35 leading-tight group-hover:text-white/50 transition-colors duration-300">
+                        <span className="font-body text-[13px] text-white/38 leading-tight group-hover:text-white/52 transition-colors duration-300">
                           {feature}
                         </span>
                       </li>
                     ))}
                   </ul>
+
+                  {/* Add-ons */}
+                  <div className="mt-5 pt-4 border-t border-white/[0.04]">
+                    <span className="font-mono text-[9px] text-white/16 uppercase tracking-[0.18em] block mb-1.5">
+                      Add-ons available
+                    </span>
+                    <p className="font-body text-[12px] text-white/24 leading-relaxed">
+                      {tier.addons}
+                    </p>
+                  </div>
                 </div>
 
-                {/* CTA button */}
-                <div className="mt-8">
+                {/* CTA — full width */}
+                <div className="mt-auto pt-5 border-t border-white/5">
                   <button
                     type="button"
-                    onClick={() => bookCall(`Book a free call — ${tier.name}`)}
+                    onClick={() => bookCall(`Get pricing — ${tier.name}`)}
                     className="group/btn w-full flex items-center justify-center gap-2 py-3 rounded-lg font-body font-medium text-[13px] transition-all duration-300 cursor-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/40"
                     style={{
-                      background: tier.popular ? tier.accent : 'rgba(255,255,255,0.04)',
-                      color: tier.popular ? '#050505' : 'rgba(255,255,255,0.5)',
-                      border: `1px solid ${tier.popular ? tier.accent : 'rgba(255,255,255,0.06)'}`,
+                      background: tier.popular ? tier.accent : 'transparent',
+                      color: tier.popular ? '#050505' : 'rgba(255,255,255,0.45)',
+                      border: `1px solid ${tier.popular ? tier.accent : 'rgba(255,255,255,0.08)'}`,
                     }}
                     onMouseEnter={(e) => {
                       setCursorState('hover')
                       if (!tier.popular) {
-                        e.currentTarget.style.background = 'rgba(255,255,255,0.08)'
-                        e.currentTarget.style.color = 'rgba(255,255,255,0.8)'
+                        e.currentTarget.style.borderColor = `${tier.accent}50`
+                        e.currentTarget.style.color = 'rgba(255,255,255,0.82)'
                       }
                     }}
                     onMouseLeave={(e) => {
                       setCursorState('default')
                       if (!tier.popular) {
-                        e.currentTarget.style.background = 'rgba(255,255,255,0.04)'
-                        e.currentTarget.style.color = 'rgba(255,255,255,0.5)'
+                        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'
+                        e.currentTarget.style.color = 'rgba(255,255,255,0.45)'
                       }
                     }}
                   >
-                    Book a free call
+                    Book a free scoping call
                     <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 transition-transform duration-300" />
                   </button>
                 </div>
@@ -236,7 +291,7 @@ export default function Pricing() {
           ))}
         </div>
 
-        {/* Enterprise — warmer, more inviting */}
+        {/* Enterprise bar */}
         <div
           className="pricing-card mt-10 relative overflow-hidden rounded-2xl"
           style={{
@@ -246,13 +301,13 @@ export default function Pricing() {
         >
           <div className="p-8 md:p-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
             <div className="flex flex-col gap-3 max-w-2xl">
-              <div className="flex items-center gap-3 mb-1">
-                <h4 className="font-display font-bold text-[22px] text-white/85">Need something bigger?</h4>
-              </div>
+              <h4 className="font-display font-bold text-[22px] text-white/85">
+                Need something bigger?
+              </h4>
               <p className="font-body text-[15px] text-white/35 leading-[1.7]">
                 Complex AI integrations, multi-platform launches, or enterprise-grade systems — we scope custom projects to match your exact needs. No cookie-cutter solutions.
               </p>
-              <div className="flex flex-wrap gap-4 mt-2">
+              <div className="flex flex-wrap gap-4 mt-1">
                 {['Custom AI Pipelines', 'Multi-Platform', 'Enterprise SLA', 'Dedicated Team'].map(tag => (
                   <span key={tag} className="font-mono text-[10px] text-white/25 tracking-wider uppercase">
                     {tag}
@@ -280,6 +335,7 @@ export default function Pricing() {
             Every engagement starts with a <span className="text-white/40">free 30-minute scoping call</span>. We only take projects we can deliver with excellence.
           </p>
         </div>
+
       </div>
     </section>
   )

@@ -1,446 +1,495 @@
 'use client'
-import { useRef, useEffect, useState } from 'react'
-import { m, useScroll, useTransform, useInView } from 'framer-motion'
+import { useRef } from 'react'
+import { m, useInView, useScroll, useTransform } from 'framer-motion'
 import { processSteps } from '@/data/process'
 
 const EASE = [0.22, 1, 0.36, 1] as const
 
-const PHASE_COLORS = [
-  { accent: '#c0a060', tint: 'rgba(192,160,96,0.08)', glow: 'rgba(192,160,96,0.03)' },
-  { accent: '#8ba4c0', tint: 'rgba(139,164,192,0.08)', glow: 'rgba(139,164,192,0.03)' },
-  { accent: '#a0b090', tint: 'rgba(160,176,144,0.08)', glow: 'rgba(160,176,144,0.03)' },
-  { accent: '#c09878', tint: 'rgba(192,152,120,0.08)', glow: 'rgba(192,152,120,0.03)' },
+const META = [
+  {
+    color: '#b09858',
+    tools: ['User Mapping', 'Data Flows', 'Architecture'],
+    outcome: 'Signed scope document, technical blueprint, and delivery timeline.',
+    why: 'Scope changes mid-development cost 5–10× more than changes made here.',
+  },
+  {
+    color: '#7a9ab8',
+    tools: ['Figma', 'Design System', 'Prototypes'],
+    outcome: 'Clickable prototype and component library, ready for stakeholder sign-off.',
+    why: 'A prototype lets every stakeholder see the product before a single line of code ships.',
+  },
+  {
+    color: '#7aaa68',
+    tools: ['TypeScript', 'API Layer', 'Performance'],
+    outcome: 'Fully tested, production-grade codebase deployed to staging.',
+    why: 'Clean, typed code means your team can extend it years from now without rewrites.',
+  },
+  {
+    color: '#b08870',
+    tools: ['CI/CD', 'Monitoring', 'Analytics'],
+    outcome: 'Live product with zero-downtime pipeline, monitoring, docs, and 30-day support.',
+    why: 'We hand over ownership — not just code. You run it confidently from day one.',
+  },
 ]
 
-const TECH_LABELS = [
-  ['User Mapping', 'Data Flows', 'Architecture'],
-  ['Figma Specs', 'Design System', 'Prototypes'],
-  ['TypeScript', 'API Layer', 'Performance'],
-  ['CI/CD', 'Monitoring', 'Analytics'],
+// Narrative bridge sentences between phases — the "story spine"
+const STORY_BEATS = [
+  { text: 'Then, with a clear blueprint in hand, we design.', fromColor: '#b09858', toColor: '#7a9ab8' },
+  { text: 'Designs approved. The build begins.', fromColor: '#7a9ab8', toColor: '#7aaa68' },
+  { text: 'The code is clean, tested, battle-hardened.', fromColor: '#7aaa68', toColor: '#b08870' },
 ]
 
-const TIMELINE = ['Week 1', 'Week 2–3', 'Week 3–6', 'Week 6–8']
-
-const ICONS = [
-  <svg key="discover" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg>,
-  <svg key="design" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>,
-  <svg key="develop" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>,
-  <svg key="launch" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 00-2.91-.09z"/><path d="m12 15-3-3a22 22 0 012-3.95A12.88 12.88 0 0122 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 01-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>,
+const STATS = [
+  { value: '4', label: 'Phases' },
+  { value: '4–8', label: 'Weeks avg.' },
+  { value: '20+', label: 'Deliverables' },
+  { value: '100%', label: 'Transparent' },
 ]
 
-function ProcessCard({ step, idx }: { step: typeof processSteps[0]; idx: number }) {
-  const color = PHASE_COLORS[idx]
-  const tech = TECH_LABELS[idx]
+// ── Narrative connector between phases ──────────────────────────────
+function StoryBeat({ beat }: { beat: typeof STORY_BEATS[0] }) {
   const ref = useRef<HTMLDivElement>(null)
-  const borderRef = useRef<SVGRectElement>(null)
-  const inView = useInView(ref, { once: true, margin: '-100px' })
-  const isLeft = idx % 2 === 0
-
-  const [borderPerimeter, setBorderPerimeter] = useState(0)
-
-  useEffect(() => {
-    const el = borderRef.current
-    if (!el) return
-    const measure = () => {
-      try {
-        setBorderPerimeter(2 * (el.width.baseVal.value + el.height.baseVal.value))
-      } catch {
-        // baseVal not available — leave the fallback dasharray in place.
-      }
-    }
-    measure()
-    // Recompute on resize so the dash animation stays in sync with the
-    // actual SVG bounding box.
-    const ro = new ResizeObserver(() => measure())
-    ro.observe(el)
-    return () => ro.disconnect()
-  }, [])
+  const inView = useInView(ref, { once: true, margin: '-20px' })
 
   return (
-    <m.div
-      ref={ref}
-      className={`relative w-[82vw] sm:w-[320px] md:w-[52%] ${isLeft ? 'md:mr-auto' : 'md:ml-auto'}`}
-      initial={{ opacity: 0, y: 60, x: isLeft ? -50 : 50 }}
-      animate={inView ? { opacity: 1, y: 0, x: 0 } : {}}
-      transition={{ duration: 1, ease: EASE }}
-    >
-      <div className="relative p-8 md:p-10 overflow-hidden group">
-        {/* Border trace SVG — draws clockwise on enter, using tint */}
-        <svg className="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="none">
-          <rect
-            ref={borderRef}
-            x="0.5" y="0.5"
-            width="calc(100% - 1px)" height="calc(100% - 1px)"
-            fill="none"
-            stroke={color.accent}
-            strokeWidth="1"
-            strokeOpacity={inView ? 0.12 : 0}
-            strokeDasharray={borderPerimeter || 2000}
-            strokeDashoffset={inView ? 0 : (borderPerimeter || 2000)}
-            style={{ transition: 'stroke-dashoffset 1.8s cubic-bezier(0.22, 1, 0.36, 1), stroke-opacity 0.5s ease' }}
-            rx="0"
-          />
-        </svg>
+    <div ref={ref} className="flex flex-col items-center py-12 md:py-16">
+      {/* Vertical drop from above */}
+      <m.div
+        className="w-px origin-top"
+        style={{ height: 40, background: 'linear-gradient(180deg, rgba(255,255,255,0.06), rgba(249,115,22,0.55))' }}
+        initial={{ scaleY: 0 }}
+        animate={inView ? { scaleY: 1 } : {}}
+        transition={{ duration: 0.55, ease: EASE }}
+      />
 
-        {/* Background tint fill */}
-        <div
-          className="absolute inset-0 transition-all duration-700"
-          style={{
-            background: `linear-gradient(160deg, ${color.glow} 0%, transparent 100%)`,
-            opacity: inView ? 1 : 0,
-          }}
-        />
-
-        {/* Top accent line — tinted */}
+      {/* Row: left arm ── blue dot ── right arm */}
+      <div className="relative flex items-center w-full my-1">
         <m.div
-          className="absolute top-0 left-0 h-px"
-          style={{ background: `linear-gradient(90deg, ${color.tint}, transparent)` }}
-          initial={{ width: '0%' }}
-          animate={inView ? { width: '100%' } : {}}
-          transition={{ duration: 1.2, delay: 0.5, ease: EASE }}
+          className="flex-1 h-px origin-right"
+          style={{ background: 'linear-gradient(90deg, transparent, rgba(249,115,22,0.35))' }}
+          initial={{ scaleX: 0 }}
+          animate={inView ? { scaleX: 1 } : {}}
+          transition={{ duration: 0.9, delay: 0.3, ease: EASE }}
         />
+        {/* Blue node */}
+        <m.div
+          className="relative z-10 mx-3 shrink-0"
+          initial={{ scale: 0, opacity: 0 }}
+          animate={inView ? { scale: 1, opacity: 1 } : {}}
+          transition={{ duration: 0.5, delay: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
+        >
+          <div
+            className="w-3 h-3 rounded-full"
+            style={{
+              background: 'rgba(249,115,22,1)',
+              boxShadow: '0 0 0 4px rgba(249,115,22,0.18), 0 0 20px rgba(249,115,22,0.65), 0 0 48px rgba(249,115,22,0.28)',
+            }}
+          />
+        </m.div>
+        <m.div
+          className="flex-1 h-px origin-left"
+          style={{ background: 'linear-gradient(90deg, rgba(249,115,22,0.35), transparent)' }}
+          initial={{ scaleX: 0 }}
+          animate={inView ? { scaleX: 1 } : {}}
+          transition={{ duration: 0.9, delay: 0.3, ease: EASE }}
+        />
+      </div>
 
-        {/* Content */}
-        <div className="relative z-10">
-          {/* Phase number + icon */}
-          <div className="flex items-start justify-between mb-8">
-            <div className="flex items-center gap-4">
-              <m.span
-                className="font-display font-bold text-[56px] md:text-[64px] leading-none tracking-tighter"
-                style={{ color: 'rgba(255,255,255,0.04)' }}
-                initial={{ opacity: 0, scale: 0.5 }}
-                animate={inView ? { opacity: 1, scale: 1 } : {}}
-                transition={{ duration: 0.8, delay: 0.3, ease: EASE }}
-              >
-                {step.number}
-              </m.span>
-              <m.div
-                style={{ color: color.accent }}
-                initial={{ opacity: 0, rotate: -20 }}
-                animate={inView ? { opacity: 1, rotate: 0 } : {}}
-                transition={{ duration: 0.6, delay: 0.5, ease: EASE }}
-              >
-                {ICONS[idx]}
-              </m.div>
-            </div>
-            <div className="flex flex-col items-end gap-1 mt-2">
-              <m.span
-                className="font-mono text-[9px] tracking-[0.2em] uppercase"
-                style={{ color: color.accent, opacity: 0.5 }}
-                initial={{ opacity: 0 }}
-                animate={inView ? { opacity: 0.5 } : {}}
-                transition={{ duration: 0.5, delay: 0.6, ease: EASE }}
-              >
-                Phase {step.number}
-              </m.span>
-              <m.span
-                className="font-mono text-[10px] tracking-wider text-white/20"
-                initial={{ opacity: 0 }}
-                animate={inView ? { opacity: 1 } : {}}
-                transition={{ duration: 0.5, delay: 0.7, ease: EASE }}
-              >
-                {TIMELINE[idx]}
-              </m.span>
-            </div>
-          </div>
+      {/* Vertical drop to below */}
+      <m.div
+        className="w-px origin-top"
+        style={{ height: 40, background: 'linear-gradient(180deg, rgba(249,115,22,0.55), rgba(255,255,255,0.04))' }}
+        initial={{ scaleY: 0 }}
+        animate={inView ? { scaleY: 1 } : {}}
+        transition={{ duration: 0.55, delay: 0.55, ease: EASE }}
+      />
 
-          {/* Title */}
+      {/* Narrative text */}
+      <m.p
+        className="font-body text-[14px] md:text-[15px] italic text-center mt-5 leading-relaxed"
+        style={{ color: 'rgba(251,146,60,0.72)' }}
+        initial={{ opacity: 0, y: 10, filter: 'blur(8px)' }}
+        animate={inView ? { opacity: 1, y: 0, filter: 'blur(0px)' } : {}}
+        transition={{ duration: 1.0, delay: 0.65, ease: EASE }}
+      >
+        {beat.text}
+      </m.p>
+    </div>
+  )
+}
+
+// ── Individual phase row ─────────────────────────────────────────────
+function PhaseRow({ step, meta, index }: {
+  step: typeof processSteps[0]
+  meta: typeof META[0]
+  index: number
+}) {
+  const ref = useRef<HTMLDivElement>(null)
+  const inView = useInView(ref, { once: true, margin: '-50px' })
+
+  return (
+    <div ref={ref} className="relative">
+      {/* Top divider — draws in when row enters */}
+      <m.div
+        className="h-px w-full origin-left"
+        style={{ background: `linear-gradient(90deg, ${meta.color}35, rgba(255,255,255,0.06) 40%, transparent)` }}
+        initial={{ scaleX: 0 }}
+        animate={inView ? { scaleX: 1 } : {}}
+        transition={{ duration: 1.2, ease: EASE }}
+      />
+
+      {/* Ghost chapter number — far right, behind content */}
+      <div
+        className="absolute right-0 top-1/2 -translate-y-1/2 font-display font-bold pointer-events-none select-none leading-none"
+        style={{
+          fontSize: 'clamp(120px, 16vw, 220px)',
+          color: 'rgba(255,255,255,0.022)',
+          letterSpacing: '-0.04em',
+          opacity: inView ? 1 : 0,
+          transition: 'opacity 1.2s ease 0.4s',
+        }}
+      >
+        {step.number}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 lg:gap-10 py-14 md:py-20 relative">
+
+        {/* ── Left column ── */}
+        <div className="lg:col-span-4 flex flex-col pb-10 lg:pb-0 lg:pr-10 lg:border-r lg:border-white/5">
+
+          {/* Phase label */}
+          <m.span
+            className="font-mono text-[10px] tracking-[0.24em] uppercase text-white/25 block mb-7"
+            initial={{ opacity: 0 }}
+            animate={inView ? { opacity: 1 } : {}}
+            transition={{ duration: 0.6, delay: 0.1, ease: EASE }}
+          >
+            Phase {step.number}
+          </m.span>
+
+          {/* Phase title — cinematic blur reveal */}
           <m.h3
-            className="font-display font-bold text-[24px] md:text-[30px] text-white/90 tracking-[-0.02em] leading-tight mb-4 group-hover:text-white transition-colors duration-300"
-            initial={{ opacity: 0, filter: 'blur(12px)', y: 12 }}
-            animate={inView ? { opacity: 1, filter: 'blur(0px)', y: 0 } : {}}
-            transition={{ duration: 1, delay: 0.4, ease: EASE }}
+            className="font-display font-bold tracking-[-0.035em] leading-[1.02] text-white/92 mb-8"
+            style={{ fontSize: 'clamp(28px, 3vw, 44px)' }}
+            initial={{ opacity: 0, y: 28, filter: 'blur(14px)', scale: 0.97 }}
+            animate={inView ? { opacity: 1, y: 0, filter: 'blur(0px)', scale: 1 } : {}}
+            transition={{ duration: 1.0, delay: 0.2, ease: EASE }}
           >
             {step.title}
           </m.h3>
 
-          {/* Description */}
+          {/* Output box — left color accent */}
+          <m.div
+            className="mb-8 pl-4"
+            style={{ borderLeft: `2px solid ${meta.color}40` }}
+            initial={{ opacity: 0, x: -14 }}
+            animate={inView ? { opacity: 1, x: 0 } : {}}
+            transition={{ duration: 0.8, delay: 0.38, ease: EASE }}
+          >
+            <p className="font-mono text-[9px] tracking-[0.2em] uppercase mb-2" style={{ color: `${meta.color}75` }}>
+              Output
+            </p>
+            <p className="font-body text-[13px] text-white/52 leading-[1.75]">
+              {meta.outcome}
+            </p>
+          </m.div>
+
+          {/* Tool tags */}
+          <m.div
+            className="flex flex-wrap gap-x-5 gap-y-2 mt-auto"
+            initial={{ opacity: 0 }}
+            animate={inView ? { opacity: 1 } : {}}
+            transition={{ duration: 0.5, delay: 0.55, ease: EASE }}
+          >
+            {meta.tools.map((tool) => (
+              <span
+                key={tool}
+                className="font-mono text-[9px] tracking-[0.16em] uppercase"
+                style={{ color: `${meta.color}50` }}
+              >
+                {tool}
+              </span>
+            ))}
+          </m.div>
+        </div>
+
+        {/* ── Right column ── */}
+        <div className="lg:col-span-8 lg:pl-4 flex flex-col gap-10">
+
+          {/* Description — written-on feel */}
           <m.p
-            className="font-body text-[14px] md:text-[15px] text-white/25 leading-[1.7] mb-8 max-w-110 group-hover:text-white/35 transition-colors duration-300"
-            initial={{ opacity: 0, y: 12 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.7, delay: 0.55, ease: EASE }}
+            className="font-body text-[16px] md:text-[17px] text-white/55 leading-[1.9] max-w-2xl"
+            initial={{ opacity: 0, y: 20, filter: 'blur(6px)' }}
+            animate={inView ? { opacity: 1, y: 0, filter: 'blur(0px)' } : {}}
+            transition={{ duration: 0.9, delay: 0.3, ease: EASE }}
           >
             {step.desc}
           </m.p>
 
-          {/* Tech tags */}
+          {/* Deliverables — cascade in */}
           <m.div
-            className="flex flex-wrap gap-4 mb-8"
             initial={{ opacity: 0 }}
             animate={inView ? { opacity: 1 } : {}}
-            transition={{ duration: 0.6, delay: 0.65, ease: EASE }}
+            transition={{ duration: 0.5, delay: 0.48, ease: EASE }}
           >
-            {tech.map((tag) => (
-              <span key={tag} className="font-mono text-[10px] tracking-wider uppercase" style={{ color: `${color.accent}70` }}>
-                {tag}
-              </span>
-            ))}
+            <span className="font-mono text-[9px] text-white/20 tracking-[0.24em] uppercase block mb-5">
+              Deliverables
+            </span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-10">
+              {step.details.map((detail, i) => (
+                <m.div
+                  key={i}
+                  className="flex items-start gap-3 py-3 border-b border-white/[0.04]"
+                  style={{ borderBottomColor: i >= step.details.length - 2 ? 'transparent' : undefined }}
+                  initial={{ opacity: 0, x: 16 }}
+                  animate={inView ? { opacity: 1, x: 0 } : {}}
+                  transition={{ duration: 0.55, delay: 0.58 + i * 0.08, ease: EASE }}
+                >
+                  <div
+                    className="w-1 h-1 rounded-full mt-[10px] shrink-0"
+                    style={{ backgroundColor: `${meta.color}70` }}
+                  />
+                  <span className="font-body text-[13.5px] text-white/50 leading-snug">
+                    {detail}
+                  </span>
+                </m.div>
+              ))}
+            </div>
           </m.div>
 
-          {/* Divider */}
+          {/* Why it matters — final beat, delayed for drama */}
           <m.div
-            className="h-px w-full mb-6 origin-left"
-            style={{ background: `${color.accent}15` }}
-            initial={{ scaleX: 0 }}
-            animate={inView ? { scaleX: 1 } : {}}
-            transition={{ duration: 0.8, delay: 0.7, ease: EASE }}
-          />
-
-          {/* Deliverables — dots appear first, text slides in */}
-          <div>
-            <m.span
-              className="font-mono text-[9px] block mb-4 uppercase tracking-[0.15em] text-white/15"
-              initial={{ opacity: 0 }}
-              animate={inView ? { opacity: 1 } : {}}
-              transition={{ duration: 0.5, delay: 0.75, ease: EASE }}
-            >
-              Deliverables
-            </m.span>
-            <ul className="flex flex-col gap-3">
-              {step.details.map((detail, dIdx) => (
-                <li key={dIdx} className="flex gap-3 items-start">
-                  <m.div
-                    className="w-1.5 h-1.5 mt-1.5 shrink-0"
-                    style={{ backgroundColor: `${color.accent}50` }}
-                    initial={{ scale: 0 }}
-                    animate={inView ? { scale: 1 } : {}}
-                    transition={{ duration: 0.3, delay: 0.8 + dIdx * 0.1, ease: [0.34, 1.56, 0.64, 1] }}
-                  />
-                  <m.span
-                    className="font-body text-[13px] text-white/25 leading-snug"
-                    initial={{ opacity: 0, x: 16 }}
-                    animate={inView ? { opacity: 1, x: 0 } : {}}
-                    transition={{ duration: 0.5, delay: 0.85 + dIdx * 0.1, ease: EASE }}
-                  >
-                    {detail}
-                  </m.span>
-                </li>
-              ))}
-            </ul>
-          </div>
+            className="flex items-start gap-4"
+            initial={{ opacity: 0, y: 12 }}
+            animate={inView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.7, delay: 1.1, ease: EASE }}
+          >
+            <div
+              className="w-5 h-px shrink-0 mt-[11px]"
+              style={{ backgroundColor: `${meta.color}45` }}
+            />
+            <div>
+              <span
+                className="font-mono text-[9px] tracking-[0.2em] uppercase block mb-1.5"
+                style={{ color: `${meta.color}60` }}
+              >
+                Why it matters
+              </span>
+              <p className="font-body text-[13px] text-white/30 leading-[1.8] italic max-w-lg">
+                {meta.why}
+              </p>
+            </div>
+          </m.div>
         </div>
-      </div>
-    </m.div>
-  )
-}
-
-function StepConnector({ fromIdx }: { fromIdx: number }) {
-  const ref = useRef<HTMLDivElement>(null)
-  const fromColor = PHASE_COLORS[fromIdx]
-  const toColor = PHASE_COLORS[fromIdx + 1]
-  const inView = useInView(ref, { once: true, margin: '-40px' })
-
-  return (
-    <div ref={ref} className="relative w-full py-6 md:py-10 z-20 hidden md:block">
-      <div className="relative flex items-center justify-center h-20">
-        {/* Vertical dashed line */}
-        <m.div
-          className="absolute left-1/2 -translate-x-1/2 w-px h-full origin-top"
-          style={{
-            background: `linear-gradient(180deg, ${fromColor.accent}20, ${toColor.accent}20)`,
-          }}
-          initial={{ scaleY: 0 }}
-          animate={inView ? { scaleY: 1 } : {}}
-          transition={{ duration: 0.8, ease: EASE }}
-        />
-
-        {/* Center node */}
-        <m.div
-          className="relative z-10 flex items-center justify-center"
-          initial={{ scale: 0, opacity: 0 }}
-          animate={inView ? { scale: 1, opacity: 1 } : {}}
-          transition={{ duration: 0.5, delay: 0.4, ease: [0.34, 1.56, 0.64, 1] }}
-        >
-          <div
-            className="w-2 h-2 rounded-full"
-            style={{
-              background: `linear-gradient(135deg, ${fromColor.accent}, ${toColor.accent})`,
-              opacity: 0.3,
-              boxShadow: `0 0 12px ${fromColor.accent}20`,
-            }}
-          />
-        </m.div>
-
-        {/* Horizontal arms extending to card edges */}
-        <m.div
-          className="absolute top-0 left-1/2 h-px"
-          style={{
-            width: '24%',
-            background: `linear-gradient(90deg, transparent, ${fromColor.accent}15)`,
-            transformOrigin: 'left center',
-          }}
-          initial={{ scaleX: 0, opacity: 0 }}
-          animate={inView ? { scaleX: 1, opacity: 1 } : {}}
-          transition={{ duration: 0.6, delay: 0.2, ease: EASE }}
-        />
-        <m.div
-          className="absolute top-0 right-1/2 h-px"
-          style={{
-            width: '24%',
-            background: `linear-gradient(270deg, transparent, ${fromColor.accent}15)`,
-            transformOrigin: 'right center',
-          }}
-          initial={{ scaleX: 0, opacity: 0 }}
-          animate={inView ? { scaleX: 1, opacity: 1 } : {}}
-          transition={{ duration: 0.6, delay: 0.2, ease: EASE }}
-        />
-
-        <m.div
-          className="absolute bottom-0 left-1/2 h-px"
-          style={{
-            width: '24%',
-            background: `linear-gradient(90deg, transparent, ${toColor.accent}15)`,
-            transformOrigin: 'left center',
-          }}
-          initial={{ scaleX: 0, opacity: 0 }}
-          animate={inView ? { scaleX: 1, opacity: 1 } : {}}
-          transition={{ duration: 0.6, delay: 0.5, ease: EASE }}
-        />
-        <m.div
-          className="absolute bottom-0 right-1/2 h-px"
-          style={{
-            width: '24%',
-            background: `linear-gradient(270deg, transparent, ${toColor.accent}15)`,
-            transformOrigin: 'right center',
-          }}
-          initial={{ scaleX: 0, opacity: 0 }}
-          animate={inView ? { scaleX: 1, opacity: 1 } : {}}
-          transition={{ duration: 0.6, delay: 0.5, ease: EASE }}
-        />
       </div>
     </div>
   )
 }
 
+// ── Section ──────────────────────────────────────────────────────────
 export default function Process() {
   const sectionRef = useRef<HTMLDivElement>(null)
-  const headerRef = useRef<HTMLDivElement>(null)
+  const headerRef  = useRef<HTMLDivElement>(null)
   const headerInView = useInView(headerRef, { once: true, margin: '-80px' })
 
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ['start end', 'end start'],
-  })
-  const glowY = useTransform(scrollYProgress, [0, 1], [100, -100])
+  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start 80%', 'end 20%'] })
+  const lineHeight = useTransform(scrollYProgress, [0, 1], ['0%', '100%'])
+
+  // Tip: small glowing bead that rides the front of the fill line
+  const tipY    = useTransform(scrollYProgress, [0, 1], ['-4px', 'calc(100% - 4px)'])
+  const tipGlow = useTransform(scrollYProgress, [0, 0.02, 0.97, 1.0], [0, 1, 1, 0])
+
+  // Dot opacity — smoothly brightens as the line arrives, stays bright
+  // Window is wide (~0.10) so the transition feels gradual, not a snap
+  const dot0Opacity = useTransform(scrollYProgress, [0.00, 0.10], [0.15, 1.0])
+  const dot1Opacity = useTransform(scrollYProgress, [0.28, 0.40], [0.15, 1.0])
+  const dot2Opacity = useTransform(scrollYProgress, [0.58, 0.70], [0.15, 1.0])
+  const dot3Opacity = useTransform(scrollYProgress, [0.86, 0.98], [0.15, 1.0])
+  const dotOpacities = [dot0Opacity, dot1Opacity, dot2Opacity, dot3Opacity]
+
 
   return (
     <section
       ref={sectionRef}
-      className="relative w-full py-16 md:py-36 select-none overflow-hidden z-10"
+      className="relative w-full py-20 md:py-40 select-none overflow-hidden z-10"
       style={{ background: '#050505' }}
     >
-      {/* Background glow */}
-      <m.div
-        className="absolute left-1/2 -translate-x-1/2 w-175 h-175 pointer-events-none"
-        style={{
-          y: glowY,
-          background: 'radial-gradient(ellipse at center, rgba(255,250,235,0.02) 0%, transparent 70%)',
-          top: '20%',
-          willChange: 'transform',
-        }}
+      {/* Ambient glow */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{ background: 'radial-gradient(ellipse 65% 50% at 50% 18%, rgba(255,248,230,0.02) 0%, transparent 60%)' }}
       />
 
       {/* Noise */}
-      <div className="absolute inset-0 opacity-[0.018] pointer-events-none" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.75%22 numOctaves=%224%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")' }} />
+      <div
+        className="absolute inset-0 opacity-[0.016] pointer-events-none"
+        style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.75\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\'/%3E%3C/svg%3E")' }}
+      />
 
-      <div className="relative z-10 w-full px-6 md:px-12 lg:px-30">
+      <div className="relative z-10 flex">
 
-        {/* Header — word-by-word */}
-        <div ref={headerRef} className="mb-20 md:mb-28">
-          <m.div
-            className="h-px w-full mb-10 origin-left"
-            style={{ background: 'linear-gradient(90deg, rgba(255,255,255,0.08), rgba(255,255,255,0.06) 50%, transparent)' }}
-            initial={{ scaleX: 0 }}
-            animate={headerInView ? { scaleX: 1 } : {}}
-            transition={{ duration: 1.4, ease: EASE }}
-          />
+        {/* ── Scroll progress spine ── */}
+        <div className="hidden lg:flex flex-col items-center w-14 shrink-0 pt-32 pb-20 ml-6 xl:ml-12">
+          <div className="relative flex-1 w-px" style={{ background: 'rgba(255,255,255,0.07)' }}>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-end">
-            <div className="flex flex-col gap-6">
-              <m.span
-                className="font-mono text-[11px] tracking-[0.25em] uppercase text-white/50"
-                initial={{ opacity: 0, y: 12 }}
-                animate={headerInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.7, delay: 0.1, ease: EASE }}
-              >
-                Our Process
-              </m.span>
+            {/* Fill — uniform bright white, grows from top */}
+            <m.div
+              className="absolute top-0 left-0 right-0 origin-top"
+              style={{
+                height: lineHeight,
+                background: 'rgba(255,255,255,0.88)',
+                boxShadow: '0 0 6px rgba(255,255,255,0.5)',
+              }}
+            />
 
-              <h2 className="font-display font-bold text-[clamp(28px,5vw,68px)] leading-[0.97] tracking-[-0.04em]">
-                <m.span
-                  className="text-white/90 inline-block"
-                  initial={{ opacity: 0, filter: 'blur(16px)', y: 16 }}
-                  animate={headerInView ? { opacity: 1, filter: 'blur(0px)', y: 0 } : {}}
-                  transition={{ duration: 1.2, delay: 0.2, ease: EASE }}
-                >
-                  From idea{' '}
-                </m.span>
-                <m.span
-                  className="text-white/35 inline-block"
-                  initial={{ opacity: 0, filter: 'blur(16px)', y: 16 }}
-                  animate={headerInView ? { opacity: 1, filter: 'blur(0px)', y: 0 } : {}}
-                  transition={{ duration: 1.2, delay: 0.5, ease: EASE }}
-                >
-                  to production{' '}
-                </m.span>
-                <m.span
-                  className="text-white/90 inline-block"
-                  initial={{ opacity: 0, filter: 'blur(16px)', y: 16 }}
-                  animate={headerInView ? { opacity: 1, filter: 'blur(0px)', y: 0 } : {}}
-                  transition={{ duration: 1.2, delay: 0.8, ease: EASE }}
-                >
-                  in four phases.
-                </m.span>
-              </h2>
-            </div>
+            {/* Travelling bead — rides the tip of the fill */}
+            <m.div
+              className="absolute left-1/2 -translate-x-1/2 w-2 h-2 rounded-full pointer-events-none"
+              style={{
+                top: tipY,
+                opacity: tipGlow,
+                background: 'white',
+                boxShadow: '0 0 8px rgba(255,255,255,1), 0 0 20px rgba(255,255,255,0.8), 0 0 40px rgba(255,255,255,0.4)',
+              }}
+            />
 
-            <m.p
-              className="font-body text-[15px] md:text-[17px] text-white/30 leading-[1.7] max-w-120 lg:text-right lg:ml-auto"
-              initial={{ opacity: 0, y: 20 }}
-              animate={headerInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.8, delay: 0.6, ease: EASE }}
-            >
-              A structured, milestone-driven approach. Every step is scoped, tested, and delivered with transparency — so you always know where your product stands.
-            </m.p>
+            {/* Phase dots — smoothly brighten as the fill line reaches them */}
+            {[0, 1, 2, 3].map((i) => (
+              <m.div
+                key={i}
+                className="absolute left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full"
+                style={{
+                  top: `calc(${i * 33.3}% - 5px)`,
+                  x: '-50%',
+                  backgroundColor: 'rgb(59,130,246)',
+                  opacity: dotOpacities[i],
+                  // glow driven by the same scroll window — interpolated inline
+                  boxShadow: `0 0 0 2px rgba(59,130,246,0.15), 0 0 10px rgba(59,130,246,0.6), 0 0 22px rgba(59,130,246,0.3)`,
+                  transition: 'box-shadow 0.3s ease',
+                }}
+              />
+            ))}
           </div>
         </div>
 
-        {/* Zigzag cards with scroll-linked S-connectors */}
-        <div className="flex flex-row overflow-x-auto snap-x snap-mandatory scrollbar-none gap-5 pb-6 px-6 md:px-0 md:flex-col">
-          {processSteps.map((step, idx) => (
-            <div key={step.number} className="shrink-0 snap-center w-auto md:w-full">
-              <ProcessCard step={step} idx={idx} />
-              {idx < processSteps.length - 1 && (
-                <StepConnector fromIdx={idx} />
-              )}
-            </div>
-          ))}
-        </div>
+        {/* ── Main content ── */}
+        <div className="flex-1 px-6 md:px-12 lg:px-16 xl:px-20 min-w-0">
 
-        {/* Bottom summary */}
-        <m.div
-          className="mt-20 md:mt-28"
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.8, ease: EASE }}
-        >
-          <div className="h-px w-full mb-10" style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.06) 15%, rgba(255,255,255,0.06) 85%, transparent)' }} />
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
-            <div className="flex gap-8 md:gap-12">
-              {PHASE_COLORS.map((c, i) => (
-                <div key={i} className="flex items-center gap-2">
-                  <div className="w-2.5 h-2.5" style={{ backgroundColor: c.accent, opacity: 0.2 }} />
-                  <span className="font-mono text-[10px] text-white/20 uppercase tracking-wider">{TIMELINE[i]}</span>
+          {/* ── Header ── */}
+          <div ref={headerRef} className="mb-16 md:mb-24">
+            <m.div
+              className="h-px w-full origin-left mb-10"
+              style={{ background: 'linear-gradient(90deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05) 60%, transparent)' }}
+              initial={{ scaleX: 0 }}
+              animate={headerInView ? { scaleX: 1 } : {}}
+              transition={{ duration: 1.2, ease: EASE }}
+            />
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-20 items-end mb-14">
+              <div>
+                <m.span
+                  className="font-mono text-[11px] tracking-[0.26em] uppercase text-white/40 block mb-6"
+                  initial={{ opacity: 0 }}
+                  animate={headerInView ? { opacity: 1 } : {}}
+                  transition={{ duration: 0.6, delay: 0.1, ease: EASE }}
+                >
+                  Our Process
+                </m.span>
+
+                <h2
+                  className="font-display font-bold tracking-[-0.04em] leading-[0.95]"
+                  style={{ fontSize: 'clamp(32px, 5.5vw, 72px)' }}
+                >
+                  <m.span
+                    className="text-white/90 inline-block"
+                    initial={{ opacity: 0, y: 22, filter: 'blur(14px)' }}
+                    animate={headerInView ? { opacity: 1, y: 0, filter: 'blur(0px)' } : {}}
+                    transition={{ duration: 1.1, delay: 0.2, ease: EASE }}
+                  >
+                    From idea
+                  </m.span>{' '}
+                  <m.span
+                    className="text-white/25 inline-block"
+                    initial={{ opacity: 0, y: 22, filter: 'blur(14px)' }}
+                    animate={headerInView ? { opacity: 1, y: 0, filter: 'blur(0px)' } : {}}
+                    transition={{ duration: 1.1, delay: 0.4, ease: EASE }}
+                  >
+                    to production
+                  </m.span>
+                  <br />
+                  <m.span
+                    className="text-white/90 inline-block"
+                    initial={{ opacity: 0, y: 22, filter: 'blur(14px)' }}
+                    animate={headerInView ? { opacity: 1, y: 0, filter: 'blur(0px)' } : {}}
+                    transition={{ duration: 1.1, delay: 0.6, ease: EASE }}
+                  >
+                    in four phases.
+                  </m.span>
+                </h2>
+              </div>
+
+              <m.p
+                className="font-body text-[15px] md:text-[17px] text-white/32 leading-[1.8] max-w-sm lg:ml-auto lg:text-right"
+                initial={{ opacity: 0, y: 16 }}
+                animate={headerInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.8, delay: 0.55, ease: EASE }}
+              >
+                A structured, milestone-driven approach. Every step is scoped, tested, and delivered with full transparency — so you always know where your product stands.
+              </m.p>
+            </div>
+
+            {/* Stats strip */}
+            <m.div
+              className="grid grid-cols-2 sm:grid-cols-4 gap-px border border-white/6"
+              initial={{ opacity: 0, y: 14 }}
+              animate={headerInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.7, delay: 0.75, ease: EASE }}
+            >
+              {STATS.map((stat) => (
+                <div
+                  key={stat.label}
+                  className="px-6 py-5 flex flex-col gap-1"
+                  style={{ background: 'rgba(255,255,255,0.014)' }}
+                >
+                  <span className="font-display font-bold text-[28px] md:text-[34px] text-white/80 tracking-[-0.03em] leading-none">
+                    {stat.value}
+                  </span>
+                  <span className="font-mono text-[9px] text-white/26 tracking-[0.2em] uppercase">
+                    {stat.label}
+                  </span>
                 </div>
               ))}
-            </div>
-            <p className="font-body text-[13px] text-white/20 text-center sm:text-right">
+            </m.div>
+          </div>
+
+          {/* ── Phases with story beats between them ── */}
+          <div>
+            {processSteps.map((step, i) => (
+              <div key={step.number}>
+                <PhaseRow step={step} meta={META[i]} index={i} />
+                {i < processSteps.length - 1 && (
+                  <StoryBeat beat={STORY_BEATS[i]} />
+                )}
+              </div>
+            ))}
+            {/* Closing divider */}
+            <div className="h-px w-full" style={{ background: 'rgba(255,255,255,0.06)' }} />
+          </div>
+
+          {/* ── Closing line ── */}
+          <m.div
+            className="mt-16 md:mt-20 flex justify-end"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true, margin: '-40px' }}
+            transition={{ duration: 0.8, ease: EASE }}
+          >
+            <p className="font-body text-[13px] text-white/20">
               Average delivery: 4–8 weeks from kickoff to launch.
             </p>
-          </div>
-        </m.div>
+          </m.div>
+
+        </div>
       </div>
     </section>
   )

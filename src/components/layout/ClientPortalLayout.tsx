@@ -87,7 +87,9 @@ function SidebarContent({ project, groups, pathname, onNavigate, onExit }: Sideb
           className="rounded-[14px] p-3.5 flex items-center gap-3"
           style={{ background: 'var(--cp-surface)', border: '1px solid var(--cp-border-soft)' }}
         >
-          <LyptronLogo subtitle={project?.name || 'Client Portal'} textClassName="text-[15px]" />
+          <Link href="/" aria-label="Lyptron home" className="flex min-w-0 flex-1">
+            <LyptronLogo subtitle={project?.name || 'Client Portal'} textClassName="text-[15px]" />
+          </Link>
         </div>
       </div>
 
@@ -275,9 +277,9 @@ export default function ClientPortalLayout({
             >
               <Menu className="w-5 h-5" />
             </button>
-            <div className="lg:hidden shrink-0">
+            <Link href="/" aria-label="Lyptron home" className="lg:hidden shrink-0">
               <LyptronMark size={28} />
-            </div>
+            </Link>
           </div>
 
           <div className="flex items-center gap-3 shrink-0">
