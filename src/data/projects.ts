@@ -13,6 +13,7 @@ export const projects: Project[] = [
     accent: '#1d7ef5',
     accentGlow: 'rgba(29,126,245,0.15)',
     number: '01',
+    url: 'https://nexus-flow-sand.vercel.app/',
   },
   {
     id: 'voxai',
@@ -26,6 +27,7 @@ export const projects: Project[] = [
     accent: '#8b5cf6',
     accentGlow: 'rgba(139,92,246,0.15)',
     number: '02',
+    url: 'https://vox-ai-henna.vercel.app/',
   },
   {
     id: 'pulsetrack',
@@ -39,6 +41,7 @@ export const projects: Project[] = [
     accent: '#22c55e',
     accentGlow: 'rgba(34,197,94,0.15)',
     number: '03',
+    url: 'https://pluse-track-pi.vercel.app/',
   },
   {
     id: 'stratum',
@@ -52,6 +55,7 @@ export const projects: Project[] = [
     accent: '#ec4899',
     accentGlow: 'rgba(236,72,153,0.15)',
     number: '04',
+    url: 'https://stratum-one-gamma.vercel.app/',
   },
   {
     id: 'novaportal',
@@ -65,5 +69,6 @@ export const projects: Project[] = [
     accent: '#f97316',
     accentGlow: 'rgba(249,115,22,0.15)',
     number: '05',
+    url: 'https://nova-portal-beta.vercel.app/',
   }
 ]

@@ -95,13 +95,17 @@ export default function Pricing() {
           start: 'top 75%',
           once: true,
           onEnter: () => {
+            // Animate only transform + opacity (compositor-friendly). The
+            // previous version tweened `filter: blur()` across the full-width
+            // header and three large cards, which repaints a big area every
+            // frame and made the whole section feel chunky.
             gsap.fromTo('.pricing-header > *',
-              { opacity: 0, y: 24, filter: 'blur(8px)' },
-              { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.8, stagger: 0.1, ease: 'power3.out' }
+              { opacity: 0, y: 24 },
+              { opacity: 1, y: 0, duration: 0.8, stagger: 0.1, ease: 'power3.out' }
             )
             gsap.fromTo('.pricing-card',
-              { opacity: 0, y: 80, rotationX: 6, filter: 'blur(8px)', transformPerspective: 800 },
-              { opacity: 1, y: 0, rotationX: 0, filter: 'blur(0px)', duration: 1, stagger: 0.15, ease: 'power3.out', delay: 0.25 }
+              { opacity: 0, y: 60 },
+              { opacity: 1, y: 0, duration: 0.9, stagger: 0.12, ease: 'power3.out', delay: 0.2 }
             )
           }
         })
@@ -157,20 +161,21 @@ export default function Pricing() {
           {PRICING_TIERS.map((tier, idx) => (
             <div
               key={idx}
-              className="pricing-card group relative overflow-hidden transition-all duration-500 shrink-0 snap-center w-[82vw] sm:w-90 lg:w-auto flex flex-col"
+              className="pricing-card group relative overflow-hidden shrink-0 snap-center w-[82vw] sm:w-90 lg:w-auto flex flex-col"
               style={{
                 background: 'rgba(255,255,255,0.016)',
                 border: '1px solid rgba(255,255,255,0.07)',
                 borderRadius: '16px',
+                // Only transition the cheap paint properties on hover — not
+                // `all` (which was also tweening the background gradient).
+                transition: 'border-color 0.3s ease, box-shadow 0.3s ease',
               }}
               onMouseEnter={e => {
                 e.currentTarget.style.borderColor = `${tier.accent}45`
-                e.currentTarget.style.background = `linear-gradient(160deg, ${tier.glow} 0%, rgba(255,255,255,0.012) 100%)`
                 e.currentTarget.style.boxShadow = `0 20px 60px rgba(0,0,0,0.35), 0 0 0 1px ${tier.accent}12`
               }}
               onMouseLeave={e => {
                 e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)'
-                e.currentTarget.style.background = 'rgba(255,255,255,0.016)'
                 e.currentTarget.style.boxShadow = 'none'
               }}
             >

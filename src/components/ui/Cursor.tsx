@@ -12,7 +12,10 @@ export default function Cursor() {
   const cursorX = useMotionValue(-100)
   const cursorY = useMotionValue(-100)
 
-  const springConfig = { stiffness: 600, damping: 45, mass: 0.4 }
+  // Snappier spring — the old config (stiffness 600 / mass 0.4) trailed
+  // noticeably behind the pointer. Higher stiffness + lower mass makes it
+  // track the mouse almost 1:1 while keeping motion smooth (not jittery).
+  const springConfig = { stiffness: 1500, damping: 45, mass: 0.22 }
   const springX = useSpring(cursorX, springConfig)
   const springY = useSpring(cursorY, springConfig)
 
@@ -57,27 +60,27 @@ export default function Cursor() {
   if (!isDesktop || !isVisible) return null
 
   // Dimension details based on CursorState
-  let size = 5
+  let size = 7
   let color = '#ffffff'
   let opacity = 1
 
   switch (cursorState) {
     case 'hover':
-      size = 14
+      size = 16
       color = '#ffffff'
       break
     case 'cta':
-      size = 18
-      color = '#1d7ef5'
+      size = 20
+      color = '#4da6ff'
       break
     case 'drag':
-      size = 12
+      size = 13
       color = '#ffffff'
-      opacity = 0.6
+      opacity = 0.7
       break
     case 'default':
     default:
-      size = 5
+      size = 7
       color = '#ffffff'
       break
   }
@@ -98,6 +101,8 @@ export default function Cursor() {
       animate={{
         backgroundColor: color,
         opacity: opacity,
+        // Soft glow makes the cursor read brighter over busy/mid-tone areas.
+        boxShadow: `0 0 8px ${color}, 0 0 3px ${color}`,
       }}
       transition={transition}
     />

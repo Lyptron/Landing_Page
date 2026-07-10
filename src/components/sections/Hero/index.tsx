@@ -1,6 +1,7 @@
 'use client'
 import { useRef, useEffect, useCallback, useState } from 'react'
 import { m } from 'framer-motion'
+import LivePreviewFrame from '../../ui/LivePreviewFrame'
 
 const EASE = [0.16, 1, 0.3, 1] as const
 
@@ -12,12 +13,7 @@ const PROJECTS = [
     tag: 'SaaS Platform',
     result: '$0 → $12k MRR',
     url: 'lyptron.com/work/nexusflow',
-    metrics: [
-      { label: 'MRR', value: '$12k' },
-      { label: 'Uptime', value: '99.99%' },
-      { label: 'Load', value: '8.4ms' },
-    ],
-    bars: [35, 52, 44, 68, 58, 78, 72, 92, 85, 100],
+    liveUrl: 'https://nexus-flow-sand.vercel.app/',
   },
   {
     title: 'Stratum',
@@ -31,6 +27,7 @@ const PROJECTS = [
     tag: 'AI Product',
     result: '42% token savings',
     url: 'lyptron.com/work/voxai',
+    liveUrl: 'https://vox-ai-henna.vercel.app/',
     preview: 'ai',
   },
 ]
@@ -80,11 +77,13 @@ export default function Hero() {
   const glowRef = useRef<HTMLDivElement>(null)
   const [storyStep, setStoryStep] = useState(0)
 
-  // Timeline compressed from 2400/4800ms — the real H1 (LCP element) was
-  // staying invisible for ~4.8s while these timers ran, which tanked LCP.
+  // Each teaser line needs long enough on screen to actually be read before
+  // it crossfades to the next. The real H1 is always in the DOM (just
+  // visually masked by the teasers), so slowing the reveal doesn't affect
+  // LCP crawling — it only paces the human-visible storytelling.
   useEffect(() => {
-    const timer1 = setTimeout(() => setStoryStep(1), 500)
-    const timer2 = setTimeout(() => setStoryStep(2), 1100)
+    const timer1 = setTimeout(() => setStoryStep(1), 1800)
+    const timer2 = setTimeout(() => setStoryStep(2), 3800)
     return () => { clearTimeout(timer1); clearTimeout(timer2) }
   }, [])
 
@@ -374,37 +373,31 @@ export default function Hero() {
                     <div className="w-1.5 h-1.5 rounded-full bg-white/8" />
                     <div className="w-1.5 h-1.5 rounded-full bg-white/6" />
                   </div>
-                  <div className="ml-3 h-4.5 flex-1 max-w-30 rounded bg-white/3 flex items-center px-2">
-                    <span className="font-mono text-[7px] text-white/12">{p.url}</span>
-                  </div>
+                  {p.liveUrl ? (
+                    <a
+                      href={p.liveUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="ml-3 h-4.5 flex-1 max-w-30 rounded bg-white/3 flex items-center px-2 cursor-pointer hover:bg-white/6 transition-colors"
+                    >
+                      <span className="font-mono text-[7px] text-white/25 truncate">{p.liveUrl.replace(/^https?:\/\//, '').replace(/\/$/, '')}</span>
+                    </a>
+                  ) : (
+                    <div className="ml-3 h-4.5 flex-1 max-w-30 rounded bg-white/3 flex items-center px-2">
+                      <span className="font-mono text-[7px] text-white/12">{p.url}</span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Preview area */}
-                <div className="aspect-16/10 relative" style={{ background: 'linear-gradient(135deg, #0e0e10 0%, #08080A 100%)' }}>
+                <div className="aspect-16/10 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #0e0e10 0%, #08080A 100%)' }}>
                   {/* Subtle inner glow */}
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700"
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 z-10 pointer-events-none"
                        style={{ background: 'radial-gradient(circle at 50% 30%, rgba(255,255,255,0.02) 0%, transparent 50%)' }} />
 
-                  {i === 0 && p.metrics && p.bars && (
-                    /* Dashboard mockup */
-                    <div className="absolute inset-3 flex flex-col gap-2">
-                      <div className="flex gap-2">
-                        {p.metrics.map((m, j) => (
-                          <div key={j} className="flex-1 rounded-lg p-2" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
-                            <span className="font-mono text-[6px] text-white/18 uppercase tracking-wider block">{m.label}</span>
-                            <span className="font-display font-bold text-[13px] text-white/70 tracking-tight leading-none">{m.value}</span>
-                          </div>
-                        ))}
-                      </div>
-                      <div className="flex-1 rounded-lg p-2.5" style={{ background: 'rgba(255,255,255,0.015)', border: '1px solid rgba(255,255,255,0.035)' }}>
-                        <div className="flex items-end gap-0.75 h-full">
-                          {p.bars.map((h, j) => (
-                            <div key={j} className="flex-1 rounded-t-xs transition-all duration-300"
-                                 style={{ height: `${h}%`, background: j >= 8 ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.05)' }} />
-                          ))}
-                        </div>
-                      </div>
-                    </div>
+                  {i === 0 && p.liveUrl && (
+                    /* Real live preview of the deployed NexusFlow app */
+                    <LivePreviewFrame url={p.liveUrl} title="NexusFlow live preview" baseWidth={1440} baseHeight={900} />
                   )}
 
                   {i === 1 && (
@@ -438,24 +431,9 @@ export default function Hero() {
                     </div>
                   )}
 
-                  {i === 2 && (
-                    /* AI chat mockup */
-                    <div className="absolute inset-3 flex flex-col gap-2">
-                      <div className="flex items-center gap-2 mb-1">
-                        <div className="w-5 h-5 rounded-full bg-white/5 border border-white/8" />
-                        <div className="h-1.5 w-16 rounded bg-white/6" />
-                        <div className="ml-auto h-1.5 w-8 rounded bg-white/4" />
-                      </div>
-                      <div className="flex-1 flex flex-col gap-2 justify-end">
-                        <div className="flex justify-end"><div className="w-[65%] rounded-xl p-2.5" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.05)' }}><div className="h-1.5 w-full rounded bg-white/8 mb-1" /><div className="h-1.5 w-2/3 rounded bg-white/5" /></div></div>
-                        <div className="flex justify-start"><div className="w-[55%] rounded-xl p-2.5" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}><div className="h-1.5 w-full rounded bg-white/6 mb-1" /><div className="h-1.5 w-3/4 rounded bg-white/4" /></div></div>
-                        <div className="flex justify-end"><div className="w-[50%] rounded-xl p-2.5" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.05)' }}><div className="h-1.5 w-full rounded bg-white/7" /></div></div>
-                      </div>
-                      <div className="flex gap-2 mt-1">
-                        <div className="flex-1 h-8 rounded-lg" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }} />
-                        <div className="w-8 h-8 rounded-lg bg-white/5" />
-                      </div>
-                    </div>
+                  {i === 2 && p.liveUrl && (
+                    /* Real live preview of the deployed VoxAI app */
+                    <LivePreviewFrame url={p.liveUrl} title="VoxAI live preview" baseWidth={1440} baseHeight={900} />
                   )}
                 </div>
 

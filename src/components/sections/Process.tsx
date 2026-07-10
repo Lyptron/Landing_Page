@@ -52,65 +52,48 @@ function StoryBeat({ beat }: { beat: typeof STORY_BEATS[0] }) {
   const inView = useInView(ref, { once: true, margin: '-20px' })
 
   return (
-    <div ref={ref} className="flex flex-col items-center py-12 md:py-16">
-      {/* Vertical drop from above */}
+    <div ref={ref} className="flex flex-col items-center py-10 md:py-14">
+      {/* Upper line — fades in tinted to the phase we're leaving */}
       <m.div
         className="w-px origin-top"
-        style={{ height: 40, background: 'linear-gradient(180deg, rgba(255,255,255,0.06), rgba(249,115,22,0.55))' }}
+        style={{ height: 44, background: `linear-gradient(180deg, transparent, ${beat.fromColor}55)` }}
         initial={{ scaleY: 0 }}
         animate={inView ? { scaleY: 1 } : {}}
-        transition={{ duration: 0.55, ease: EASE }}
+        transition={{ duration: 0.6, ease: EASE }}
       />
 
-      {/* Row: left arm ── blue dot ── right arm */}
-      <div className="relative flex items-center w-full my-1">
-        <m.div
-          className="flex-1 h-px origin-right"
-          style={{ background: 'linear-gradient(90deg, transparent, rgba(249,115,22,0.35))' }}
-          initial={{ scaleX: 0 }}
-          animate={inView ? { scaleX: 1 } : {}}
-          transition={{ duration: 0.9, delay: 0.3, ease: EASE }}
+      {/* Node — refined diamond blending the two phase colors */}
+      <m.div
+        className="my-2.5"
+        initial={{ scale: 0, opacity: 0, rotate: 45 }}
+        animate={inView ? { scale: 1, opacity: 1, rotate: 45 } : {}}
+        transition={{ duration: 0.5, delay: 0.35, ease: [0.34, 1.56, 0.64, 1] }}
+      >
+        <div
+          className="w-2.5 h-2.5 rounded-[3px]"
+          style={{
+            background: `linear-gradient(135deg, ${beat.fromColor}, ${beat.toColor})`,
+            boxShadow: `0 0 0 4px ${beat.toColor}10, 0 0 14px ${beat.toColor}40`,
+          }}
         />
-        {/* Blue node */}
-        <m.div
-          className="relative z-10 mx-3 shrink-0"
-          initial={{ scale: 0, opacity: 0 }}
-          animate={inView ? { scale: 1, opacity: 1 } : {}}
-          transition={{ duration: 0.5, delay: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
-        >
-          <div
-            className="w-3 h-3 rounded-full"
-            style={{
-              background: 'rgba(249,115,22,1)',
-              boxShadow: '0 0 0 4px rgba(249,115,22,0.18), 0 0 20px rgba(249,115,22,0.65), 0 0 48px rgba(249,115,22,0.28)',
-            }}
-          />
-        </m.div>
-        <m.div
-          className="flex-1 h-px origin-left"
-          style={{ background: 'linear-gradient(90deg, rgba(249,115,22,0.35), transparent)' }}
-          initial={{ scaleX: 0 }}
-          animate={inView ? { scaleX: 1 } : {}}
-          transition={{ duration: 0.9, delay: 0.3, ease: EASE }}
-        />
-      </div>
+      </m.div>
 
-      {/* Vertical drop to below */}
+      {/* Lower line — fades out tinted to the phase we're entering */}
       <m.div
         className="w-px origin-top"
-        style={{ height: 40, background: 'linear-gradient(180deg, rgba(249,115,22,0.55), rgba(255,255,255,0.04))' }}
+        style={{ height: 44, background: `linear-gradient(180deg, ${beat.toColor}55, transparent)` }}
         initial={{ scaleY: 0 }}
         animate={inView ? { scaleY: 1 } : {}}
-        transition={{ duration: 0.55, delay: 0.55, ease: EASE }}
+        transition={{ duration: 0.6, delay: 0.4, ease: EASE }}
       />
 
-      {/* Narrative text */}
+      {/* Narrative text — soft, tied to the incoming phase colour */}
       <m.p
-        className="font-body text-[14px] md:text-[15px] italic text-center mt-5 leading-relaxed"
-        style={{ color: 'rgba(251,146,60,0.72)' }}
-        initial={{ opacity: 0, y: 10, filter: 'blur(8px)' }}
-        animate={inView ? { opacity: 1, y: 0, filter: 'blur(0px)' } : {}}
-        transition={{ duration: 1.0, delay: 0.65, ease: EASE }}
+        className="font-body text-[13.5px] md:text-[14.5px] italic text-center mt-5 leading-relaxed max-w-xs"
+        style={{ color: `${beat.toColor}c0` }}
+        initial={{ opacity: 0, y: 8 }}
+        animate={inView ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: 0.8, delay: 0.5, ease: EASE }}
       >
         {beat.text}
       </m.p>
@@ -119,10 +102,9 @@ function StoryBeat({ beat }: { beat: typeof STORY_BEATS[0] }) {
 }
 
 // ── Individual phase row ─────────────────────────────────────────────
-function PhaseRow({ step, meta, index }: {
+function PhaseRow({ step, meta }: {
   step: typeof processSteps[0]
   meta: typeof META[0]
-  index: number
 }) {
   const ref = useRef<HTMLDivElement>(null)
   const inView = useInView(ref, { once: true, margin: '-50px' })
@@ -171,9 +153,9 @@ function PhaseRow({ step, meta, index }: {
           <m.h3
             className="font-display font-bold tracking-[-0.035em] leading-[1.02] text-white/92 mb-8"
             style={{ fontSize: 'clamp(28px, 3vw, 44px)' }}
-            initial={{ opacity: 0, y: 28, filter: 'blur(14px)', scale: 0.97 }}
-            animate={inView ? { opacity: 1, y: 0, filter: 'blur(0px)', scale: 1 } : {}}
-            transition={{ duration: 1.0, delay: 0.2, ease: EASE }}
+            initial={{ opacity: 0, y: 24, filter: 'blur(8px)' }}
+            animate={inView ? { opacity: 1, y: 0, filter: 'blur(0px)' } : {}}
+            transition={{ duration: 0.9, delay: 0.2, ease: EASE }}
           >
             {step.title}
           </m.h3>
@@ -293,18 +275,17 @@ export default function Process() {
   const headerInView = useInView(headerRef, { once: true, margin: '-80px' })
 
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start 80%', 'end 20%'] })
-  const lineHeight = useTransform(scrollYProgress, [0, 1], ['0%', '100%'])
-
-  // Tip: small glowing bead that rides the front of the fill line
-  const tipY    = useTransform(scrollYProgress, [0, 1], ['-4px', 'calc(100% - 4px)'])
-  const tipGlow = useTransform(scrollYProgress, [0, 0.02, 0.97, 1.0], [0, 1, 1, 0])
+  // Fill grows via a scaleY transform (compositor-only) instead of animating
+  // `height` — the old approach forced a layout pass on every scroll frame,
+  // which is what made this section feel laggy and chunky while scrolling.
+  const lineScaleY = useTransform(scrollYProgress, [0, 1], [0, 1])
 
   // Dot opacity — smoothly brightens as the line arrives, stays bright
   // Window is wide (~0.10) so the transition feels gradual, not a snap
-  const dot0Opacity = useTransform(scrollYProgress, [0.00, 0.10], [0.15, 1.0])
-  const dot1Opacity = useTransform(scrollYProgress, [0.28, 0.40], [0.15, 1.0])
-  const dot2Opacity = useTransform(scrollYProgress, [0.58, 0.70], [0.15, 1.0])
-  const dot3Opacity = useTransform(scrollYProgress, [0.86, 0.98], [0.15, 1.0])
+  const dot0Opacity = useTransform(scrollYProgress, [0.00, 0.10], [0.2, 1.0])
+  const dot1Opacity = useTransform(scrollYProgress, [0.28, 0.40], [0.2, 1.0])
+  const dot2Opacity = useTransform(scrollYProgress, [0.58, 0.70], [0.2, 1.0])
+  const dot3Opacity = useTransform(scrollYProgress, [0.86, 0.98], [0.2, 1.0])
   const dotOpacities = [dot0Opacity, dot1Opacity, dot2Opacity, dot3Opacity]
 
 
@@ -330,42 +311,29 @@ export default function Process() {
 
         {/* ── Scroll progress spine ── */}
         <div className="hidden lg:flex flex-col items-center w-14 shrink-0 pt-32 pb-20 ml-6 xl:ml-12">
-          <div className="relative flex-1 w-px" style={{ background: 'rgba(255,255,255,0.07)' }}>
+          <div className="relative flex-1 w-px rounded-full" style={{ background: 'rgba(255,255,255,0.06)' }}>
 
-            {/* Fill — uniform bright white, grows from top */}
+            {/* Fill — warm off-white, grows from the top via scaleY (no layout) */}
             <m.div
-              className="absolute top-0 left-0 right-0 origin-top"
+              className="absolute inset-0 origin-top rounded-full"
               style={{
-                height: lineHeight,
-                background: 'rgba(255,255,255,0.88)',
-                boxShadow: '0 0 6px rgba(255,255,255,0.5)',
+                scaleY: lineScaleY,
+                background: 'linear-gradient(180deg, rgba(255,251,244,0.75) 0%, rgba(255,248,238,0.32) 100%)',
               }}
             />
 
-            {/* Travelling bead — rides the tip of the fill */}
-            <m.div
-              className="absolute left-1/2 -translate-x-1/2 w-2 h-2 rounded-full pointer-events-none"
-              style={{
-                top: tipY,
-                opacity: tipGlow,
-                background: 'white',
-                boxShadow: '0 0 8px rgba(255,255,255,1), 0 0 20px rgba(255,255,255,0.8), 0 0 40px rgba(255,255,255,0.4)',
-              }}
-            />
-
-            {/* Phase dots — smoothly brighten as the fill line reaches them */}
+            {/* Phase dots — tinted to each phase's accent, gently glowing.
+                They brighten (opacity) as the fill line reaches them. */}
             {[0, 1, 2, 3].map((i) => (
               <m.div
                 key={i}
-                className="absolute left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full"
+                className="absolute left-1/2 w-2 h-2 rounded-full"
                 style={{
-                  top: `calc(${i * 33.3}% - 5px)`,
+                  top: `calc(${i * 33.3}% - 4px)`,
                   x: '-50%',
-                  backgroundColor: 'rgb(59,130,246)',
+                  backgroundColor: META[i].color,
                   opacity: dotOpacities[i],
-                  // glow driven by the same scroll window — interpolated inline
-                  boxShadow: `0 0 0 2px rgba(59,130,246,0.15), 0 0 10px rgba(59,130,246,0.6), 0 0 22px rgba(59,130,246,0.3)`,
-                  transition: 'box-shadow 0.3s ease',
+                  boxShadow: `0 0 0 3px ${META[i].color}14, 0 0 10px ${META[i].color}66`,
                 }}
               />
             ))}
@@ -402,7 +370,7 @@ export default function Process() {
                 >
                   <m.span
                     className="text-white/90 inline-block"
-                    initial={{ opacity: 0, y: 22, filter: 'blur(14px)' }}
+                    initial={{ opacity: 0, y: 22, filter: 'blur(8px)' }}
                     animate={headerInView ? { opacity: 1, y: 0, filter: 'blur(0px)' } : {}}
                     transition={{ duration: 1.1, delay: 0.2, ease: EASE }}
                   >
@@ -410,7 +378,7 @@ export default function Process() {
                   </m.span>{' '}
                   <m.span
                     className="text-white/25 inline-block"
-                    initial={{ opacity: 0, y: 22, filter: 'blur(14px)' }}
+                    initial={{ opacity: 0, y: 22, filter: 'blur(8px)' }}
                     animate={headerInView ? { opacity: 1, y: 0, filter: 'blur(0px)' } : {}}
                     transition={{ duration: 1.1, delay: 0.4, ease: EASE }}
                   >
@@ -419,7 +387,7 @@ export default function Process() {
                   <br />
                   <m.span
                     className="text-white/90 inline-block"
-                    initial={{ opacity: 0, y: 22, filter: 'blur(14px)' }}
+                    initial={{ opacity: 0, y: 22, filter: 'blur(8px)' }}
                     animate={headerInView ? { opacity: 1, y: 0, filter: 'blur(0px)' } : {}}
                     transition={{ duration: 1.1, delay: 0.6, ease: EASE }}
                   >
@@ -466,7 +434,7 @@ export default function Process() {
           <div>
             {processSteps.map((step, i) => (
               <div key={step.number}>
-                <PhaseRow step={step} meta={META[i]} index={i} />
+                <PhaseRow step={step} meta={META[i]} />
                 {i < processSteps.length - 1 && (
                   <StoryBeat beat={STORY_BEATS[i]} />
                 )}

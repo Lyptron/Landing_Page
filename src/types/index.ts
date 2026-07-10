@@ -28,6 +28,9 @@ export interface Project {
   accent:  string
   accentGlow: string
   number:  string
+  // Live deployed URL — when present, the Work section renders a real
+  // embedded preview instead of the placeholder "Preview" mockup.
+  url?:    string
 }
 
 export interface TeamMember {

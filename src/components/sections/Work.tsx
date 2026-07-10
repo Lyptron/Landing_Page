@@ -4,6 +4,7 @@ import { m, useScroll, useTransform, useInView, type Variants } from 'framer-mot
 import { projects } from '@/data/projects'
 import { ArrowUpRight, ArrowRight } from 'lucide-react'
 import { useCursor } from '../providers/CursorProvider'
+import LivePreviewFrame from '../ui/LivePreviewFrame'
 
 const scrollToCTA = () => {
   const target = document.querySelector('#cta')
@@ -72,13 +73,37 @@ function DeviceMockup({ project }: { project: typeof projects[0] }) {
           <div className="absolute top-2 left-1/2 -translate-x-1/2 w-16 h-4.5 bg-black rounded-full z-30 flex items-center justify-center">
             <div className="w-2 h-2 rounded-full bg-white/4 ring-1 ring-white/6" />
           </div>
-          <div className="w-full h-full rounded-[27px] bg-[#111114] flex items-center justify-center">
-            <span className="font-mono text-[8px] text-white/8 uppercase tracking-widest">Preview</span>
+          <div className="w-full h-full rounded-[27px] bg-[#111114] overflow-hidden relative">
+            {project.url ? (
+              <>
+                <LivePreviewFrame
+                  url={project.url}
+                  title={`${project.name} live preview`}
+                  baseWidth={390}
+                  baseHeight={844}
+                />
+                <a
+                  href={project.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`Open ${project.name} live site`}
+                  className="absolute top-8 right-2 z-30 flex items-center justify-center w-6 h-6 rounded-full bg-black/60 border border-white/10 hover:bg-black/80 hover:border-white/25 transition-colors"
+                >
+                  <ArrowUpRight className="w-3 h-3 text-white/60" />
+                </a>
+              </>
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="font-mono text-[8px] text-white/8 uppercase tracking-widest">Preview</span>
+              </div>
+            )}
           </div>
         </div>
       </div>
     )
   }
+
+  const displayUrl = project.url ? project.url.replace(/^https?:\/\//, '').replace(/\/$/, '') : `lyptron.com/${project.id}`
 
   return (
     <div className="relative w-full">
@@ -96,12 +121,34 @@ function DeviceMockup({ project }: { project: typeof projects[0] }) {
             <div className="w-1.5 h-1.5 rounded-full bg-white/8" />
             <div className="w-1.5 h-1.5 rounded-full bg-white/6" />
           </div>
-          <div className="ml-3 h-4.5 flex-1 max-w-35 rounded bg-white/3 flex items-center px-2">
-            <span className="font-mono text-[7px] text-white/12" aria-hidden="true">lyptron.com/{project.id}</span>
-          </div>
+          {project.url ? (
+            <a
+              href={project.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ml-3 h-4.5 flex-1 max-w-35 rounded bg-white/3 flex items-center px-2 cursor-pointer hover:bg-white/6 transition-colors"
+            >
+              <span className="font-mono text-[7px] text-white/25 truncate">{displayUrl}</span>
+            </a>
+          ) : (
+            <div className="ml-3 h-4.5 flex-1 max-w-35 rounded bg-white/3 flex items-center px-2">
+              <span className="font-mono text-[7px] text-white/12" aria-hidden="true">{displayUrl}</span>
+            </div>
+          )}
         </div>
-        <div className="flex-1 w-full bg-[#0f0f11] flex items-center justify-center">
-          <span className="font-mono text-[10px] text-white/8 uppercase tracking-widest">Preview</span>
+        <div className="flex-1 w-full bg-[#0f0f11] relative overflow-hidden">
+          {project.url ? (
+            <LivePreviewFrame
+              url={project.url}
+              title={`${project.name} live preview`}
+              baseWidth={1440}
+              baseHeight={900}
+            />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="font-mono text-[10px] text-white/8 uppercase tracking-widest">Preview</span>
+            </div>
+          )}
         </div>
       </div>
     </div>
