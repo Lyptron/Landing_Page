@@ -20,7 +20,7 @@ const PROJECTS = [
     tag: 'Brand & Marketing',
     result: 'Lighthouse 100',
     url: 'lyptron.com/work/stratum',
-    preview: 'brand',
+    liveUrl: 'https://stratum-one-gamma.vercel.app/',
   },
   {
     title: 'VoxAI',
@@ -169,55 +169,38 @@ export default function Hero() {
           }}
         />
 
-        {/* Ultra-subtle warm edge glow at top center */}
+        {/* Ultra-subtle warm edge glow at top center — no blur filter (expensive repaint) */}
         <div
           className="absolute left-1/2 -translate-x-1/2 top-[-5%]"
           style={{
-            width: '30%',
-            height: '200px',
-            background: 'radial-gradient(ellipse at 50% 100%, rgba(255,230,180,0.08) 0%, transparent 70%)',
-            filter: 'blur(40px)',
+            width: '50%',
+            height: '220px',
+            background: 'radial-gradient(ellipse 60% 80% at 50% 100%, rgba(255,230,180,0.06) 0%, transparent 100%)',
           }}
         />
 
         {/* Noise grain for cinematic texture */}
         <div className="absolute inset-0 opacity-[0.018]" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.75%22 numOctaves=%224%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")' }} />
 
-        {/* Mobile Ambient Glow */}
-        <m.div 
+        {/* Mobile Ambient Glow — static, no animation loop (saves main-thread work) */}
+        <div
           className="absolute inset-0 md:hidden z-0 pointer-events-none"
-          initial={{ opacity: 0.2 }}
-          animate={{ opacity: [0.2, 0.4, 0.2], scale: [1, 1.05, 1] }}
-          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-          style={{ background: 'radial-gradient(ellipse at 50% 30%, rgba(255,255,255,0.06) 0%, transparent 70%)' }}
+          style={{ background: 'radial-gradient(ellipse at 50% 30%, rgba(255,255,255,0.05) 0%, transparent 70%)' }}
         />
 
-        {/* Animated SVG Timeline Thread — synced to story steps */}
+        {/* Ambient SVG arc — static path, fades in with the story steps.
+            Previously used pathLength animation (stroke-dashoffset each frame)
+            which is expensive. Replaced with a simple CSS opacity transition. */}
         <svg aria-hidden="true" focusable="false" className="hidden md:block absolute inset-x-0 top-0 w-full pointer-events-none z-10" style={{ height: '800px' }} preserveAspectRatio="none" viewBox="0 0 1440 800">
-          <m.path
+          <path
             d="M -100,200 C 300,200 400,100 720,100 C 1000,100 1200,400 1500,400"
             fill="none"
             stroke="url(#glowGradient)"
             strokeWidth="1.5"
-            initial={{ pathLength: 0, opacity: 0 }}
-            animate={{
-              pathLength: storyStep === 0 ? 0.33 : storyStep === 1 ? 0.66 : 1,
-              opacity: storyStep === 0 ? 0.5 : storyStep === 1 ? 0.7 : 0.9,
+            style={{
+              opacity: storyStep === 0 ? 0 : storyStep === 1 ? 0.6 : 0.9,
+              transition: 'opacity 1.8s ease',
             }}
-            transition={{ duration: 2, ease: [0.25, 0.46, 0.45, 0.94] }}
-          />
-          <m.path
-            d="M -100,200 C 300,200 400,100 720,100 C 1000,100 1200,400 1500,400"
-            fill="none"
-            stroke="url(#glowGradientBright)"
-            strokeWidth="4"
-            style={{ filter: 'blur(6px)' }}
-            initial={{ pathLength: 0, opacity: 0 }}
-            animate={{
-              pathLength: storyStep === 0 ? 0.33 : storyStep === 1 ? 0.66 : 1,
-              opacity: storyStep === 0 ? 0.15 : storyStep === 1 ? 0.25 : 0.4,
-            }}
-            transition={{ duration: 2, ease: [0.25, 0.46, 0.45, 0.94] }}
           />
           <defs>
             <linearGradient id="glowGradient" x1="0" y1="0" x2="1" y2="0">
@@ -225,12 +208,6 @@ export default function Hero() {
               <stop offset="30%" stopColor="rgba(255,252,245,0.9)" />
               <stop offset="70%" stopColor="rgba(255,252,245,0.9)" />
               <stop offset="100%" stopColor="rgba(255,252,245,0)" />
-            </linearGradient>
-            <linearGradient id="glowGradientBright" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%" stopColor="rgba(255,250,230,0)" />
-              <stop offset="40%" stopColor="rgba(255,250,230,0.8)" />
-              <stop offset="60%" stopColor="rgba(255,250,230,0.8)" />
-              <stop offset="100%" stopColor="rgba(255,250,230,0)" />
             </linearGradient>
           </defs>
         </svg>
@@ -258,7 +235,7 @@ export default function Hero() {
                 teasers below sit visually in front via z-index but are
                 aria-hidden so they never replace the H1 semantically. */}
             <m.h1
-              initial={{ opacity: 0, filter: 'blur(14px)', scale: 0.98 }}
+              initial={{ opacity: 0, filter: 'blur(6px)', scale: 0.98 }}
               animate={{
                 // After 6s storyStep flips to 2 and the H1 fades in. Before
                 // that the H1 is still in the DOM but visually masked by the
@@ -281,10 +258,10 @@ export default function Hero() {
             {/* Step 0 — tease line (visual only, not a heading) */}
             <m.span
               aria-hidden="true"
-              initial={{ opacity: 0, filter: 'blur(10px)', y: 8 }}
+              initial={{ opacity: 0, filter: 'blur(5px)', y: 8 }}
               animate={{
                 opacity: storyStep === 0 ? 1 : 0,
-                filter: storyStep === 0 ? 'blur(0px)' : 'blur(10px)',
+                filter: storyStep === 0 ? 'blur(0px)' : 'blur(5px)',
                 y: storyStep === 0 ? 0 : -6,
               }}
               transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
@@ -296,10 +273,10 @@ export default function Hero() {
             {/* Step 1 — problem line (visual only, not a heading) */}
             <m.span
               aria-hidden="true"
-              initial={{ opacity: 0, filter: 'blur(10px)', y: 8 }}
+              initial={{ opacity: 0, filter: 'blur(5px)', y: 8 }}
               animate={{
                 opacity: storyStep === 1 ? 1 : 0,
-                filter: storyStep === 1 ? 'blur(0px)' : 'blur(10px)',
+                filter: storyStep === 1 ? 'blur(0px)' : 'blur(5px)',
                 y: storyStep === 1 ? 0 : storyStep < 1 ? 8 : -6,
               }}
               transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
@@ -400,35 +377,8 @@ export default function Hero() {
                     <LivePreviewFrame url={p.liveUrl} title="NexusFlow live preview" baseWidth={1440} baseHeight={900} />
                   )}
 
-                  {i === 1 && (
-                    /* Brand / marketing mockup */
-                    <div className="absolute inset-3 flex gap-2">
-                      <div className="w-[38%] flex flex-col gap-2">
-                        <div className="flex-1 rounded-lg" style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.04)' }}>
-                          <div className="p-2.5 flex flex-col h-full">
-                            <div className="h-2 w-16 rounded bg-white/8 mb-2" />
-                            <div className="h-1.5 w-12 rounded bg-white/4 mb-3" />
-                            <div className="flex-1 rounded bg-white/2 border border-white/4 flex items-center justify-center">
-                              <div className="w-10 h-12 rounded border border-white/8 bg-white/2" />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex-1 flex flex-col gap-2">
-                        <div className="h-8 rounded-lg flex items-center px-3 gap-3" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
-                          <div className="h-1.5 w-10 rounded bg-white/6" />
-                          <div className="h-1.5 w-8 rounded bg-white/4" />
-                          <div className="h-1.5 w-12 rounded bg-white/4" />
-                        </div>
-                        <div className="flex-1 rounded-lg p-2.5" style={{ background: 'rgba(255,255,255,0.015)', border: '1px solid rgba(255,255,255,0.04)' }}>
-                          <div className="grid grid-cols-2 gap-2 h-full">
-                            {[...Array(4)].map((_, k) => (
-                              <div key={k} className="rounded bg-white/2 border border-white/4" />
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                  {i === 1 && p.liveUrl && (
+                    <LivePreviewFrame url={p.liveUrl} title="Stratum live preview" baseWidth={1440} baseHeight={900} />
                   )}
 
                   {i === 2 && p.liveUrl && (
