@@ -129,8 +129,8 @@ export default function ServicePageBody({ service, faqs }: ServicePageBodyProps)
             <m.h1
               className="font-display font-bold text-white/95 tracking-[-0.04em] leading-[0.92] mb-10"
               style={{ fontSize: 'clamp(52px, 8vw, 112px)' }}
-              initial={{ opacity: 0, y: 40, filter: 'blur(14px)' }}
-              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1.2, delay: 0.1, ease: EASE }}
             >
               {service.name}

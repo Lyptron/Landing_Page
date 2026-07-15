@@ -44,10 +44,12 @@ const projectStats: Record<string, { label: string; value: string }[]> = {
   ],
 }
 
+// Opacity + scale only — tweening filter:blur() during scroll-triggered
+// reveals repaints large areas every frame and stutters on weak GPUs.
 const statChild: Variants = {
-  hidden: { opacity: 0, scale: 1.3, filter: 'blur(8px)' },
+  hidden: { opacity: 0, scale: 1.3 },
   visible: {
-    opacity: 1, scale: 1, filter: 'blur(0px)',
+    opacity: 1, scale: 1,
     transition: { duration: 0.8, ease: EASE },
   },
 }
@@ -225,14 +227,12 @@ function ProjectRow({ project, index }: { project: typeof projects[0]; index: nu
               opacity: 0,
               scale: 0.85,
               rotateY: isReversed ? -8 : 8,
-              filter: 'blur(12px)',
               x: isReversed ? 60 : -60,
             }}
             whileInView={{
               opacity: 1,
               scale: 1,
               rotateY: 0,
-              filter: 'blur(0px)',
               x: 0,
             }}
             viewport={{ once: true, margin: '-60px' }}
@@ -269,11 +269,11 @@ function ProjectRow({ project, index }: { project: typeof projects[0]; index: nu
             </span>
           </m.div>
 
-          {/* Name — blur reveal */}
+          {/* Name — fade-up reveal */}
           <m.h3
             className="font-display font-bold text-[clamp(28px,4vw,52px)] text-white/90 tracking-[-0.03em] leading-[0.95] mb-4"
-            initial={{ opacity: 0, filter: 'blur(16px)', y: 16 }}
-            animate={infoInView ? { opacity: 1, filter: 'blur(0px)', y: 0 } : {}}
+            initial={{ opacity: 0, y: 16 }}
+            animate={infoInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 1, delay: 0.15, ease: EASE }}
           >
             {project.name}
@@ -413,8 +413,8 @@ export default function Work() {
 
           <m.h2
             className="font-display font-bold text-[clamp(32px,5vw,68px)] text-white/90 tracking-[-0.04em] leading-[0.97]"
-            initial={{ opacity: 0, filter: 'blur(16px)', y: 16 }}
-            animate={headerInView ? { opacity: 1, filter: 'blur(0px)', y: 0 } : {}}
+            initial={{ opacity: 0, y: 16 }}
+            animate={headerInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 1.2, delay: 0.3, ease: EASE }}
           >
             Our work

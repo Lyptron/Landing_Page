@@ -15,8 +15,6 @@ interface TeamModalProps {
   onClose: () => void
 }
 
-type LenisLike = { stop: () => void; start: () => void }
-
 export default function TeamModal({ member, onClose }: TeamModalProps) {
   const { setCursorState } = useCursor()
   const [mounted, setMounted] = useState(false)
@@ -31,8 +29,6 @@ export default function TeamModal({ member, onClose }: TeamModalProps) {
     setMounted(true)
     previouslyFocused.current = document.activeElement as HTMLElement | null
     document.body.style.overflow = 'hidden'
-    const lenis = (window as unknown as { lenis?: LenisLike }).lenis
-    if (lenis) lenis.stop()
 
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
@@ -42,7 +38,6 @@ export default function TeamModal({ member, onClose }: TeamModalProps) {
 
     return () => {
       document.body.style.overflow = ''
-      if (lenis) lenis.start()
       window.removeEventListener('keydown', handleKey)
       previouslyFocused.current?.focus?.()
     }
@@ -53,19 +48,25 @@ export default function TeamModal({ member, onClose }: TeamModalProps) {
   return createPortal(
     <AnimatePresence>
       {/* Backdrop */}
+      {/* backdrop-blur was a viewport-wide backdrop-filter blur — the
+          browser reblurred everything behind it every animation frame,
+          costing ~40ms/frame on integrated GPUs. Solid dark scrim reads
+          essentially the same and is compositor-only. */}
       <m.div
         key="backdrop"
-        className="fixed inset-0 z-100 bg-black/70 backdrop-blur-md"
+        className="fixed inset-0 z-100 bg-black/80"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
         onClick={onClose}
         aria-hidden="true"
       />
 
-      {/* Modal */}
-      <div key="modal-content" className="fixed inset-0 z-101 flex items-center justify-center pointer-events-none p-4 sm:p-8">
+      {/* Modal wrapper needs overflow-y-auto so tall content on mobile
+          (or a small viewport) can scroll — body scroll is locked, so
+          without this the user gets frozen. */}
+      <div key="modal-content" className="fixed inset-0 z-101 flex items-center justify-center pointer-events-none p-4 sm:p-8 overflow-y-auto overscroll-contain">
         <m.div
           ref={dialogRef}
           role="dialog"
@@ -78,10 +79,10 @@ export default function TeamModal({ member, onClose }: TeamModalProps) {
             border: '1px solid rgba(255,255,255,0.07)',
             boxShadow: '0 48px 96px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05)',
           }}
-          initial={{ y: 24, opacity: 0, scale: 0.97, filter: 'blur(8px)' }}
-          animate={{ y: 0, opacity: 1, scale: 1, filter: 'blur(0px)' }}
-          exit={{ y: 16, opacity: 0, scale: 0.97, filter: 'blur(8px)' }}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          initial={{ y: 24, opacity: 0, scale: 0.97 }}
+          animate={{ y: 0, opacity: 1, scale: 1 }}
+          exit={{ y: 16, opacity: 0, scale: 0.97 }}
+          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
           onMouseEnter={() => setCursorState('default')}
         >
           {/* Left — Portrait */}
@@ -108,8 +109,8 @@ export default function TeamModal({ member, onClose }: TeamModalProps) {
             <div className="absolute inset-0 bg-linear-to-r from-transparent via-transparent to-[#0c0c0e]/80 md:to-[#0c0c0e] pointer-events-none" />
           </div>
 
-          {/* Right — Content */}
-          <div className="w-full md:w-[60%] p-8 md:p-12 flex flex-col justify-center relative bg-[#0c0c0e]">
+          {/* Right — Content (scrollable if it overflows on desktop) */}
+          <div className="w-full md:w-[60%] p-8 md:p-12 flex flex-col justify-center relative bg-[#0c0c0e] md:overflow-y-auto">
 
             {/* Close */}
             <button

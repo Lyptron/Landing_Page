@@ -57,8 +57,8 @@ function OutcomeCard({ work, delay, setCursorState }: { work: Service['works'][0
       ref={ref}
       className="group/work relative flex flex-col gap-2 py-5 pl-4 border-b border-white/8 last:border-0 cursor-none transition-all duration-300"
       style={{ borderLeft: '2px solid rgba(96,165,250,0.18)' }}
-      initial={{ opacity: 0, y: 12, filter: 'blur(4px)' }}
-      animate={inView ? { opacity: 1, y: 0, filter: 'blur(0px)' } : {}}
+      initial={{ opacity: 0, y: 12 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.7, delay, ease: EASE }}
       onMouseEnter={(e) => {
         e.currentTarget.style.borderLeftColor = 'rgba(96,165,250,0.55)'
@@ -193,8 +193,8 @@ export default function ServiceCard({ service, index, onDetailClick }: ServiceCa
 
               <m.div
                 className="mb-6"
-                initial={{ opacity: 0, filter: 'blur(16px)', y: 20 }}
-                animate={titleInView ? { opacity: 1, filter: 'blur(0px)', y: 0 } : {}}
+                initial={{ opacity: 0, y: 20 }}
+                animate={titleInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 1.2, delay: 0.2, ease: EASE }}
               >
                 <h3 className="font-display font-bold text-[clamp(28px,3.5vw,48px)] text-white/95 tracking-[-0.03em] leading-none">
@@ -224,7 +224,7 @@ export default function ServiceCard({ service, index, onDetailClick }: ServiceCa
                     onMouseEnter={() => setCursorState('cta')}
                     onMouseLeave={() => setCursorState('default')}
                   >
-                    <div className="absolute inset-0 border border-white/[0.12] rounded-full transition-all duration-300 group-hover/btn:bg-white group-hover/btn:border-white" />
+                    <div className="absolute inset-0 border border-white/12 rounded-full transition-all duration-300 group-hover/btn:bg-white group-hover/btn:border-white" />
                     <div className="relative flex items-center gap-2 px-7 py-3 font-semibold text-[13px] text-white/60 group-hover/btn:text-bg tracking-[0.02em] transition-colors duration-300">
                       View how we develop this
                       <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 transition-transform duration-300" />

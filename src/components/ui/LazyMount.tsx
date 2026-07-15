@@ -23,7 +23,7 @@ export default function LazyMount({ children, minHeight, id }: { children: React
           observer.disconnect()
         }
       },
-      { rootMargin: '600px 0px' }
+      { rootMargin: '1200px 0px' }
     )
     observer.observe(el)
     return () => observer.disconnect()

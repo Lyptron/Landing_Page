@@ -113,24 +113,24 @@ export default function CTA() {
           <h2 className="font-display font-bold text-[clamp(28px,5.5vw,72px)] leading-[0.95] tracking-[-0.04em]">
             <m.span
               className="text-white/90 inline-block"
-              initial={{ opacity: 0, filter: 'blur(16px)', y: 20 }}
-              animate={headlineInView ? { opacity: 1, filter: 'blur(0px)', y: 0 } : {}}
+              initial={{ opacity: 0, y: 20 }}
+              animate={headlineInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 1.2, delay: 0.2, ease: EASE }}
             >
               Have an idea?
             </m.span>{' '}
             <m.span
               className="text-white/45 inline-block"
-              initial={{ opacity: 0, filter: 'blur(16px)', y: 20 }}
-              animate={headlineInView ? { opacity: 1, filter: 'blur(0px)', y: 0 } : {}}
+              initial={{ opacity: 0, y: 20 }}
+              animate={headlineInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 1.2, delay: 0.5, ease: EASE }}
             >
               Let&apos;s talk about
             </m.span>{' '}
             <m.span
               className="text-white/90 inline-block"
-              initial={{ opacity: 0, filter: 'blur(16px)', y: 20 }}
-              animate={headlineInView ? { opacity: 1, filter: 'blur(0px)', y: 0 } : {}}
+              initial={{ opacity: 0, y: 20 }}
+              animate={headlineInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 1.2, delay: 0.8, ease: EASE }}
             >
               making it real.

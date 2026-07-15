@@ -149,12 +149,14 @@ function PhaseRow({ step, meta }: {
             Phase {step.number}
           </m.span>
 
-          {/* Phase title — cinematic blur reveal */}
+          {/* Phase title — reveal on scroll. Opacity + y only: these fire
+              mid-scroll, and tweening filter:blur() on 44px text repaints a
+              large area every frame — the main cause of chunky scrolling here. */}
           <m.h3
             className="font-display font-bold tracking-[-0.035em] leading-[1.02] text-white/92 mb-8"
             style={{ fontSize: 'clamp(28px, 3vw, 44px)' }}
-            initial={{ opacity: 0, y: 24, filter: 'blur(8px)' }}
-            animate={inView ? { opacity: 1, y: 0, filter: 'blur(0px)' } : {}}
+            initial={{ opacity: 0, y: 24 }}
+            animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.9, delay: 0.2, ease: EASE }}
           >
             {step.title}
@@ -201,8 +203,8 @@ function PhaseRow({ step, meta }: {
           {/* Description — written-on feel */}
           <m.p
             className="font-body text-[16px] md:text-[17px] text-white/55 leading-[1.9] max-w-2xl"
-            initial={{ opacity: 0, y: 20, filter: 'blur(6px)' }}
-            animate={inView ? { opacity: 1, y: 0, filter: 'blur(0px)' } : {}}
+            initial={{ opacity: 0, y: 20 }}
+            animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.9, delay: 0.3, ease: EASE }}
           >
             {step.desc}
@@ -221,14 +223,14 @@ function PhaseRow({ step, meta }: {
               {step.details.map((detail, i) => (
                 <m.div
                   key={i}
-                  className="flex items-start gap-3 py-3 border-b border-white/[0.04]"
+                  className="flex items-start gap-3 py-3 border-b border-white/4"
                   style={{ borderBottomColor: i >= step.details.length - 2 ? 'transparent' : undefined }}
                   initial={{ opacity: 0, x: 16 }}
                   animate={inView ? { opacity: 1, x: 0 } : {}}
                   transition={{ duration: 0.55, delay: 0.58 + i * 0.08, ease: EASE }}
                 >
                   <div
-                    className="w-1 h-1 rounded-full mt-[10px] shrink-0"
+                    className="w-1 h-1 rounded-full mt-2.5 shrink-0"
                     style={{ backgroundColor: `${meta.color}70` }}
                   />
                   <span className="font-body text-[13.5px] text-white/50 leading-snug">
@@ -247,7 +249,7 @@ function PhaseRow({ step, meta }: {
             transition={{ duration: 0.7, delay: 1.1, ease: EASE }}
           >
             <div
-              className="w-5 h-px shrink-0 mt-[11px]"
+              className="w-5 h-px shrink-0 mt-2.75"
               style={{ backgroundColor: `${meta.color}45` }}
             />
             <div>
@@ -370,16 +372,16 @@ export default function Process() {
                 >
                   <m.span
                     className="text-white/90 inline-block"
-                    initial={{ opacity: 0, y: 22, filter: 'blur(8px)' }}
-                    animate={headerInView ? { opacity: 1, y: 0, filter: 'blur(0px)' } : {}}
+                    initial={{ opacity: 0, y: 22 }}
+                    animate={headerInView ? { opacity: 1, y: 0 } : {}}
                     transition={{ duration: 1.1, delay: 0.2, ease: EASE }}
                   >
                     From idea
                   </m.span>{' '}
                   <m.span
                     className="text-white/25 inline-block"
-                    initial={{ opacity: 0, y: 22, filter: 'blur(8px)' }}
-                    animate={headerInView ? { opacity: 1, y: 0, filter: 'blur(0px)' } : {}}
+                    initial={{ opacity: 0, y: 22 }}
+                    animate={headerInView ? { opacity: 1, y: 0 } : {}}
                     transition={{ duration: 1.1, delay: 0.4, ease: EASE }}
                   >
                     to production
@@ -387,8 +389,8 @@ export default function Process() {
                   <br />
                   <m.span
                     className="text-white/90 inline-block"
-                    initial={{ opacity: 0, y: 22, filter: 'blur(8px)' }}
-                    animate={headerInView ? { opacity: 1, y: 0, filter: 'blur(0px)' } : {}}
+                    initial={{ opacity: 0, y: 22 }}
+                    animate={headerInView ? { opacity: 1, y: 0 } : {}}
                     transition={{ duration: 1.1, delay: 0.6, ease: EASE }}
                   >
                     in four phases.

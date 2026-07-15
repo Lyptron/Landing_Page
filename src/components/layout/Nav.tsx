@@ -140,16 +140,22 @@ export default function Nav() {
   ]
 
   const handleScrollTo = (e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>, id: string) => {
-    e.preventDefault()
     setMobileMenuOpen(false)
-    const target = document.querySelector(id)
-    if (target) {
-      if ((window as unknown as { lenis?: { scrollTo: (t: Element, o: object) => void } }).lenis) {
-        (window as unknown as { lenis: { scrollTo: (t: Element, o: object) => void } }).lenis.scrollTo(target, { offset: -80, duration: 1.5 })
-      } else {
-        target.scrollIntoView({ behavior: 'smooth' })
-      }
+    // Fragment anchors (#work, #team, #hero…) only resolve on the home
+    // page. From /privacy, /terms, or any other route, let the browser
+    // navigate to `/${hash}` instead of trying to scroll to a nonexistent
+    // element on the current page.
+    if (logicalPathname !== '/') {
+      // Rewrite the click to a same-tab navigation to home + hash. Anchor
+      // clicks get a special-case prevent+href swap; button clicks (logo)
+      // don't have an href so we push manually.
+      e.preventDefault()
+      window.location.href = `/${id}`
+      return
     }
+    e.preventDefault()
+    const target = document.querySelector(id)
+    if (target) target.scrollIntoView({ behavior: 'smooth' })
   }
 
   return (
@@ -249,13 +255,14 @@ export default function Nav() {
             role="dialog"
             aria-modal="true"
             aria-label="Main navigation"
-            className="fixed inset-0 z-101 bg-bg flex flex-col justify-center px-8 md:hidden"
+            className="fixed inset-0 z-101 bg-bg flex flex-col overflow-y-auto overscroll-contain px-8 pt-24 pb-10 md:hidden"
+            style={{ WebkitOverflowScrolling: 'touch' }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.35 }}
           >
-            <div className="absolute top-0 left-0 right-0 h-18 flex items-center justify-end px-6">
+            <div className="fixed top-0 left-0 right-0 h-18 flex items-center justify-end px-6">
               <button
                 onClick={() => setMobileMenuOpen(false)}
                 className="p-2 text-white/60 hover:text-white"
@@ -265,7 +272,7 @@ export default function Nav() {
               </button>
             </div>
 
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-1 m-auto w-full">
               {navItems.map((item, idx) => (
                 <m.a
                   key={item.name}

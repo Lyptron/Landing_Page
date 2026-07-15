@@ -47,8 +47,8 @@ function StatBlock({ stat, index }: { stat: typeof STATS[0]; index: number }) {
     <m.div
       ref={ref}
       className="relative md:text-center"
-      initial={{ opacity: 0, scale: 1.4, filter: 'blur(12px)' }}
-      animate={inView ? { opacity: 1, scale: 1, filter: 'blur(0px)' } : {}}
+      initial={{ opacity: 0, scale: 1.4 }}
+      animate={inView ? { opacity: 1, scale: 1 } : {}}
       transition={{ duration: 0.9, delay: 0.1 + index * 0.12, ease: EASE }}
     >
       {index > 0 && <div className="hidden md:block absolute left-0 top-1/2 -translate-y-1/2 w-px h-10 bg-white/4" />}
@@ -190,24 +190,24 @@ export default function WhoWeAre() {
             <h2 className="font-display font-bold text-[clamp(28px,5vw,68px)] leading-[0.97] tracking-[-0.04em] max-w-225">
               <m.span
                 className="text-white/90 inline-block"
-                initial={{ opacity: 0, filter: 'blur(16px)', y: 16 }}
-                animate={headlineInView ? { opacity: 1, filter: 'blur(0px)', y: 0 } : {}}
+                initial={{ opacity: 0, y: 16 }}
+                animate={headlineInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 1.2, delay: 0.2, ease: EASE }}
               >
                 A product studio
               </m.span>{' '}
               <m.span
                 className="text-white/35 inline-block"
-                initial={{ opacity: 0, filter: 'blur(16px)', y: 16 }}
-                animate={headlineInView ? { opacity: 1, filter: 'blur(0px)', y: 0 } : {}}
+                initial={{ opacity: 0, y: 16 }}
+                animate={headlineInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 1.2, delay: 0.5, ease: EASE }}
               >
                 for founders who need design, engineering &amp; strategy
               </m.span>{' '}
               <m.span
                 className="text-white/90 inline-block"
-                initial={{ opacity: 0, filter: 'blur(16px)', y: 16 }}
-                animate={headlineInView ? { opacity: 1, filter: 'blur(0px)', y: 0 } : {}}
+                initial={{ opacity: 0, y: 16 }}
+                animate={headlineInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 1.2, delay: 0.85, ease: EASE }}
               >
                 under one roof.
@@ -220,8 +220,8 @@ export default function WhoWeAre() {
             <m.p
               ref={paraLeftRef}
               className="font-body text-[15px] md:text-[17px] text-white/30 leading-[1.7] max-w-130"
-              initial={{ opacity: 0, x: -40, filter: 'blur(6px)' }}
-              animate={paraLeftInView ? { opacity: 1, x: 0, filter: 'blur(0px)' } : {}}
+              initial={{ opacity: 0, x: -40 }}
+              animate={paraLeftInView ? { opacity: 1, x: 0 } : {}}
               transition={{ duration: 1, delay: 0.1, ease: EASE }}
             >
               We are a specialized group of engineers and designers committed to delivering robust, reliable systems. We don&apos;t take shortcuts. We build codebases that scale, designs that engage, and AI pipelines that automate core operations.
@@ -229,8 +229,8 @@ export default function WhoWeAre() {
             <m.p
               ref={paraRightRef}
               className="font-body text-[15px] md:text-[17px] text-white/30 leading-[1.7] max-w-130 hidden md:block"
-              initial={{ opacity: 0, x: 40, filter: 'blur(6px)' }}
-              animate={paraRightInView ? { opacity: 1, x: 0, filter: 'blur(0px)' } : {}}
+              initial={{ opacity: 0, x: 40 }}
+              animate={paraRightInView ? { opacity: 1, x: 0 } : {}}
               transition={{ duration: 1, delay: 0.2, ease: EASE }}
             >
               Every project we ship is production-ready, performance-audited, and built to last. From full-stack web platforms to native mobile apps to intelligent automation — we handle the hard engineering so you can focus on growth.

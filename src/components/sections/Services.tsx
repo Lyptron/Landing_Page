@@ -61,8 +61,8 @@ export default function Services() {
 
           <m.h2
             className="font-display font-bold text-[clamp(28px,5vw,68px)] leading-[0.97] tracking-[-0.04em] max-w-200"
-            initial={{ opacity: 0, filter: 'blur(12px)', y: 10 }}
-            animate={headerInView ? { opacity: 1, filter: 'blur(0px)', y: 0 } : {}}
+            initial={{ opacity: 0, y: 10 }}
+            animate={headerInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 1.4, delay: 0.3, ease: EASE }}
           >
             <span className="text-white/90">What we do</span>

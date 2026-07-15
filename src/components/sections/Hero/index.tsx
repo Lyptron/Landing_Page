@@ -110,7 +110,11 @@ export default function Hero() {
       rafRef.current = null
       const pos = lastPosRef.current
       if (!pos || !glowRef.current) return
-      glowRef.current.style.background = `radial-gradient(500px circle at ${pos.x}px ${pos.y}px, rgba(255,250,240,0.02) 0%, transparent 50%)`
+      // Move a pre-painted glow layer with a transform (compositor-only)
+      // instead of rewriting the gradient background, which forced a full
+      // repaint of the layer on every frame the pointer moved.
+      glowRef.current.style.transform = `translate3d(${pos.x - 500}px, ${pos.y - 500}px, 0)`
+      glowRef.current.style.opacity = '1'
     })
   }, [])
 
@@ -213,8 +217,19 @@ export default function Hero() {
         </svg>
       </div>
 
-      {/* Mouse follow glow — softer to match minimal aesthetic */}
-      <div ref={glowRef} className="absolute inset-0 z-1 pointer-events-none" />
+      {/* Mouse follow glow — a fixed-size pre-painted radial that follows the
+          pointer via transform, clipped to the section. */}
+      <div className="absolute inset-0 z-1 pointer-events-none overflow-hidden">
+        <div
+          ref={glowRef}
+          className="absolute top-0 left-0 w-[1000px] h-[1000px] rounded-full opacity-0"
+          style={{
+            background: 'radial-gradient(circle, rgba(255,250,240,0.02) 0%, transparent 50%)',
+            transition: 'opacity 0.4s ease',
+            willChange: 'transform',
+          }}
+        />
+      </div>
 
       {/* Top accent line */}
       <m.div className="absolute top-0 left-0 right-0 h-px z-30"
@@ -235,14 +250,15 @@ export default function Hero() {
                 teasers below sit visually in front via z-index but are
                 aria-hidden so they never replace the H1 semantically. */}
             <m.h1
-              initial={{ opacity: 0, filter: 'blur(6px)', scale: 0.98 }}
+              initial={{ opacity: 0, scale: 0.98 }}
               animate={{
                 // After 6s storyStep flips to 2 and the H1 fades in. Before
                 // that the H1 is still in the DOM but visually masked by the
                 // teaser spans, so a crawler that doesn't execute the
-                // timeout still picks it up.
+                // timeout still picks it up. Opacity + scale only — tweening
+                // filter:blur() on an 88px headline repaints a huge area
+                // every frame and makes early scrolling feel chunky.
                 opacity: storyStep === 2 ? 1 : 0,
-                filter: storyStep === 2 ? 'blur(0px)' : 'blur(14px)',
                 scale: storyStep === 2 ? 1 : 0.98,
               }}
               transition={{ duration: 2, ease: [0.22, 1, 0.36, 1] }}
@@ -258,10 +274,9 @@ export default function Hero() {
             {/* Step 0 — tease line (visual only, not a heading) */}
             <m.span
               aria-hidden="true"
-              initial={{ opacity: 0, filter: 'blur(5px)', y: 8 }}
+              initial={{ opacity: 0, y: 8 }}
               animate={{
                 opacity: storyStep === 0 ? 1 : 0,
-                filter: storyStep === 0 ? 'blur(0px)' : 'blur(5px)',
                 y: storyStep === 0 ? 0 : -6,
               }}
               transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
@@ -273,10 +288,9 @@ export default function Hero() {
             {/* Step 1 — problem line (visual only, not a heading) */}
             <m.span
               aria-hidden="true"
-              initial={{ opacity: 0, filter: 'blur(5px)', y: 8 }}
+              initial={{ opacity: 0, y: 8 }}
               animate={{
                 opacity: storyStep === 1 ? 1 : 0,
-                filter: storyStep === 1 ? 'blur(0px)' : 'blur(5px)',
                 y: storyStep === 1 ? 0 : storyStep < 1 ? 8 : -6,
               }}
               transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
@@ -372,18 +386,20 @@ export default function Hero() {
                   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 z-10 pointer-events-none"
                        style={{ background: 'radial-gradient(circle at 50% 30%, rgba(255,255,255,0.02) 0%, transparent 50%)' }} />
 
+                  {/* deferUntilHover: three concurrent iframes running on the
+                      hero were pinning scroll to ~18fps on integrated GPUs.
+                      Each card now shows a static domain caption until the
+                      user hovers or taps it, then the real preview mounts. */}
                   {i === 0 && p.liveUrl && (
-                    /* Real live preview of the deployed NexusFlow app */
-                    <LivePreviewFrame url={p.liveUrl} title="NexusFlow live preview" baseWidth={1440} baseHeight={900} />
+                    <LivePreviewFrame url={p.liveUrl} title="NexusFlow live preview" baseWidth={1440} baseHeight={900} deferUntilHover previewImage="/images/previews/nexusflow.png" />
                   )}
 
                   {i === 1 && p.liveUrl && (
-                    <LivePreviewFrame url={p.liveUrl} title="Stratum live preview" baseWidth={1440} baseHeight={900} />
+                    <LivePreviewFrame url={p.liveUrl} title="Stratum live preview" baseWidth={1440} baseHeight={900} deferUntilHover previewImage="/images/previews/stratum.png" />
                   )}
 
                   {i === 2 && p.liveUrl && (
-                    /* Real live preview of the deployed VoxAI app */
-                    <LivePreviewFrame url={p.liveUrl} title="VoxAI live preview" baseWidth={1440} baseHeight={900} />
+                    <LivePreviewFrame url={p.liveUrl} title="VoxAI live preview" baseWidth={1440} baseHeight={900} deferUntilHover previewImage="/images/previews/voxai.png" />
                   )}
                 </div>
 
