@@ -143,6 +143,10 @@ export async function insertInvoice(data: {
   return supabase.from('invoices').insert(data).select('*, projects(id, name)').single()
 }
 
+export async function deleteInvoice(id: string) {
+  return supabase.from('invoices').delete().eq('id', id)
+}
+
 // ─── Revenue Analytics ──────────────────────────────────────
 export async function fetchRevenueAnalytics() {
   return supabase.from('revenue_analytics').select('*').order('month', { ascending: true })

@@ -2,9 +2,9 @@
 import { useEffect, useState, useMemo } from 'react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
-import { Plus, Receipt, Wallet, TrendingDown, Trash2, Users2, Search, ArrowUpDown, Activity, Percent } from 'lucide-react'
+import { Plus, Receipt, Wallet, TrendingDown, Trash2, Users2, Search, ArrowUpDown, Activity, Percent, UserMinus } from 'lucide-react'
 import { motion } from 'framer-motion'
-import { fetchInvoices, fetchAllPayments, insertInvoice, fetchExpenses, insertExpense, deleteExpense, fetchTeamMembers, updateTeamMember, fetchSubscriptions, fetchProjects } from '@/lib/db'
+import { fetchInvoices, fetchAllPayments, insertInvoice, deleteInvoice, fetchExpenses, insertExpense, deleteExpense, fetchTeamMembers, updateTeamMember, fetchSubscriptions, fetchProjects } from '@/lib/db'
 import Modal, { ModalInput, ModalSelect } from '@/components/ui/Modal'
 import { useChartTheme } from '@/lib/theme/chartTheme'
 import SalaryStepper from '@/components/ui/SalaryStepper'
@@ -102,6 +102,20 @@ export default function FinanceHubPage() {
   const removeExpense = async (id: string) => {
     setExpenses(expenses.filter(e => e.id !== id))
     await deleteExpense(id)
+  }
+
+  const removeInvoice = async (id: string) => {
+    if (!confirm('Delete this invoice? This cannot be undone.')) return
+    setInvoices(prev => prev.filter(inv => inv.id !== id))
+    await deleteInvoice(id)
+  }
+
+  // Offboard a member who has left. Soft-delete (is_active = false) so
+  // payroll totals/headcount recalc but their history is preserved.
+  const offboardMember = async (id: string, name: string) => {
+    if (!confirm(`Offboard ${name || 'this member'}? They'll be removed from payroll but their history is kept.`)) return
+    setTeamMembers(prev => prev.filter(m => m.id !== id))
+    await updateTeamMember(id, { is_active: false })
   }
 
   const updateSalary = async (id: string, value: string) => {
@@ -360,7 +374,7 @@ export default function FinanceHubPage() {
                   <p className="text-[12px] text-(--cp-text-faint)">No invoices or payments yet.</p>
                 </div>
               ) : unifiedInvoices.map((inv) => (
-                <div key={inv.id} className="p-4 rounded-xl bg-(--cp-bg-soft) transition-colors hover:bg-(--cp-surface-strong) flex flex-col justify-between gap-3" style={{ border: '1px solid var(--cp-border-soft)' }}>
+                <div key={inv.id} className="group p-4 rounded-xl bg-(--cp-bg-soft) transition-colors hover:bg-(--cp-surface-strong) flex flex-col justify-between gap-3" style={{ border: '1px solid var(--cp-border-soft)' }}>
                   <div>
                     <div className="flex justify-between items-start mb-2">
                       <div className="flex items-center gap-1.5">
@@ -369,7 +383,12 @@ export default function FinanceHubPage() {
                           {inv.isPayment ? 'Project' : 'Invoice'}
                         </span>
                       </div>
-                      <span className={`px-2 py-0.5 rounded-md text-[8px] font-bold uppercase tracking-widest border ${statusStyle(inv.status)}`}>{inv.status}</span>
+                      <div className="flex items-center gap-1.5">
+                        <span className={`px-2 py-0.5 rounded-md text-[8px] font-bold uppercase tracking-widest border ${statusStyle(inv.status)}`}>{inv.status}</span>
+                        {!inv.isPayment && (
+                          <button onClick={() => removeInvoice(inv.id)} aria-label="Delete invoice" className="p-1 rounded-md text-(--cp-text-faint) hover:text-(--cp-red) hover:bg-(--cp-red-soft) transition-all opacity-0 group-hover:opacity-100"><Trash2 className="w-3 h-3" /></button>
+                        )}
+                      </div>
                     </div>
                     <h4 className="text-[13.5px] font-bold text-(--cp-text) truncate">{inv.client_name}</h4>
                     <p className="text-[11px] text-(--cp-text-muted) mt-1 line-clamp-2" title={inv.reason}>{inv.reason}</p>
@@ -575,6 +594,16 @@ export default function FinanceHubPage() {
                     >
                       {/* Interactive Accent Stripe on top */}
                       <div className="absolute top-0 left-0 right-0 h-0.75 opacity-40 transition-opacity group-hover:opacity-100" style={{ backgroundColor: accentColor }} />
+
+                      {/* Offboard (member left) — soft-delete, keeps history */}
+                      <button
+                        onClick={() => offboardMember(m.id, m.name)}
+                        aria-label={`Offboard ${m.name || 'member'}`}
+                        title="Offboard — member left the team"
+                        className="absolute top-2.5 right-2.5 z-10 p-1.5 rounded-lg text-(--cp-text-faint) hover:text-(--cp-red) hover:bg-(--cp-red-soft) transition-all opacity-0 group-hover:opacity-100"
+                      >
+                        <UserMinus className="w-3.5 h-3.5" />
+                      </button>
 
                       {/* Avatar & Info Header */}
                       <div className="flex items-start gap-3">
