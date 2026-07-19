@@ -18,25 +18,33 @@ export default function Modal({ open, onClose, title, subtitle, children, width 
   const dialogRef = useRef<HTMLDivElement>(null)
   const previouslyFocused = useRef<HTMLElement | null>(null)
 
-  // Capture focus on open, restore on close, and bind Escape.
+  // Capture focus on open, restore on close. Depends on `open` ONLY —
+  // if `onClose` were in the deps, its new identity on every parent
+  // re-render would re-run this and steal focus back to the first
+  // focusable (the X button) on each keystroke.
   useEffect(() => {
     if (!open) return
     previouslyFocused.current = document.activeElement as HTMLElement | null
     const dialog = dialogRef.current
     if (dialog) {
       const focusable = dialog.querySelector<HTMLElement>(
-        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        'input, select, textarea, [href], button, [tabindex]:not([tabindex="-1"])'
       )
       ;(focusable || dialog).focus()
     }
+    return () => {
+      previouslyFocused.current?.focus?.()
+    }
+  }, [open])
+
+  // Bind Escape separately so re-binding it never disturbs focus.
+  useEffect(() => {
+    if (!open) return
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
     }
     window.addEventListener('keydown', onKey)
-    return () => {
-      window.removeEventListener('keydown', onKey)
-      previouslyFocused.current?.focus?.()
-    }
+    return () => window.removeEventListener('keydown', onKey)
   }, [open, onClose])
 
   return (

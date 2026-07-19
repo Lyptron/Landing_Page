@@ -43,6 +43,14 @@ export default function FinanceHubPage() {
   const [projects, setProjects] = useState<any[]>([])
   const [formProjectId, setFormProjectId] = useState('')
 
+  // In-app confirmation (replaces native confirm()).
+  const [confirmAction, setConfirmAction] = useState<null | {
+    title: string
+    body: string
+    confirmLabel: string
+    onConfirm: () => void
+  }>(null)
+
   const chartTheme = useChartTheme()
 
   useEffect(() => {
@@ -104,18 +112,30 @@ export default function FinanceHubPage() {
     await deleteExpense(id)
   }
 
-  const removeInvoice = async (id: string) => {
-    if (!confirm('Delete this invoice? This cannot be undone.')) return
-    setInvoices(prev => prev.filter(inv => inv.id !== id))
-    await deleteInvoice(id)
+  const removeInvoice = (id: string, number: string) => {
+    setConfirmAction({
+      title: 'Delete invoice',
+      body: `Permanently delete invoice ${number}? This cannot be undone.`,
+      confirmLabel: 'Delete invoice',
+      onConfirm: async () => {
+        setInvoices(prev => prev.filter(inv => inv.id !== id))
+        await deleteInvoice(id)
+      },
+    })
   }
 
   // Offboard a member who has left. Soft-delete (is_active = false) so
   // payroll totals/headcount recalc but their history is preserved.
-  const offboardMember = async (id: string, name: string) => {
-    if (!confirm(`Offboard ${name || 'this member'}? They'll be removed from payroll but their history is kept.`)) return
-    setTeamMembers(prev => prev.filter(m => m.id !== id))
-    await updateTeamMember(id, { is_active: false })
+  const offboardMember = (id: string, name: string) => {
+    setConfirmAction({
+      title: 'Offboard member',
+      body: `${name || 'This member'} will be removed from payroll and headcount. Their history is kept, and this can be undone later.`,
+      confirmLabel: 'Offboard',
+      onConfirm: async () => {
+        setTeamMembers(prev => prev.filter(m => m.id !== id))
+        await updateTeamMember(id, { is_active: false })
+      },
+    })
   }
 
   const updateSalary = async (id: string, value: string) => {
@@ -386,7 +406,7 @@ export default function FinanceHubPage() {
                       <div className="flex items-center gap-1.5">
                         <span className={`px-2 py-0.5 rounded-md text-[8px] font-bold uppercase tracking-widest border ${statusStyle(inv.status)}`}>{inv.status}</span>
                         {!inv.isPayment && (
-                          <button onClick={() => removeInvoice(inv.id)} aria-label="Delete invoice" className="p-1 rounded-md text-(--cp-text-faint) hover:text-(--cp-red) hover:bg-(--cp-red-soft) transition-all opacity-0 group-hover:opacity-100"><Trash2 className="w-3 h-3" /></button>
+                          <button onClick={() => removeInvoice(inv.id, inv.invoice_number)} aria-label="Delete invoice" className="p-1 rounded-md text-(--cp-text-faint) hover:text-(--cp-red) hover:bg-(--cp-red-soft) transition-all opacity-0 group-hover:opacity-100"><Trash2 className="w-3 h-3" /></button>
                         )}
                       </div>
                     </div>
@@ -737,6 +757,21 @@ export default function FinanceHubPage() {
             <button onClick={() => setExpenseModalOpen(false)} className="px-4 py-2 rounded-xl text-[12px] font-medium text-(--cp-text-faint) hover:text-(--cp-text-secondary) transition-colors">Cancel</button>
             <button onClick={addExpense} disabled={savingExpense || !expForm.label || !expForm.amount || !expForm.expense_date} className="px-5 py-2 bg-(--cp-cyan) text-white font-semibold text-[12px] rounded-xl hover:bg-(--cp-cyan-strong) transition-all disabled:opacity-30">
               {savingExpense ? 'Saving...' : 'Add'}
+            </button>
+          </div>
+        </div>
+      </Modal>
+
+      <Modal open={!!confirmAction} onClose={() => setConfirmAction(null)} title={confirmAction?.title || ''}>
+        <div className="flex flex-col gap-6">
+          <p className="text-[13px] leading-relaxed text-(--cp-text-secondary)">{confirmAction?.body}</p>
+          <div className="flex justify-end gap-3 pt-4 border-t border-(--cp-border-soft)">
+            <button onClick={() => setConfirmAction(null)} className="px-4 py-2 rounded-xl text-[12px] font-medium text-(--cp-text-faint) hover:text-(--cp-text-secondary) transition-colors">Cancel</button>
+            <button
+              onClick={() => { confirmAction?.onConfirm(); setConfirmAction(null) }}
+              className="px-5 py-2 bg-(--cp-red) text-white font-semibold text-[12px] rounded-xl hover:opacity-90 transition-all"
+            >
+              {confirmAction?.confirmLabel}
             </button>
           </div>
         </div>

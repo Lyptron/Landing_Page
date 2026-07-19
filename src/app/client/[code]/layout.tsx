@@ -1,6 +1,7 @@
 import ClientPortalLayout from '@/components/layout/ClientPortalLayout'
 import { ThemeProvider } from '@/lib/theme/ThemeProvider'
 import { LogoProvider } from '@/lib/LogoContext'
+import { ClientProjectProvider } from '@/lib/ClientProjectContext'
 
 export default async function ProjectPortalLayout({
   children,
@@ -14,9 +15,11 @@ export default async function ProjectPortalLayout({
   return (
     <ThemeProvider defaultMode="dark">
       <LogoProvider>
-        <ClientPortalLayout projectCode={code}>
-          {children}
-        </ClientPortalLayout>
+        <ClientProjectProvider code={code}>
+          <ClientPortalLayout projectCode={code}>
+            {children}
+          </ClientPortalLayout>
+        </ClientProjectProvider>
       </LogoProvider>
     </ThemeProvider>
   )

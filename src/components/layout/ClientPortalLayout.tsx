@@ -19,7 +19,7 @@ import {
   X,
   LogOut,
 } from 'lucide-react'
-import { fetchProjectByAccessCode } from '@/lib/db'
+import { useClientProject } from '@/lib/ClientProjectContext'
 import { LyptronLogo, LyptronMark } from '@/components/ui/LyptronLogo'
 import ThemeToggle from '@/components/admin/ThemeToggle'
 
@@ -156,7 +156,15 @@ export default function ClientPortalLayout({
   const pathname = usePathname()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
-  const [project, setProject] = useState<ProjectSummary | null>(null)
+  const { project: bundle } = useClientProject()
+  const project: ProjectSummary | null = bundle
+    ? {
+        name: bundle.name || '',
+        status: bundle.status || '',
+        progress: bundle.progress || 0,
+        health: bundle.health || 'on-track',
+      }
+    : null
   const [authorized, setAuthorized] = useState<boolean | null>(null)
 
   const handleExit = (e: React.MouseEvent) => {
@@ -187,27 +195,6 @@ export default function ClientPortalLayout({
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
-
-  useEffect(() => {
-    if (!authorized) return
-    let cancelled = false
-    async function loadProject() {
-      const { data } = await fetchProjectByAccessCode(projectCode)
-      if (cancelled) return
-      if (data) {
-        setProject({
-          name: data.name || '',
-          status: data.status || '',
-          progress: data.progress || 0,
-          health: data.health || 'on-track',
-        })
-      }
-    }
-    loadProject()
-    return () => {
-      cancelled = true
-    }
-  }, [projectCode, authorized])
 
   if (!authorized || !project) {
     return <FullPageSplash />
