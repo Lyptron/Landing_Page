@@ -63,7 +63,7 @@ export default function ServiceDetail({ service, onClose }: ServiceDetailProps) 
     <>
       {/* Backdrop */}
       <m.div
-        className="fixed inset-0 z-100 bg-black/70 backdrop-blur-sm"
+        className="fixed inset-0 z-100 bg-black/70"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}

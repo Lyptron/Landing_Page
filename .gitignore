@@ -96,8 +96,7 @@ $RECYCLE.BIN/
 # ==============================================================================
 # Database & Backend Schema Exports (Prevent tracking local credentials/dumps)
 # ==============================================================================
-supabase-schema.sql
-supabase-bugfixes.sql
+supabase-*.sql
 *.sql.gz
 *.backup
 *.dump

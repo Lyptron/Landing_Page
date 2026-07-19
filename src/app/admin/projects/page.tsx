@@ -5,6 +5,7 @@ import { Plus, Calendar, CheckCircle2, AlertCircle, Clock, Search } from 'lucide
 import Link from 'next/link'
 import { fetchProjectsKanban, fetchClients, insertProject, updateProject, insertClient } from '@/lib/db'
 import { newAccessCode, normalizeAccessCode } from '@/lib/accessCode'
+import { optimistic } from '@/lib/optimistic'
 import Modal, { ModalInput, ModalSelect } from '@/components/ui/Modal'
 
 const STAGES = ['Backlog', 'Design', 'Development', 'Review', 'Completed']
@@ -96,9 +97,13 @@ export default function ProjectsPage() {
   const handleDrop = async (e: React.DragEvent, stage: string) => {
     e.preventDefault()
     if (!draggedProject) return
-    setProjects(projects.map((p) => (p.id === draggedProject ? { ...p, stage } : p)))
+    const id = draggedProject
     setDraggedProject(null)
-    await updateProject(draggedProject, { stage })
+    await optimistic(
+      setProjects,
+      (prev) => prev.map((p) => (p.id === id ? { ...p, stage } : p)),
+      () => updateProject(id, { stage })
+    )
   }
 
   const handleAddProject = async () => {

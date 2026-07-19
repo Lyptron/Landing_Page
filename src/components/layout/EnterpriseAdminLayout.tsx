@@ -290,7 +290,7 @@ export default function EnterpriseAdminLayout({ children }: { children: React.Re
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 md:hidden"
+              className="fixed inset-0 bg-black/50 z-40 md:hidden"
               onClick={() => setMobileMenuOpen(false)}
             />
             <motion.aside
@@ -412,7 +412,7 @@ export default function EnterpriseAdminLayout({ children }: { children: React.Re
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setCommandPaletteOpen(false)}
-              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-100"
+              className="fixed inset-0 bg-black/50 z-100"
             />
             <motion.div
               initial={{ opacity: 0, scale: 0.96, y: -20 }}

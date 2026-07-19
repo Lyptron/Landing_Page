@@ -10,6 +10,7 @@ import {
   insertClient,
 } from '@/lib/db'
 import { newAccessCode, normalizeAccessCode } from '@/lib/accessCode'
+import { optimistic } from '@/lib/optimistic'
 import { Plus, FolderKanban, ArrowUpRight } from 'lucide-react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
@@ -23,6 +24,7 @@ export default function AdminDashboard() {
   const [projects, setProjects] = useState<any[]>([])
   const [clients, setClients] = useState<Client[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   const [projectModalOpen, setProjectModalOpen] = useState(false)
   const [milestoneModalOpen, setMilestoneModalOpen] = useState(false)
@@ -64,40 +66,40 @@ export default function AdminDashboard() {
 
   const toggleMilestone = async (projectId: string, milestoneId: string, currentStatus: string) => {
     const newStatus = currentStatus === 'completed' ? 'upcoming' : 'completed'
-    const snapshot = projects
-    setProjects(
-      projects.map((p) =>
-        p.id === projectId
-          ? {
-              ...p,
-              milestones: (p.milestones || []).map((m: any) =>
-                m.id === milestoneId ? { ...m, status: newStatus } : m
-              ),
-            }
-          : p
-      )
+    await optimistic(
+      setProjects,
+      (prev) =>
+        prev.map((p) =>
+          p.id === projectId
+            ? {
+                ...p,
+                milestones: (p.milestones || []).map((m: any) =>
+                  m.id === milestoneId ? { ...m, status: newStatus } : m
+                ),
+              }
+            : p
+        ),
+      () => updateMilestone(milestoneId, { status: newStatus })
     )
-    const { error } = await updateMilestone(milestoneId, { status: newStatus })
-    if (error) setProjects(snapshot)
   }
 
   const addMilestoneHandler = async () => {
     if (!formMilestoneName || !activeProjectId) return
     setSaving(true)
-    const { data } = await insertMilestone({
+    setError(null)
+    const { data, error: insertError } = await insertMilestone({
       name: formMilestoneName,
       status: 'upcoming',
       project_id: activeProjectId,
     })
-    const newM = data || {
-      id: Math.random().toString(),
-      name: formMilestoneName,
-      status: 'upcoming',
-      project_id: activeProjectId,
+    if (insertError || !data) {
+      setError(insertError?.message || 'Could not add milestone. Please try again.')
+      setSaving(false)
+      return
     }
-    setProjects(
-      projects.map((p) =>
-        p.id === activeProjectId ? { ...p, milestones: [...(p.milestones || []), newM] } : p
+    setProjects((prev) =>
+      prev.map((p) =>
+        p.id === activeProjectId ? { ...p, milestones: [...(p.milestones || []), data] } : p
       )
     )
     setFormMilestoneName('')
@@ -106,22 +108,25 @@ export default function AdminDashboard() {
   }
 
   const updateProgressHandler = async (projectId: string, progress: number) => {
-    const snapshot = projects
-    setProjects(projects.map((p) => (p.id === projectId ? { ...p, progress } : p)))
-    const { error } = await updateProject(projectId, { progress })
-    if (error) setProjects(snapshot)
+    await optimistic(
+      setProjects,
+      (prev) => prev.map((p) => (p.id === projectId ? { ...p, progress } : p)),
+      () => updateProject(projectId, { progress })
+    )
   }
 
   const updateStatusHandler = async (projectId: string, status: string) => {
-    const snapshot = projects
-    setProjects(projects.map((p) => (p.id === projectId ? { ...p, status } : p)))
-    const { error } = await updateProject(projectId, { status })
-    if (error) setProjects(snapshot)
+    await optimistic(
+      setProjects,
+      (prev) => prev.map((p) => (p.id === projectId ? { ...p, status } : p)),
+      () => updateProject(projectId, { status })
+    )
   }
 
   const addProjectHandler = async () => {
     if (!formProjectName || (!formClientId && !createNewClient)) return
     setSaving(true)
+    setError(null)
 
     let targetClientId = formClientId || null
     let clientEmail = null
@@ -142,7 +147,7 @@ export default function AdminDashboard() {
       clientEmail = client?.email
     }
 
-    const { data } = await insertProject({
+    const { data, error: insertError } = await insertProject({
       name: formProjectName,
       client_id: targetClientId,
       client_email: clientEmail || undefined,
@@ -152,19 +157,13 @@ export default function AdminDashboard() {
       stage: formStage,
       description: 'New project setup...',
     })
-    const newProj = data
-      ? { ...data, milestones: [], payments: [] }
-      : {
-          id: Math.random().toString(),
-          name: formProjectName,
-          client_id: targetClientId,
-          client_email: clientEmail || undefined,
-          status: 'starting',
-          progress: 0,
-          milestones: [],
-          payments: [],
-        }
-    setProjects([newProj, ...projects])
+    if (insertError || !data) {
+      setError(insertError?.message || 'Could not create project. Please try again.')
+      setSaving(false)
+      return
+    }
+    const newProj = { ...data, milestones: [], payments: [] }
+    setProjects((prev) => [newProj, ...prev])
     setFormProjectName('')
     setFormClientId('')
     setFormCode('')
@@ -490,7 +489,7 @@ export default function AdminDashboard() {
       {/* Modals */}
       <Modal
         open={projectModalOpen}
-        onClose={() => setProjectModalOpen(false)}
+        onClose={() => { setError(null); setProjectModalOpen(false) }}
         title="New Project"
         subtitle="Create a project and link it to an existing client."
       >
@@ -599,12 +598,14 @@ export default function AdminDashboard() {
             options={STAGES.map((s) => ({ value: s, label: s }))}
           />
 
+          {error && <p role="alert" className="text-[12px]" style={{ color: 'var(--cp-red)' }}>{error}</p>}
+
           <div
             className="flex justify-end gap-3 pt-4"
             style={{ borderTop: '1px solid var(--cp-border-soft)' }}
           >
             <button
-              onClick={() => setProjectModalOpen(false)}
+              onClick={() => { setError(null); setProjectModalOpen(false) }}
               className="px-4 py-2 rounded-xl text-[12px] font-medium transition-colors text-(--cp-text-muted) hover:text-(--cp-text)"
             >
               Cancel
@@ -627,7 +628,7 @@ export default function AdminDashboard() {
 
       <Modal
         open={milestoneModalOpen}
-        onClose={() => setMilestoneModalOpen(false)}
+        onClose={() => { setError(null); setMilestoneModalOpen(false) }}
         title="Add Milestone"
         subtitle="Add a milestone to this project."
       >
@@ -639,12 +640,13 @@ export default function AdminDashboard() {
             placeholder="e.g. UI/UX Design Complete"
             required
           />
+          {error && <p role="alert" className="text-[12px]" style={{ color: 'var(--cp-red)' }}>{error}</p>}
           <div
             className="flex justify-end gap-3 pt-4"
             style={{ borderTop: '1px solid var(--cp-border-soft)' }}
           >
             <button
-              onClick={() => setMilestoneModalOpen(false)}
+              onClick={() => { setError(null); setMilestoneModalOpen(false) }}
               className="px-4 py-2 rounded-xl text-[12px] font-medium transition-colors text-(--cp-text-muted) hover:text-(--cp-text)"
             >
               Cancel

@@ -25,19 +25,6 @@ export async function signInWithPassword(email: string, password: string) {
   return supabase.auth.signInWithPassword({ email, password })
 }
 
-export async function signUpWithPassword(email: string, password: string) {
-  return supabase.auth.signUp({ email, password })
-}
-
-export async function signInWithGoogle() {
-  return supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: {
-      redirectTo: `${typeof window !== 'undefined' ? window.location.origin : ''}/admin/dashboard`,
-    },
-  })
-}
-
 export async function signOut() {
   return supabase.auth.signOut()
 }
