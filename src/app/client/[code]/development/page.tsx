@@ -1,7 +1,6 @@
 'use client'
 import { motion } from 'framer-motion'
 import { Hammer, Globe, FlaskConical, Activity, ExternalLink } from 'lucide-react'
-import { fetchActivities, fetchDeployments } from '@/lib/db'
 import { PageHeader, EmptyState, Loading, SectionLabel, Badge } from '@/components/portal/PortalUI'
 import { useClientPortalProject } from '@/hooks/useClientPortalProject'
 
@@ -14,23 +13,13 @@ function timeAgo(date: string) {
   return `${Math.floor(hrs / 24)}d ago`
 }
 
-interface DevUpdate { id: string; msg: string; dev: string; time: string }
-interface DevData { updates: DevUpdate[]; deployments: any[] }
-
-async function loadDevelopment(projectId: string): Promise<{ data: DevData }> {
-  const [actRes, depRes] = await Promise.all([fetchActivities(projectId, 10), fetchDeployments(projectId)])
-  const updates: DevUpdate[] = !actRes.error && actRes.data?.length
-    ? actRes.data
-        .filter((a: any) => a.type === 'commit')
-        .map((a: any) => ({ id: a.id, msg: a.action_text, dev: a.actor_name, time: timeAgo(a.created_at) }))
-    : []
-  const deployments = !depRes.error && depRes.data?.length ? depRes.data : []
-  return { data: { updates, deployments } }
-}
-
 export default function ClientDevelopmentPage() {
-  const { resource, loading } = useClientPortalProject(loadDevelopment)
-  const { updates, deployments } = resource ?? { updates: [], deployments: [] }
+  const { project, loading } = useClientPortalProject()
+  const updates = (project?.activities ?? [])
+    .filter((a: any) => a.type === 'commit')
+    .slice(0, 10)
+    .map((a: any) => ({ id: a.id, msg: a.action_text, dev: a.actor_name, time: timeAgo(a.created_at) }))
+  const deployments = project?.deployments ?? []
 
   if (loading) return <Loading />
 

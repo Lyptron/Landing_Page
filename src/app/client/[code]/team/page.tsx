@@ -1,18 +1,12 @@
 'use client'
 import { motion } from 'framer-motion'
-import { Mail, Phone, UsersRound } from 'lucide-react'
-import { fetchProjectTeam } from '@/lib/db'
+import { Mail, UsersRound } from 'lucide-react'
 import { PageHeader, EmptyState, Loading } from '@/components/portal/PortalUI'
 import { useClientPortalProject } from '@/hooks/useClientPortalProject'
 
-async function loadTeam(projectId: string) {
-  const { data } = await fetchProjectTeam(projectId)
-  return { data: data?.length ? data.map((pt: any) => pt.team_members) : [] }
-}
-
 export default function TeamPage() {
-  const { resource, loading } = useClientPortalProject(loadTeam)
-  const team = resource ?? []
+  const { project, loading } = useClientPortalProject()
+  const team = (project?.project_team ?? []).map((pt: any) => pt.team_members)
 
   if (loading) return <Loading />
 
@@ -65,11 +59,6 @@ export default function TeamPage() {
                     >
                       <Mail className="w-3.5 h-3.5" /> Email
                     </a>
-                  )}
-                  {member.role === 'Project Manager' && (
-                    <button className="cp-btn-primary flex-1 py-2 flex items-center justify-center gap-1.5 text-[12px]">
-                      <Phone className="w-3.5 h-3.5" /> Book Call
-                    </button>
                   )}
                 </div>
               </motion.div>

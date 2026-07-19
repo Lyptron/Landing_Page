@@ -9,6 +9,7 @@ import {
   updateMilestone,
   insertClient,
 } from '@/lib/db'
+import { newAccessCode, normalizeAccessCode } from '@/lib/accessCode'
 import { Plus, FolderKanban, ArrowUpRight } from 'lucide-react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
@@ -17,14 +18,6 @@ import Modal, { ModalInput, ModalSelect } from '@/components/ui/Modal'
 const STAGES = ['Backlog', 'Design', 'Development', 'Review', 'Completed']
 
 type Client = { id: string; company: string; email?: string }
-
-function slugifyAccessCode(name: string) {
-  return name
-    .toUpperCase()
-    .replace(/[^A-Z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 24)
-}
 
 export default function AdminDashboard() {
   const [projects, setProjects] = useState<any[]>([])
@@ -58,7 +51,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (formProjectName && !formCode) setFormCode(slugifyAccessCode(formProjectName))
+    if (formProjectName && !formCode) setFormCode(newAccessCode())
   }, [formProjectName]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const clientLabel = (proj: any) => {
@@ -155,7 +148,7 @@ export default function AdminDashboard() {
       client_email: clientEmail || undefined,
       status: 'starting',
       progress: 0,
-      access_code: formCode || slugifyAccessCode(formProjectName),
+      access_code: formCode || newAccessCode(),
       stage: formStage,
       description: 'New project setup...',
     })
@@ -596,8 +589,8 @@ export default function AdminDashboard() {
           <ModalInput
             label="Access Code"
             value={formCode}
-            onChange={(v) => setFormCode(slugifyAccessCode(v))}
-            placeholder="NIRMAN"
+            onChange={(v) => setFormCode(normalizeAccessCode(v))}
+            placeholder="Auto-generated when you name the project"
           />
           <ModalSelect
             label="Initial Stage"

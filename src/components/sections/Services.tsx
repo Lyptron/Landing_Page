@@ -79,8 +79,13 @@ export default function Services() {
         </div>
       </div>
 
+      {/* Swipe hint — only shown where the layout is a horizontal
+          scroller (below md, where it flips to a stacked column). */}
+      <div className="md:hidden text-right font-mono text-[9px] text-white/25 uppercase tracking-widest mb-2 pr-6 pointer-events-none">
+        Swipe →
+      </div>
       {/* Story chapters — stacked sticky cards */}
-      <div className="relative z-10 flex flex-row overflow-x-auto snap-x snap-mandatory scrollbar-none pb-6 px-6 md:px-0 md:flex-col md:overflow-visible gap-5 md:gap-0">
+      <div className="relative z-10 flex flex-row overflow-x-auto snap-x snap-mandatory scrollbar-none pb-6 px-6 md:px-0 md:flex-col md:overflow-visible gap-5 md:gap-0 scroll-hint-x-md">
         {services.map((service, idx) => (
           <ServiceCard
             key={service.id}

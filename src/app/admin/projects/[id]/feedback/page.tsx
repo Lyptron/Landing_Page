@@ -1,22 +1,30 @@
 'use client'
+import { useState } from 'react'
 import { MessageSquare, Trash2 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useProject } from '../layout'
 
 export default function ProjectFeedbackPage() {
   const { feedback, setFeedback } = useProject()
+  const [error, setError] = useState<string | null>(null)
 
   async function updateStatus(id: string, status: string) {
+    setError(null)
     const { error } = await supabase.from('feedback').update({ status }).eq('id', id)
     if (!error) {
       setFeedback(feedback.map(f => f.id === id ? { ...f, status } : f))
+    } else {
+      setError(error.message)
     }
   }
 
   async function updatePriority(id: string, priority: string) {
+    setError(null)
     const { error } = await supabase.from('feedback').update({ priority }).eq('id', id)
     if (!error) {
       setFeedback(feedback.map(f => f.id === id ? { ...f, priority } : f))
+    } else {
+      setError(error.message)
     }
   }
 
@@ -34,6 +42,7 @@ export default function ProjectFeedbackPage() {
         <h3 className="text-[13px] font-bold text-(--cp-text-secondary)">Client Feedback & Bugs</h3>
         <span className="text-[10px] font-mono text-(--cp-text-faint)">{feedback.length} items</span>
       </div>
+      {error && <p className="mb-3 text-[12px] text-(--cp-red)" role="alert">{error}</p>}
       <div className="flex flex-col gap-2.5">
         {feedback.map(f => (
           <div key={f.id} className="p-3.5 rounded-xl bg-(--cp-bg-soft) border border-(--cp-border-soft)">

@@ -145,19 +145,39 @@ export default function LivePreviewFrame({ url, title, baseWidth, baseHeight, cl
   const handleSleep = () => setHovered(false)
 
   if (lowPerf) {
-    // Static stand-in: same dark canvas the iframe would sit on, with the
-    // project's domain as a quiet caption. Zero runtime cost.
+    // On phones/low-spec devices, running the iframe is too expensive.
+    // Same surface as desktop-idle: preview image if we have one (else
+    // domain caption) with the whole card acting as a link to the real
+    // site — tapping anywhere opens it in a new tab.
     const domain = url.replace(/^https?:\/\//, '').replace(/\/$/, '')
     return (
-      <div className={`absolute inset-0 overflow-hidden flex items-center justify-center ${className}`}>
-        <div
-          className="absolute inset-0"
-          style={{ background: 'radial-gradient(ellipse 80% 60% at 50% 30%, rgba(255,255,255,0.035) 0%, transparent 70%)' }}
-        />
-        <span className="relative font-mono text-[10px] tracking-[0.18em] uppercase text-white/30">
-          {domain}
-        </span>
-      </div>
+      <a
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={`Open ${domain} in a new tab`}
+        className={`absolute inset-0 overflow-hidden block ${className}`}
+      >
+        {previewImage ? (
+          <Image
+            src={previewImage}
+            alt={`${domain} preview`}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
+            className="object-cover object-top"
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div
+              className="absolute inset-0"
+              style={{ background: 'radial-gradient(ellipse 80% 60% at 50% 30%, rgba(255,255,255,0.035) 0%, transparent 70%)' }}
+            />
+            <span className="relative font-mono text-[10px] tracking-[0.18em] uppercase text-white/30">
+              {domain}
+            </span>
+          </div>
+        )}
+      </a>
     )
   }
 
@@ -231,6 +251,10 @@ export default function LivePreviewFrame({ url, title, baseWidth, baseHeight, cl
             transform: `scale(${scale})`,
             transformOrigin: 'top left',
             display: onScreen && (!deferUntilHover || hovered) ? 'block' : 'none',
+            // visibility: hidden during load skips paint entirely — the
+            // compositor doesn't blend a mid-load iframe over the parent,
+            // so parent scroll stays smooth while the embed hydrates.
+            visibility: loaded ? 'visible' : 'hidden',
             opacity: loaded ? 1 : 0,
             transition: 'opacity 0.3s ease',
           }}

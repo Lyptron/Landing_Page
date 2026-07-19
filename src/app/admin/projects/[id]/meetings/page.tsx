@@ -10,21 +10,28 @@ export default function ProjectMeetingsPage() {
   const { projectId, meetings, setMeetings } = useProject()
   const [modalOpen, setModalOpen] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [form, setForm] = useState({ title: '', type: 'Video Call', meeting_date: '', meeting_time: '', link: '' })
+  const [error, setError] = useState<string | null>(null)
+  const [form, setForm] = useState<{ title: string; medium: 'Video Call' | 'In Person' | 'Phone Call'; meeting_date: string; meeting_time: string; link: string }>({ title: '', medium: 'Video Call', meeting_date: '', meeting_time: '', link: '' })
 
   async function handleAdd() {
     if (!form.title || !form.meeting_date) return
     setSaving(true)
-    const { data } = await insertMeeting({
+    setError(null)
+    const { data, error: insertError } = await insertMeeting({
       project_id: projectId,
       title: form.title,
-      type: form.type,
+      medium: form.medium,
       meeting_date: form.meeting_date,
-      meeting_time: form.meeting_time || '',
-      link: form.link || '',
+      meeting_time: form.meeting_time || undefined,
+      link: form.link || undefined,
     })
+    if (insertError) {
+      setError(insertError.message)
+      setSaving(false)
+      return
+    }
     if (data) setMeetings(prev => [data, ...prev])
-    setForm({ title: '', type: 'Video Call', meeting_date: '', meeting_time: '', link: '' })
+    setForm({ title: '', medium: 'Video Call', meeting_date: '', meeting_time: '', link: '' })
     setSaving(false)
     setModalOpen(false)
   }
@@ -73,10 +80,11 @@ export default function ProjectMeetingsPage() {
           <ModalInput label="Title" value={form.title} onChange={v => setForm({ ...form, title: v })} placeholder="e.g. Weekly Standup" required />
           <div className="grid grid-cols-2 gap-4">
             <ModalInput label="Date" value={form.meeting_date} onChange={v => setForm({ ...form, meeting_date: v })} type="date" required />
-            <ModalInput label="Time" value={form.meeting_time} onChange={v => setForm({ ...form, meeting_time: v })} placeholder="e.g. 3:00 PM" />
+            <ModalInput label="Time" value={form.meeting_time} onChange={v => setForm({ ...form, meeting_time: v })} type="time" />
           </div>
-          <ModalSelect label="Type" value={form.type} onChange={v => setForm({ ...form, type: v })} options={[{ value: 'Video Call', label: 'Video Call' }, { value: 'In Person', label: 'In Person' }, { value: 'Phone Call', label: 'Phone Call' }]} />
+          <ModalSelect label="Medium" value={form.medium} onChange={v => setForm({ ...form, medium: v as 'Video Call' | 'In Person' | 'Phone Call' })} options={[{ value: 'Video Call', label: 'Video Call' }, { value: 'In Person', label: 'In Person' }, { value: 'Phone Call', label: 'Phone Call' }]} />
           <ModalInput label="Meeting Link" value={form.link} onChange={v => setForm({ ...form, link: v })} placeholder="https://meet.google.com/..." />
+          {error && <p className="text-[12px] text-(--cp-red)" role="alert">{error}</p>}
           <div className="flex justify-end gap-3 pt-4 border-t" style={{ borderColor: 'var(--cp-border-soft)' }}>
             <button onClick={() => setModalOpen(false)} className="px-4 py-2 rounded-xl text-[12px] font-medium text-(--cp-text-muted) hover:text-(--cp-text)">Cancel</button>
             <button onClick={handleAdd} disabled={saving || !form.title || !form.meeting_date} className="cp-btn-primary px-5 py-2 text-[12px] cursor-pointer">

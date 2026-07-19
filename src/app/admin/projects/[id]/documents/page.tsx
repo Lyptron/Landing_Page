@@ -19,23 +19,42 @@ const DOCUMENT_TYPES = [
   { value: 'Link', label: 'Link' },
 ]
 
+// Category groups the doc on the client portal. Onboarding →
+// "Required Signing Agreements" section (MSA/NDA/SOW/etc). Deliverable
+// → surfaces on the Deliverables page. General → default file list.
+const DOCUMENT_CATEGORIES = [
+  { value: 'general', label: 'General file' },
+  { value: 'onboarding', label: 'Onboarding / signing agreement' },
+  { value: 'deliverable', label: 'Deliverable' },
+]
+
+type DocCategory = 'onboarding' | 'deliverable' | 'general'
+
 export default function ProjectDocumentsPage() {
   const { projectId, documents, setDocuments } = useProject()
   const [modalOpen, setModalOpen] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [form, setForm] = useState({ title: '', type: 'PDF', file_url: '' })
+  const [error, setError] = useState<string | null>(null)
+  const [form, setForm] = useState<{ title: string; type: string; file_url: string; category: DocCategory }>({ title: '', type: 'PDF', file_url: '', category: 'general' })
 
   async function handleAdd() {
     if (!form.title) return
     setSaving(true)
-    const { data } = await insertDocument({
+    setError(null)
+    const { data, error: insertError } = await insertDocument({
       project_id: projectId,
       title: form.title,
       type: form.type,
-      file_url: form.file_url || '',
+      file_url: form.file_url || undefined,
+      category: form.category,
     })
+    if (insertError) {
+      setError(insertError.message)
+      setSaving(false)
+      return
+    }
     if (data) setDocuments(prev => [data, ...prev])
-    setForm({ title: '', type: 'PDF', file_url: '' })
+    setForm({ title: '', type: 'PDF', file_url: '', category: 'general' })
     setSaving(false)
     setModalOpen(false)
   }
@@ -83,7 +102,9 @@ export default function ProjectDocumentsPage() {
         <div className="flex flex-col gap-4">
           <ModalInput label="Title" value={form.title} onChange={v => setForm({ ...form, title: v })} placeholder="e.g. Project SOW" required />
           <ModalSelect label="Type" value={form.type} onChange={v => setForm({ ...form, type: v })} options={DOCUMENT_TYPES} />
+          <ModalSelect label="Category" value={form.category} onChange={v => setForm({ ...form, category: v as DocCategory })} options={DOCUMENT_CATEGORIES} />
           <ModalInput label="File URL" value={form.file_url} onChange={v => setForm({ ...form, file_url: v })} placeholder="https://..." />
+          {error && <p className="text-[12px] text-(--cp-red)" role="alert">{error}</p>}
           <div className="flex justify-end gap-3 pt-4 border-t" style={{ borderColor: 'var(--cp-border-soft)' }}>
             <button onClick={() => setModalOpen(false)} className="px-4 py-2 rounded-xl text-[12px] font-medium text-(--cp-text-muted) hover:text-(--cp-text)">Cancel</button>
             <button onClick={handleAdd} disabled={saving || !form.title} className="cp-btn-primary px-5 py-2 text-[12px] cursor-pointer">

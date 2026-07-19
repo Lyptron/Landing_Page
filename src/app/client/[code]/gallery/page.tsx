@@ -3,14 +3,9 @@ import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Image as ImageIcon, X, ImageOff, Upload } from 'lucide-react'
 import Image from 'next/image'
-import { fetchGallery, insertGalleryImage, uploadGalleryImage } from '@/lib/db'
+import { submitClientGalleryItem, uploadGalleryImage } from '@/lib/db'
 import { PageHeader, EmptyState, Loading } from '@/components/portal/PortalUI'
 import { useClientPortalProject } from '@/hooks/useClientPortalProject'
-
-async function loadGallery(projectId: string) {
-  const { data } = await fetchGallery(projectId)
-  return { data: data ?? [] }
-}
 
 function groupByWeek(images: any[]) {
   const grouped: Record<string, any> = {}
@@ -29,7 +24,8 @@ function groupByWeek(images: any[]) {
 }
 
 export default function ClientGalleryPage() {
-  const { project, resource, loading } = useClientPortalProject<any[]>(loadGallery)
+  const { project, loading, code } = useClientPortalProject()
+  const resource = project?.gallery
   const projectId = project?.id ?? null
   const [images, setImages] = useState<any[]>([])
   const [selectedImage, setSelectedImage] = useState<{ url: string; title: string } | null>(null)
@@ -53,11 +49,19 @@ export default function ClientGalleryPage() {
       setUploading(false)
       return
     }
-    const { data } = await insertGalleryImage({
-      project_id: projectId,
+    // DB insert routes through the code-authenticated RPC — project_id
+    // is resolved server-side, callers can't spoof it. See
+    // submit_client_gallery_item in supabase-schema.sql.
+    const { data, error: writeErr } = await submitClientGalleryItem({
+      code,
       title: file.name.replace(/\.[^.]+$/, ''),
       image_url: imageUrl,
     })
+    if (writeErr) {
+      setUploadError('Uploaded, but the gallery entry failed to save. Please try again.')
+      setUploading(false)
+      return
+    }
     if (data) setImages((prev) => [data, ...prev])
     setUploading(false)
   }
@@ -75,7 +79,7 @@ export default function ClientGalleryPage() {
         >
           <input
             type="file"
-            accept="image/*"
+            accept="image/png,image/jpeg,image/webp"
             className="absolute inset-0 opacity-0 cursor-pointer"
             disabled={uploading}
             onChange={(e) => handleUpload(e.target.files?.[0] ?? null)}

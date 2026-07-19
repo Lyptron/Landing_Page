@@ -1,22 +1,30 @@
 'use client'
+import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Video, Clock, ExternalLink, PlayCircle, CalendarOff } from 'lucide-react'
-import { fetchMeetings } from '@/lib/db'
 import { PageHeader, EmptyState, Loading, SectionLabel } from '@/components/portal/PortalUI'
 import { useClientPortalProject } from '@/hooks/useClientPortalProject'
 
-async function loadMeetings(projectId: string) {
-  const { data } = await fetchMeetings(projectId)
-  return { data: data ?? [] }
-}
-
 export default function MeetingsPage() {
-  const { resource, loading } = useClientPortalProject(loadMeetings)
-  const meetings = resource ?? []
-  const upcoming = meetings.filter((m: any) => m.type === 'upcoming')
-  const past = meetings.filter((m: any) => m.type === 'past')
+  const { project, loading } = useClientPortalProject()
+  const meetings = project?.meetings ?? []
+  // Bucket by meeting_date, not the legacy `type` column. The stored
+  // type used to be jammed with 'Video Call'/etc by the admin form
+  // (a constraint violation that made every insert fail); even after
+  // the form was fixed, `type` isn't a reliable upcoming/past signal
+  // for rows created before that fix. meeting_date is authoritative.
+  // Date.now() is impure during render, so resolve it after mount —
+  // one paint of the Loading spinner longer, imperceptible in practice.
+  const [nowMs, setNowMs] = useState<number | null>(null)
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setNowMs(Date.now())
+  }, [])
 
-  if (loading) return <Loading />
+  if (loading || nowMs === null) return <Loading />
+
+  const upcoming = meetings.filter((m: any) => new Date(m.meeting_date).getTime() >= nowMs)
+  const past = meetings.filter((m: any) => new Date(m.meeting_date).getTime() < nowMs)
 
   return (
     <div className="flex flex-col gap-12 max-w-4xl">
@@ -58,14 +66,21 @@ export default function MeetingsPage() {
                       </div>
                     </div>
                     <h3 className="text-[17px] font-bold leading-snug" style={{ color: 'var(--cp-text)' }}>{meet.title}</h3>
-                    <a
-                      href={meet.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="cp-btn-primary flex items-center justify-center gap-2 w-full py-2.5 text-[12.5px]"
-                    >
-                      Join Meeting <ExternalLink className="w-3.5 h-3.5" />
-                    </a>
+                    {meet.medium && (
+                      <span className="text-[12px]" style={{ color: 'var(--cp-text-muted)' }}>
+                        {meet.medium}
+                      </span>
+                    )}
+                    {meet.link && (
+                      <a
+                        href={meet.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="cp-btn-primary flex items-center justify-center gap-2 w-full py-2.5 text-[12.5px]"
+                      >
+                        Join Meeting <ExternalLink className="w-3.5 h-3.5" />
+                      </a>
+                    )}
                   </motion.div>
                 ))}
               </div>

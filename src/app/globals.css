@@ -641,3 +641,26 @@ html[data-theme="dark"] .client-shell {
   }
 }
 
+/* Mobile horizontal-scroll affordance: containers marked with these
+   classes get a mask-image gradient that fades the right edge — the
+   mask stays fixed to the container's viewport as content scrolls,
+   signalling more content off-screen. Two variants because containers
+   flip from row-scroll to a stack/grid at different breakpoints. */
+.scroll-hint-x,
+.scroll-hint-x-md {
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 44px), transparent 100%);
+          mask-image: linear-gradient(to right, #000 calc(100% - 44px), transparent 100%);
+}
+@media (min-width: 768px) {
+  .scroll-hint-x-md {
+    -webkit-mask-image: none;
+            mask-image: none;
+  }
+}
+@media (min-width: 1024px) {
+  .scroll-hint-x {
+    -webkit-mask-image: none;
+            mask-image: none;
+  }
+}
+

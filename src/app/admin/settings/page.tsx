@@ -37,6 +37,7 @@ import {
   resetAllLeads,
   factoryResetAgency,
 } from '@/lib/db'
+import { newAccessCode, normalizeAccessCode } from '@/lib/accessCode'
 import Modal from '@/components/ui/Modal'
 import { useSetLogoUrl } from '@/lib/LogoContext'
 
@@ -67,13 +68,6 @@ const DEFAULT_NOTIFICATIONS: NotificationPrefs = NOTIFICATION_ITEMS.reduce(
   (acc, item) => ({ ...acc, [item.key]: item.default }),
   {} as NotificationPrefs
 )
-
-function generateRandomCode(length = 8) {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
-  let code = ''
-  for (let i = 0; i < length; i++) code += chars[Math.floor(Math.random() * chars.length)]
-  return code
-}
 
 export default function SettingsPage() {
   const { user } = useAdminAuth()
@@ -237,7 +231,8 @@ export default function SettingsPage() {
   }
 
   async function handleGenerateCode(projectId: string) {
-    const code = customCode.trim().toUpperCase() || generateRandomCode()
+    const custom = normalizeAccessCode(customCode)
+    const code = custom || newAccessCode()
     await generateAccessCode(projectId, code)
     setCustomCode('')
     setNewCodeProject(null)
@@ -318,13 +313,13 @@ export default function SettingsPage() {
                         {logoUploading ? 'Uploading...' : 'Upload Logo'}
                         <input
                           type="file"
-                          accept="image/svg+xml,image/png,image/jpeg,image/webp"
+                          accept="image/png,image/jpeg,image/webp"
                           className="hidden"
                           onChange={handleLogoUpload}
                           disabled={logoUploading}
                         />
                       </label>
-                      <p className="text-[11px] text-(--cp-text-faint) mt-2">SVG, PNG, JPG, or WebP (max. 800x400px)</p>
+                      <p className="text-[11px] text-(--cp-text-faint) mt-2">PNG, JPG, or WebP (max. 10MB)</p>
                       {logoError && (
                         <p className="text-[11px] text-(--cp-red) mt-2" role="alert">{logoError}</p>
                       )}

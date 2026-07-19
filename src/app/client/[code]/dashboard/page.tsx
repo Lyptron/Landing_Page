@@ -20,7 +20,6 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 import Link from 'next/link'
-import { fetchProjectTeam, fetchAnnouncements } from '@/lib/db'
 import { useClientPortalProject } from '@/hooks/useClientPortalProject'
 import {
   EmptyState,
@@ -79,19 +78,10 @@ function hasMeaningfulTitle(m: any) {
 
 const DIVIDER = { borderColor: 'var(--cp-border-soft)' }
 
-interface DashboardSide { team: any[]; announcements: any[] }
-
-async function loadDashboardSidecars(projectId: string): Promise<{ data: DashboardSide }> {
-  const [{ data: teamData }, { data: announcementData }] = await Promise.all([
-    fetchProjectTeam(projectId),
-    fetchAnnouncements(projectId),
-  ])
-  return { data: { team: teamData || [], announcements: announcementData || [] } }
-}
-
 export default function ClientDashboardPage() {
-  const { project, resource, loading, code } = useClientPortalProject<DashboardSide>(loadDashboardSidecars)
-  const { team, announcements } = resource ?? { team: [], announcements: [] }
+  const { project, loading, code } = useClientPortalProject()
+  const team = project?.project_team ?? []
+  const announcements = project?.announcements ?? []
   // Date.now() is impure for render, so we resolve the countdown after mount.
   const [daysRemaining, setDaysRemaining] = useState<number | null>(null)
   useEffect(() => {

@@ -2,24 +2,20 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Send, MessagesSquare } from 'lucide-react'
-import { fetchFeedback, insertFeedback } from '@/lib/db'
+import { submitClientFeedback } from '@/lib/db'
 import { PageHeader, EmptyState, Loading, Badge } from '@/components/portal/PortalUI'
 import { useClientPortalProject } from '@/hooks/useClientPortalProject'
 
-async function loadFeedback(projectId: string) {
-  const { data } = await fetchFeedback(projectId)
-  return { data: data ?? [] }
-}
-
 export default function FeedbackPage() {
-  const { project, resource, loading } = useClientPortalProject<any[]>(loadFeedback)
-  const projectId = project?.id ?? null
+  const { project, loading, code } = useClientPortalProject()
+  const resource = project?.feedback
   const [feedbackList, setFeedbackList] = useState<any[]>([])
   const [activeTab, setActiveTab] = useState<'submit' | 'history'>('submit')
   const [feedbackType, setFeedbackType] = useState('Feature Request')
   const [subject, setSubject] = useState('')
   const [details, setDetails] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
   // Hydrate local feedback list once the hook returns the fetched data,
   // so subsequent submissions can prepend to it without re-fetching.
@@ -29,9 +25,20 @@ export default function FeedbackPage() {
   }, [resource])
 
   const handleSubmit = async () => {
-    if (!subject || !projectId) return
+    if (!subject) return
     setSubmitting(true)
-    const { data } = await insertFeedback({ project_id: projectId, type: feedbackType, title: subject, description: details })
+    setSubmitError(null)
+    const { data, error } = await submitClientFeedback({
+      code,
+      type: feedbackType,
+      title: subject,
+      description: details || undefined,
+    })
+    if (error) {
+      setSubmitError('Could not send feedback. Please try again.')
+      setSubmitting(false)
+      return
+    }
     if (data) setFeedbackList([data, ...feedbackList])
     setSubject('')
     setDetails('')
@@ -136,6 +143,9 @@ export default function FeedbackPage() {
             />
           </div>
 
+          {submitError && (
+            <p className="text-[12px] text-(--cp-red)" role="alert">{submitError}</p>
+          )}
           <div className="pt-4 flex justify-end border-t" style={{ borderColor: 'var(--cp-border-soft)' }}>
             <button
               onClick={handleSubmit}

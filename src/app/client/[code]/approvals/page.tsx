@@ -2,18 +2,15 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { CheckSquare, XCircle, CheckCircle2, AlertCircle, ClipboardCheck } from 'lucide-react'
-import { fetchApprovals, updateApproval } from '@/lib/db'
+import { updateClientApproval } from '@/lib/db'
 import { PageHeader, EmptyState, Loading, SectionLabel, Badge, type PortalTone } from '@/components/portal/PortalUI'
 import { useClientPortalProject } from '@/hooks/useClientPortalProject'
 
-async function loadApprovals(projectId: string) {
-  const { data } = await fetchApprovals(projectId)
-  return { data: data ?? [] }
-}
-
 export default function ApprovalsPage() {
-  const { resource, loading } = useClientPortalProject<any[]>(loadApprovals)
+  const { project, loading, code } = useClientPortalProject()
+  const resource = project?.approvals
   const [approvals, setApprovals] = useState<any[]>([])
+  const [actionError, setActionError] = useState<string | null>(null)
 
   // Hydrate local list so optimistic updates from handleApproval persist.
   useEffect(() => {
@@ -21,9 +18,16 @@ export default function ApprovalsPage() {
     if (resource) setApprovals(resource)
   }, [resource])
 
-  const handleApproval = async (id: string, status: string) => {
+  const handleApproval = async (id: string, status: 'approved' | 'rejected') => {
+    setActionError(null)
+    const prev = approvals
+    // Optimistic update — reverted below if the RPC fails.
     setApprovals(approvals.map((a) => (a.id === id ? { ...a, status } : a)))
-    await updateApproval(id, status)
+    const { error } = await updateClientApproval({ code, approvalId: id, status })
+    if (error) {
+      setApprovals(prev)
+      setActionError('Could not save. Please try again.')
+    }
   }
 
   const getStatusInfo = (status: string): { icon: typeof CheckSquare; tone: PortalTone; label: string } => {
@@ -56,6 +60,9 @@ export default function ApprovalsPage() {
         />
       ) : (
         <>
+          {actionError && (
+            <p className="text-[12px] text-(--cp-red)" role="alert">{actionError}</p>
+          )}
           {/* Pending Section */}
           {pending.length > 0 && (
             <div className="flex flex-col gap-6">

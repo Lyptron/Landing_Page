@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { Plus, Calendar, CheckCircle2, AlertCircle, Clock, Search } from 'lucide-react'
 import Link from 'next/link'
 import { fetchProjectsKanban, fetchClients, insertProject, updateProject, insertClient } from '@/lib/db'
+import { newAccessCode, normalizeAccessCode } from '@/lib/accessCode'
 import Modal, { ModalInput, ModalSelect } from '@/components/ui/Modal'
 
 const STAGES = ['Backlog', 'Design', 'Development', 'Review', 'Completed']
@@ -25,13 +26,6 @@ type Project = {
   team?: string[]
 }
 
-function slugifyAccessCode(name: string) {
-  return name
-    .toUpperCase()
-    .replace(/[^A-Z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 24)
-}
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([])
@@ -74,10 +68,12 @@ export default function ProjectsPage() {
     load()
   }, [])
 
-  // Auto-derive a clean access code from project name
+  // Auto-fill a crypto-secure access code once the admin has named
+  // the project. Deriving the code from the name (previous behavior)
+  // made codes trivially guessable — see src/lib/accessCode.ts.
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (formName && !formCode) setFormCode(slugifyAccessCode(formName))
+    if (formName && !formCode) setFormCode(newAccessCode())
   }, [formName]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSelectClient = (clientId: string) => {
@@ -148,7 +144,7 @@ export default function ProjectsPage() {
       status: 'starting',
       progress: 0,
       description: formDesc || undefined,
-      access_code: formCode || slugifyAccessCode(formName),
+      access_code: formCode || newAccessCode(),
       stage: formStage,
     })
 
@@ -819,8 +815,8 @@ export default function ProjectsPage() {
           <ModalInput
             label="Access Code"
             value={formCode}
-            onChange={(v) => setFormCode(slugifyAccessCode(v))}
-            placeholder="NIRMAN"
+            onChange={(v) => setFormCode(normalizeAccessCode(v))}
+            placeholder="Auto-generated when you name the project"
           />
           <ModalInput
             label="Description"

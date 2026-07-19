@@ -4,6 +4,7 @@ import {
   FileText, Key, Megaphone, CheckCircle2, Copy, Trash2, Mail, LucideIcon
 } from 'lucide-react'
 import { generateAccessCode, removeAccessCode, insertAnnouncement, updateAnnouncement, deleteAnnouncement } from '@/lib/db'
+import { newAccessCode, normalizeAccessCode } from '@/lib/accessCode'
 import Modal, { ModalInput, ModalSelect } from '@/components/ui/Modal'
 import { ListBox, ListRow, Textarea, IconButton } from '@/components/admin/AdminUI'
 import { Badge } from '@/components/portal/PortalUI'
@@ -125,7 +126,8 @@ export default function ProjectOverviewPage() {
 
   // Access Code functions
   async function handleGenerateCode() {
-    const code = customCode.trim().toUpperCase() || Math.random().toString(36).substring(2, 10).toUpperCase()
+    const custom = normalizeAccessCode(customCode)
+    const code = custom || newAccessCode()
     await generateAccessCode(projectId, code)
     setAccessCode(code)
     setCustomCode('')
@@ -252,7 +254,7 @@ export default function ProjectOverviewPage() {
               type="text"
               placeholder="Custom code or leave blank"
               value={customCode}
-              onChange={e => setCustomCode(e.target.value.toUpperCase())}
+              onChange={e => setCustomCode(normalizeAccessCode(e.target.value))}
               className="flex-1 px-4 py-3 rounded-xl text-[13px] font-mono tracking-widest outline-none placeholder:text-(--cp-text-faint)"
               style={{ background: 'var(--cp-bg-soft)', border: '1px solid var(--cp-border)', color: 'var(--cp-text)' }}
             />

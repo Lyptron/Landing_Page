@@ -103,7 +103,7 @@ export default function ProjectGalleryPage() {
             >
               <input
                 type="file"
-                accept="image/*"
+                accept="image/png,image/jpeg,image/webp"
                 className="absolute inset-0 opacity-0 cursor-pointer"
                 onChange={(e) => handleFileSelect(e.target.files?.[0] ?? null)}
               />

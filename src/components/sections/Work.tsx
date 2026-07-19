@@ -1,5 +1,6 @@
 'use client'
 import { useRef, useState, useEffect } from 'react'
+import Link from 'next/link'
 import { m, useScroll, useTransform, useInView, type Variants } from 'framer-motion'
 import { projects } from '@/data/projects'
 import { ArrowUpRight, ArrowRight } from 'lucide-react'
@@ -18,7 +19,7 @@ const EASE = [0.22, 1, 0.36, 1] as const
 
 const projectStats: Record<string, { label: string; value: string }[]> = {
   nexusflow: [
-    { label: 'MRR Growth', value: '$0 → $12k' },
+    { label: 'MRR Growth', value: '₹0 → ₹10L' },
     { label: 'Uptime', value: '99.99%' },
     { label: 'Load Time', value: '8.4ms' },
   ],
@@ -59,8 +60,20 @@ const stagger = (delayChildren: number, staggerChildren: number): Variants => ({
   visible: { transition: { delayChildren, staggerChildren } },
 })
 
+// Static screenshots keep the mockup surface looking finished during the
+// iframe's cold hydration — the compositor blends the image (cheap) rather
+// than the mid-load iframe. Only projects we have shots for are listed.
+const PROJECT_PREVIEW: Record<string, string> = {
+  nexusflow: '/images/previews/nexusflow.png',
+  stratum: '/images/previews/stratum.png',
+  voxai: '/images/previews/voxai.png',
+  pulsetrack: '/images/previews/pulsetrack.png',
+  novaportal: '/images/previews/novaportal.png',
+}
+
 function DeviceMockup({ project }: { project: typeof projects[0] }) {
   const isMobile = project.id === 'pulsetrack'
+  const previewImage = PROJECT_PREVIEW[project.id]
 
   if (isMobile) {
     return (
@@ -83,6 +96,8 @@ function DeviceMockup({ project }: { project: typeof projects[0] }) {
                   title={`${project.name} live preview`}
                   baseWidth={390}
                   baseHeight={844}
+                  previewImage={previewImage}
+                  deferUntilHover
                 />
                 <a
                   href={project.url}
@@ -145,6 +160,7 @@ function DeviceMockup({ project }: { project: typeof projects[0] }) {
               title={`${project.name} live preview`}
               baseWidth={1440}
               baseHeight={900}
+              previewImage={previewImage}
             />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center">
@@ -345,19 +361,34 @@ function ProjectRow({ project, index }: { project: typeof projects[0]; index: nu
             animate={infoInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.7, ease: EASE }}
           >
-            <button
-              type="button"
-              onClick={scrollToCTA}
-              aria-label={`Discuss a project like ${project.name}`}
-              onMouseEnter={() => setCursorState('cta')}
-              onMouseLeave={() => setCursorState('default')}
-              className="group/link self-start cursor-none flex items-center gap-3 text-white/30 hover:text-white/70 transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/40"
-            >
-              <span className="font-mono text-xs tracking-wider uppercase">View case study</span>
-              <div className="w-8 h-8 rounded-full border border-white/8 flex items-center justify-center group-hover/link:border-white/18 transition-all duration-300">
-                <ArrowUpRight className="w-3.5 h-3.5 group-hover/link:translate-x-px group-hover/link:-translate-y-px transition-transform duration-300" />
-              </div>
-            </button>
+            {project.caseStudy ? (
+              <Link
+                href={`/work/${project.id}`}
+                aria-label={`Read the ${project.name} case study`}
+                onMouseEnter={() => setCursorState('cta')}
+                onMouseLeave={() => setCursorState('default')}
+                className="group/link self-start cursor-none flex items-center gap-3 text-white/30 hover:text-white/70 transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/40"
+              >
+                <span className="font-mono text-xs tracking-wider uppercase">Read case study</span>
+                <div className="w-8 h-8 rounded-full border border-white/8 flex items-center justify-center group-hover/link:border-white/18 transition-all duration-300">
+                  <ArrowRight className="w-3.5 h-3.5 group-hover/link:translate-x-px transition-transform duration-300" />
+                </div>
+              </Link>
+            ) : (
+              <button
+                type="button"
+                onClick={scrollToCTA}
+                aria-label={`Discuss a project like ${project.name}`}
+                onMouseEnter={() => setCursorState('cta')}
+                onMouseLeave={() => setCursorState('default')}
+                className="group/link self-start cursor-none flex items-center gap-3 text-white/30 hover:text-white/70 transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/40"
+              >
+                <span className="font-mono text-xs tracking-wider uppercase">Discuss a project</span>
+                <div className="w-8 h-8 rounded-full border border-white/8 flex items-center justify-center group-hover/link:border-white/18 transition-all duration-300">
+                  <ArrowUpRight className="w-3.5 h-3.5 group-hover/link:translate-x-px group-hover/link:-translate-y-px transition-transform duration-300" />
+                </div>
+              </button>
+            )}
           </m.div>
         </div>
       </div>
@@ -427,6 +458,18 @@ export default function Work() {
             transition={{ duration: 0.8, delay: 0.55, ease: EASE }}
           >
             Engineering-led builds for SaaS, mobile, and AI — shipped to production and scaled to real users.
+          </m.p>
+
+          {/* Disclosure — these are self-initiated demo builds we made to
+              show our process, not real client engagements. Stated
+              plainly so it never reads as a claim about a real client. */}
+          <m.p
+            className="font-body text-[11px] text-white/15 max-w-130 leading-[1.6]"
+            initial={{ opacity: 0 }}
+            animate={headerInView ? { opacity: 1 } : {}}
+            transition={{ duration: 0.8, delay: 0.7, ease: EASE }}
+          >
+            Concept projects built to demonstrate our craft — not real client engagements. Metrics and quotes are illustrative.
           </m.p>
         </div>
       </div>

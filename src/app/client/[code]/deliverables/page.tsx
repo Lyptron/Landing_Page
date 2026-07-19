@@ -1,22 +1,16 @@
 'use client'
 import { motion } from 'framer-motion'
 import { Download, ExternalLink, FileImage, FileCode2, FileType2, PackageOpen } from 'lucide-react'
-import { fetchDocuments } from '@/lib/db'
 import { PageHeader, EmptyState, Loading } from '@/components/portal/PortalUI'
 import { useClientPortalProject } from '@/hooks/useClientPortalProject'
 
 const ICON_MAP: Record<string, any> = { design: FileImage, code: FileCode2, document: FileType2 }
 
-async function loadDeliverables(projectId: string) {
-  const { data } = await fetchDocuments(projectId)
-  if (!data?.length) return { data: [] }
-  const filtered = data.filter((d: any) => d.category === 'deliverable' || d.is_deliverable)
-  return { data: filtered.length > 0 ? filtered : data }
-}
-
 export default function DeliverablesPage() {
-  const { resource, loading } = useClientPortalProject(loadDeliverables)
-  const deliverables = resource ?? []
+  const { project, loading } = useClientPortalProject()
+  const documents = project?.documents ?? []
+  const filtered = documents.filter((d: any) => d.category === 'deliverable' || d.is_deliverable)
+  const deliverables = filtered.length > 0 ? filtered : documents
 
   if (loading) return <Loading />
 

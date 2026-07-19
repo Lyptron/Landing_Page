@@ -11,7 +11,7 @@ const PROJECTS = [
   {
     title: 'NexusFlow',
     tag: 'SaaS Platform',
-    result: '$0 → $12k MRR',
+    result: '₹0 → ₹10L MRR',
     url: 'lyptron.com/work/nexusflow',
     liveUrl: 'https://nexus-flow-sand.vercel.app/',
   },
@@ -334,7 +334,12 @@ export default function Hero() {
         </div>
 
         <div className="w-full max-w-360 mx-auto px-6 md:px-12 lg:px-20 py-6 md:py-14">
-          <div className="flex overflow-x-auto lg:grid lg:grid-cols-3 gap-5 pb-8 snap-x snap-mandatory" style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
+          {/* Swipe hint — visible only where the strip is a horizontal
+              scroller (below lg, where it flips to a 3-col grid). */}
+          <div className="lg:hidden text-right font-mono text-[9px] text-white/25 uppercase tracking-widest mb-2 pointer-events-none">
+            Swipe →
+          </div>
+          <div className="flex overflow-x-auto lg:grid lg:grid-cols-3 gap-5 pb-8 snap-x snap-mandatory scroll-hint-x" style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
             {PROJECTS.map((p, i) => (
               <m.div
                 key={p.title}
@@ -414,6 +419,13 @@ export default function Hero() {
               </m.div>
             ))}
           </div>
+          {/* Disclosure — these are self-initiated demo builds, not real
+              client engagements. Kept quiet (small, low-contrast) since
+              it's a footnote, not a headline, but present on every
+              surface that shows these projects' metrics. */}
+          <p className="font-mono text-[9px] text-white/15 uppercase tracking-widest mt-1">
+            Concept projects — not real client engagements
+          </p>
         </div>
 
         {/* ── TRUST BAR ── */}

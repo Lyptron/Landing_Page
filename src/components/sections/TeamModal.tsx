@@ -66,14 +66,18 @@ export default function TeamModal({ member, onClose }: TeamModalProps) {
       {/* Modal wrapper needs overflow-y-auto so tall content on mobile
           (or a small viewport) can scroll — body scroll is locked, so
           without this the user gets frozen. */}
-      <div key="modal-content" className="fixed inset-0 z-101 flex items-center justify-center pointer-events-none p-4 sm:p-8 overflow-y-auto overscroll-contain">
+      <div key="modal-content" className="fixed inset-0 z-101 flex items-center justify-center pointer-events-none p-3 sm:p-6 md:p-8 overflow-y-auto overscroll-contain">
         <m.div
           ref={dialogRef}
           role="dialog"
           aria-modal="true"
           aria-labelledby={titleId}
           tabIndex={-1}
-          className="pointer-events-auto w-full max-w-225 overflow-hidden flex flex-col md:flex-row h-auto md:h-140 rounded-2xl relative cursor-none focus:outline-none"
+          // Sizing: width caps at max-w-225 (900px) on wide screens; on
+          // shorter viewports (laptops with 600–800px height, landscape
+          // phones), the fixed md:h-140 (560px) would overflow, so cap
+          // height at the viewport minus the wrapper's padding.
+          className="pointer-events-auto w-full max-w-225 max-h-[calc(100dvh-1.5rem)] sm:max-h-[calc(100dvh-3rem)] md:max-h-[calc(100dvh-4rem)] overflow-hidden flex flex-col md:flex-row md:h-140 rounded-2xl relative cursor-none focus:outline-none my-auto"
           style={{
             background: 'linear-gradient(160deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)',
             border: '1px solid rgba(255,255,255,0.07)',

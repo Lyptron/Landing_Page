@@ -1,4 +1,5 @@
 import { supabase, isSupabaseConfigured } from './supabase'
+import type { ProjectRow } from './db-types'
 
 // ─── Inquiries ───────────────────────────────────────────────
 export async function insertInquiry(data: {
@@ -23,12 +24,14 @@ export async function fetchProjects() {
     .order('created_at', { ascending: false })
 }
 
+// Routes through a SECURITY DEFINER RPC that verifies the access code
+// server-side and returns the project plus every related table the client
+// portal needs — direct SELECT on these tables is admin-only (see
+// supabase-schema.sql PHASE F), so this is the only way the anon key can
+// read a client's project data.
 export async function fetchProjectByAccessCode(code: string) {
-  return supabase
-    .from('projects')
-    .select('*, milestones(*), payments(*), approvals(*), activities(*), deployments(*), documents(*), meetings(*), feedback(*), gallery(*), clients(industry)')
-    .eq('access_code', code)
-    .single()
+  const { data, error } = await supabase.rpc('get_client_project_bundle', { p_code: code })
+  return { data: data as ProjectRow | null, error }
 }
 
 export async function fetchProjectsKanban() {
@@ -221,6 +224,54 @@ export async function insertFeedback(data: {
   return supabase.from('feedback').insert(data).select().single()
 }
 
+// Client-portal write. Verifies p_code server-side and resolves
+// project_id there — the caller cannot spoof project_id or bypass the
+// code. See submit_client_feedback SECURITY DEFINER RPC.
+export async function submitClientFeedback(args: {
+  code: string
+  type: string
+  title: string
+  description?: string
+}) {
+  return supabase.rpc('submit_client_feedback', {
+    p_code: args.code,
+    p_type: args.type,
+    p_title: args.title,
+    p_description: args.description ?? null,
+  })
+}
+
+// Client-portal write. Same pattern — code-authenticated RPC that
+// resolves project_id server-side after upload to Storage.
+export async function submitClientGalleryItem(args: {
+  code: string
+  title: string
+  image_url: string
+  week_label?: string
+}) {
+  return supabase.rpc('submit_client_gallery_item', {
+    p_code: args.code,
+    p_title: args.title,
+    p_image_url: args.image_url,
+    p_week_label: args.week_label ?? null,
+  })
+}
+
+// Client-portal write. Approvals UPDATE is admin-only at the RLS
+// layer; the client goes through this RPC which verifies the code
+// AND that the approval belongs to the code's project.
+export async function updateClientApproval(args: {
+  code: string
+  approvalId: string
+  status: 'approved' | 'rejected'
+}) {
+  return supabase.rpc('update_client_approval', {
+    p_code: args.code,
+    p_approval_id: args.approvalId,
+    p_status: args.status,
+  })
+}
+
 // ─── Gallery ─────────────────────────────────────────────────
 export async function fetchGallery(projectId: string) {
   return supabase.from('gallery').select('*').eq('project_id', projectId).order('created_at', { ascending: false })
@@ -361,15 +412,22 @@ export async function insertDocument(data: {
   title: string
   type?: string
   file_url?: string
+  category?: 'onboarding' | 'deliverable' | 'general'
 }) {
   return supabase.from('documents').insert(data).select().single()
 }
 
 // ─── Meetings CRUD ───────────────────────────────────────────
+// `medium` is the physical medium (Video Call / In Person / Phone Call)
+// and is what the admin form actually collects. `type` remains as the
+// legacy upcoming/past bucket column with a default of 'upcoming'; the
+// client portal derives upcoming/past from meeting_date, so callers
+// should generally leave `type` unset.
 export async function insertMeeting(data: {
   project_id: string
   title: string
-  type?: string
+  medium?: 'Video Call' | 'In Person' | 'Phone Call'
+  type?: 'upcoming' | 'past'
   meeting_date: string
   meeting_time?: string
   link?: string
@@ -387,9 +445,59 @@ export async function insertGalleryImage(data: {
   return supabase.from('gallery').insert(data).select().single()
 }
 
+// ─── Upload validation ──────────────────────────────────────
+// Client-side gate before hitting Supabase Storage. Advisory only —
+// real enforcement is the bucket policy (MIME allowlist + size cap
+// configured in the Supabase Dashboard). But this catches the honest
+// mistakes (wrong file picked, oversized screenshot) with a clear
+// message, and blocks the two upload paths from accepting arbitrary
+// content-types (e.g. SVG, which is a stored-XSS vector) even when
+// the bucket policy is misconfigured.
+//
+// Allowlist is raster-only: SVG is *deliberately* excluded — it can
+// carry embedded scripts and, because getPublicUrl returns a
+// same-origin (per Supabase) URL, a rendered SVG would execute JS
+// against that origin. If SVG support is ever needed, it must be
+// served with Content-Disposition: attachment and never rendered.
+export const ALLOWED_IMAGE_MIME: ReadonlySet<string> = new Set([
+  'image/png',
+  'image/jpeg',
+  'image/webp',
+])
+export const MAX_UPLOAD_BYTES = 10 * 1024 * 1024 // 10 MB
+
+const EXT_FOR_MIME: Record<string, string> = {
+  'image/png': 'png',
+  'image/jpeg': 'jpg',
+  'image/webp': 'webp',
+}
+
+function validateImageUpload(file: File): { error: Error | null; ext: string } {
+  if (!ALLOWED_IMAGE_MIME.has(file.type)) {
+    return {
+      error: new Error(
+        `Unsupported file type: ${file.type || 'unknown'}. Use PNG, JPEG, or WebP.`
+      ),
+      ext: '',
+    }
+  }
+  if (file.size > MAX_UPLOAD_BYTES) {
+    const shownMB = (file.size / 1024 / 1024).toFixed(1)
+    const maxMB = MAX_UPLOAD_BYTES / 1024 / 1024
+    return {
+      error: new Error(`File too large: ${shownMB}MB. Maximum is ${maxMB}MB.`),
+      ext: '',
+    }
+  }
+  return { error: null, ext: EXT_FOR_MIME[file.type] }
+}
+
 // ─── Logo / Storage ─────────────────────────────────────────
 export async function uploadLogo(file: File) {
-  const ext = file.name.split('.').pop()
+  const { error: validationError, ext } = validateImageUpload(file)
+  if (validationError) return { data: null, error: validationError }
+  // Extension derived from MIME (not the user-supplied filename) so
+  // an .exe.png trick can't leave a stale extension on the object.
   const path = `agency-logo.${ext}`
   // Upload to 'logos' bucket (must be created in Supabase Dashboard → Storage)
   const { error } = await supabase.storage.from('logos').upload(path, file, { upsert: true, cacheControl: '0' })
@@ -405,7 +513,14 @@ export async function uploadLogo(file: File) {
 // insert policy scoped to authenticated admins and anon client-portal writes)
 // under a per-project folder so files from different projects never collide.
 export async function uploadGalleryImage(file: File, projectId: string) {
-  const ext = file.name.split('.').pop()
+  const { error: validationError, ext } = validateImageUpload(file)
+  if (validationError) return { data: null, error: validationError }
+  // projectId comes from a UUID column via useProject / useClientPortalProject;
+  // reject anything that doesn't look like a UUID as a belt-and-braces guard
+  // against path traversal into a sibling project's folder.
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(projectId)) {
+    return { data: null, error: new Error('Invalid project id.') }
+  }
   const path = `${projectId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`
   const { error } = await supabase.storage.from('project-gallery').upload(path, file, { cacheControl: '3600' })
   if (error) return { data: null, error }

@@ -156,8 +156,13 @@ export default function Pricing() {
           </p>
         </div>
 
+        {/* Swipe hint — visible only where cards are a horizontal
+            scroller (below lg, where it flips to a 3-col grid). */}
+        <div className="lg:hidden text-right font-mono text-[9px] text-white/25 uppercase tracking-widest mb-2 pr-6 pointer-events-none">
+          Swipe →
+        </div>
         {/* Cards */}
-        <div className="flex flex-row overflow-x-auto snap-x snap-mandatory scrollbar-none gap-5 pb-6 px-6 lg:px-0 lg:grid lg:grid-cols-3 lg:gap-5">
+        <div className="flex flex-row overflow-x-auto snap-x snap-mandatory scrollbar-none gap-5 pb-6 px-6 lg:px-0 lg:grid lg:grid-cols-3 lg:gap-5 scroll-hint-x">
           {PRICING_TIERS.map((tier, idx) => (
             <div
               key={idx}

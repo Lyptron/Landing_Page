@@ -30,9 +30,9 @@ function ClientLoginGate() {
     if (!code) return
     setLoading(true)
     setError('')
-    // SECURITY DEFINER RPC — see supabase-schema.sql get_project_by_access_code.
-    // Falls back to a direct select if the RPC isn't deployed yet.
-    const { data, error: err } = await supabase.rpc('get_project_by_access_code', { p_code: code })
+    // SECURITY DEFINER RPC — see supabase-schema.sql get_client_project_bundle.
+    // Verifies the access code server-side; anon key can't SELECT projects directly.
+    const { data, error: err } = await supabase.rpc('get_client_project_bundle', { p_code: code })
     if (err || !data) {
       setError("We couldn't find a project for that code. Please check it and try again.")
       setLoading(false)

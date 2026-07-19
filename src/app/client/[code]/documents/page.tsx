@@ -1,58 +1,78 @@
 'use client'
 import { useState } from 'react'
-import { FileText, Search, Download, FileSignature, Receipt, FolderOpen, AlertCircle, CheckCircle2 } from 'lucide-react'
-import { fetchDocuments } from '@/lib/db'
-import { PageHeader, EmptyState, Loading, Badge } from '@/components/portal/PortalUI'
+import { FileText, Search, Download, FileSignature, Receipt, FolderOpen } from 'lucide-react'
+import { PageHeader, EmptyState, Loading } from '@/components/portal/PortalUI'
 import { useClientPortalProject } from '@/hooks/useClientPortalProject'
 
-const ICON_MAP: Record<string, any> = { Contract: FileSignature, Proposal: FileText, Invoice: Receipt, Requirements: FileText }
+const ICON_MAP: Record<string, any> = {
+  Contract: FileSignature,
+  Proposal: FileText,
+  Invoice: Receipt,
+  Requirements: FileText,
+  MSA: FileSignature,
+  NDA: FileSignature,
+  SOW: FileSignature,
+}
 
-const ONBOARDING_DOCS = [
-  {
-    id: 'msa',
-    title: 'Master Services Agreement (MSA)',
-    description: 'Governing legal agreement defining general business terms, IP ownership, and payment frameworks.',
-    status: 'signed',
-    date: 'Signed on 12 May 2026',
-    type: 'Contract',
-  },
-  {
-    id: 'sow',
-    title: 'Statement of Work (SOW) — Phase 1',
-    description: 'Scope of deliverables, milestones, phase-1 timeline, budget allocation, and support parameters.',
-    status: 'pending',
-    date: 'Updated today',
-    type: 'Contract',
-  },
-  {
-    id: 'nda',
-    title: 'Mutual Non-Disclosure Agreement (NDA)',
-    description: 'Confidentiality agreement protecting proprietary technical assets, source code, and design files.',
-    status: 'signed',
-    date: 'Signed on 10 May 2026',
-    type: 'Contract',
-  },
-]
+function DocumentRow({ doc, signing = false }: { doc: any; signing?: boolean }) {
+  const DocIcon = ICON_MAP[doc.type] || (signing ? FileSignature : FileText)
+  const date = doc.uploaded_at ? new Date(doc.uploaded_at) : null
+  const content = (
+    <>
+      <div className="flex items-center gap-3.5 min-w-0">
+        <div className="shrink-0">
+          <DocIcon className="w-4.25 h-4.25" style={{ color: 'var(--cp-cyan)' }} />
+        </div>
+        <div className="min-w-0">
+          <h3 className="text-[13.5px] font-semibold truncate" style={{ color: 'var(--cp-text)' }}>
+            {doc.title}
+          </h3>
+          <p className="text-[11px] mt-0.5" style={{ color: 'var(--cp-text-faint)' }}>
+            {doc.type || (signing ? 'Contract' : 'Document')}
+            {date && ` · Uploaded ${date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}`}
+          </p>
+        </div>
+      </div>
+      <Download className={`w-4 h-4 shrink-0 transition-colors mr-1 ${doc.file_url ? 'text-(--cp-text-faint) group-hover:text-(--cp-text-muted)' : 'text-(--cp-text-faint) opacity-35'}`} />
+    </>
+  )
 
-async function loadProjectDocuments(projectId: string) {
-  const { data } = await fetchDocuments(projectId)
-  return { data: data ?? [] }
+  if (!doc.file_url) {
+    return (
+      <div className="flex items-center justify-between p-4 opacity-80">
+        {content}
+      </div>
+    )
+  }
+
+  return (
+    <a
+      href={doc.file_url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group flex items-center justify-between p-4 transition-colors hover:bg-(--cp-bg-soft)"
+    >
+      {content}
+    </a>
+  )
 }
 
 export default function DocumentsPage() {
-  const { resource, loading } = useClientPortalProject<any[]>(loadProjectDocuments)
-  const documents = resource ?? []
+  const { project, loading } = useClientPortalProject()
+  const documents = project?.documents ?? []
   const [search, setSearch] = useState('')
 
-  const filtered = search
-    ? documents.filter((d) => d.title?.toLowerCase().includes(search.toLowerCase()) || d.type?.toLowerCase().includes(search.toLowerCase()))
-    : documents
+  const onboardingDocs = documents.filter((d: any) => d.category === 'onboarding')
+  const otherDocs = documents.filter((d: any) => d.category !== 'onboarding')
+
+  const filteredOther = search
+    ? otherDocs.filter((d) => d.title?.toLowerCase().includes(search.toLowerCase()) || d.type?.toLowerCase().includes(search.toLowerCase()))
+    : otherDocs
 
   if (loading) return <Loading />
 
   return (
     <div className="flex flex-col gap-10 w-full">
-      {/* Header */}
       <PageHeader
         title="Contracts & Assets"
         description="Access contracts, onboarding files, proposals, and project assets."
@@ -75,65 +95,23 @@ export default function DocumentsPage() {
         }
       />
 
-      {/* Section 1: Necessary Client Signing & Onboarding Documents */}
-      <div className="flex flex-col gap-4">
-        <h2 className="text-[15px] font-bold tracking-tight" style={{ color: 'var(--cp-text)' }}>
-          Required Signing Agreements
-        </h2>
-        <div className="cp-card cp-list overflow-hidden">
-          {ONBOARDING_DOCS.map((doc) => {
-            const isSigned = doc.status === 'signed'
-            return (
-              <div
-                key={doc.id}
-                className="flex flex-col sm:flex-row sm:items-center justify-between p-4 gap-4 transition-colors hover:bg-(--cp-bg-soft)"
-              >
-                {/* Info */}
-                <div className="flex items-start gap-3.5 min-w-0">
-                  <div className="shrink-0 mt-0.5">
-                    {isSigned ? (
-                      <CheckCircle2 className="w-4.5 h-4.5" style={{ color: 'var(--cp-emerald)' }} />
-                    ) : (
-                      <AlertCircle className="w-4.5 h-4.5" style={{ color: 'var(--cp-cyan)' }} />
-                    )}
-                  </div>
-                  <div className="min-w-0">
-                    <h3 className="text-[13.5px] font-semibold" style={{ color: 'var(--cp-text)' }}>
-                      {doc.title}
-                    </h3>
-                    <p className="text-[12px] leading-relaxed mt-0.5 max-w-2xl" style={{ color: 'var(--cp-text-muted)' }}>
-                      {doc.description}
-                    </p>
-                    <span className="text-[10.5px] mt-1 block" style={{ color: 'var(--cp-text-faint)' }}>
-                      {doc.date}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Status & Actions */}
-                <div className="shrink-0 flex items-center justify-between sm:justify-end gap-4 mt-1 sm:mt-0">
-                  <Badge tone={isSigned ? 'emerald' : 'cyan'}>
-                    {isSigned ? 'Signed' : 'Needs Signature'}
-                  </Badge>
-                  {!isSigned && (
-                    <button className="cp-btn-primary px-3 py-1.5 text-[11px]">
-                      Review & Sign
-                    </button>
-                  )}
-                </div>
-              </div>
-            )
-          })}
+      {onboardingDocs.length > 0 && (
+        <div className="flex flex-col gap-4">
+          <h2 className="text-[15px] font-bold tracking-tight" style={{ color: 'var(--cp-text)' }}>
+            Signing Agreements
+          </h2>
+          <div className="cp-card cp-list overflow-hidden">
+            {onboardingDocs.map((doc: any) => <DocumentRow key={doc.id} doc={doc} signing />)}
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* Section 2: Uploaded Project Files */}
       <div className="flex flex-col gap-4 mt-2">
         <h2 className="text-[15px] font-bold tracking-tight" style={{ color: 'var(--cp-text)' }}>
           Project Files & Assets
         </h2>
 
-        {documents.length === 0 ? (
+        {otherDocs.length === 0 ? (
           <EmptyState
             icon={FolderOpen}
             title="No project files uploaded yet"
@@ -141,34 +119,7 @@ export default function DocumentsPage() {
           />
         ) : (
           <div className="cp-card cp-list overflow-hidden">
-            {filtered.map((doc) => {
-              const DocIcon = ICON_MAP[doc.type] || FileText
-              const date = doc.uploaded_at ? new Date(doc.uploaded_at) : null
-              return (
-                <a
-                  href={doc.file_url || '#'}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  key={doc.id}
-                  className="group flex items-center justify-between p-4 transition-colors hover:bg-(--cp-bg-soft)"
-                >
-                  <div className="flex items-center gap-3.5 min-w-0">
-                    <div className="shrink-0">
-                      <DocIcon className="w-4.25 h-4.25" style={{ color: 'var(--cp-cyan)' }} />
-                    </div>
-                    <div className="min-w-0">
-                      <h3 className="text-[13.5px] font-semibold truncate" style={{ color: 'var(--cp-text)' }}>
-                        {doc.title}
-                      </h3>
-                      <p className="text-[11px] mt-0.5" style={{ color: 'var(--cp-text-faint)' }}>
-                        {doc.type || 'Document'} {date && ` · Uploaded ${date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}`}
-                      </p>
-                    </div>
-                  </div>
-                  <Download className="w-4 h-4 shrink-0 transition-colors mr-1 text-(--cp-text-faint) group-hover:text-(--cp-text-muted)" />
-                </a>
-              )
-            })}
+            {filteredOther.map((doc) => <DocumentRow key={doc.id} doc={doc} />)}
           </div>
         )}
       </div>
