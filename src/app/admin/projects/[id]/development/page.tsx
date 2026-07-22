@@ -3,26 +3,35 @@ import { useState } from 'react'
 import { Zap, GitCommit, Plus, Trash2 } from 'lucide-react'
 import { insertDeployment, insertActivity } from '@/lib/db'
 import { supabase } from '@/lib/supabase'
+import { safeHttpUrl } from '@/lib/safeUrl'
 import Modal, { ModalInput, ModalSelect } from '@/components/ui/Modal'
-import { useProject } from '../layout'
+import { useProject } from '@/lib/AdminProjectContext'
 
 export default function ProjectDevelopmentPage() {
   const { projectId, deployments, setDeployments, activities, setActivities } = useProject()
   const [depModalOpen, setDepModalOpen] = useState(false)
   const [actModalOpen, setActModalOpen] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [depError, setDepError] = useState<string | null>(null)
 
   const [depForm, setDepForm] = useState({ environment: 'Production', version: '', status: 'success', url: '' })
   const [actForm, setActForm] = useState({ action_text: '', actor_name: 'Admin', type: 'milestone' })
 
   async function handleAddDeployment() {
     setSaving(true)
+    setDepError(null)
+    const deploymentUrl = depForm.url ? safeHttpUrl(depForm.url) || undefined : undefined
+    if (depForm.url && !deploymentUrl) {
+      setDepError('Enter a valid http:// or https:// deployment URL.')
+      setSaving(false)
+      return
+    }
     const { data } = await insertDeployment({
       project_id: projectId,
       environment: depForm.environment,
       version: depForm.version || undefined,
       status: depForm.status,
-      url: depForm.url || undefined,
+      url: deploymentUrl,
     })
     if (data) setDeployments(prev => [data, ...prev])
     setDepForm({ environment: 'Production', version: '', status: 'success', url: '' })
@@ -75,7 +84,7 @@ export default function ProjectDevelopmentPage() {
                 <span className={`w-2 h-2 rounded-full shrink-0 ${d.status === 'success' ? 'bg-(--cp-emerald)' : d.status === 'failed' ? 'bg-(--cp-red)' : 'bg-(--cp-cyan) animate-pulse'}`} />
                 <div>
                   <span className="text-[13px] block font-semibold text-(--cp-text)">{d.environment}{d.version && ` v${d.version}`}</span>
-                  {d.url && <a href={d.url} target="_blank" rel="noopener noreferrer" className="text-[10.5px] text-(--cp-cyan) hover:underline truncate block max-w-50">{d.url}</a>}
+                  {safeHttpUrl(d.url) && <a href={safeHttpUrl(d.url)!} target="_blank" rel="noopener noreferrer" className="text-[10.5px] text-(--cp-cyan) hover:underline truncate block max-w-50">{safeHttpUrl(d.url)}</a>}
                 </div>
               </div>
               <div className="flex items-center gap-2 shrink-0">
@@ -128,6 +137,7 @@ export default function ProjectDevelopmentPage() {
           <ModalInput label="Version" value={depForm.version} onChange={v => setDepForm({ ...depForm, version: v })} placeholder="e.g. 1.0.0" />
           <ModalSelect label="Status" value={depForm.status} onChange={v => setDepForm({ ...depForm, status: v })} options={[{ value: 'success', label: 'Success' }, { value: 'building', label: 'Building' }, { value: 'failed', label: 'Failed' }]} />
           <ModalInput label="URL" value={depForm.url} onChange={v => setDepForm({ ...depForm, url: v })} placeholder="https://..." />
+          {depError && <p className="text-[12px] text-(--cp-red)" role="alert">{depError}</p>}
           <div className="flex justify-end gap-3 pt-4 border-t" style={{ borderColor: 'var(--cp-border-soft)' }}>
             <button onClick={() => setDepModalOpen(false)} className="px-4 py-2 rounded-xl text-[12px] font-medium text-(--cp-text-muted) hover:text-(--cp-text)">Cancel</button>
             <button onClick={handleAddDeployment} disabled={saving} className="cp-btn-primary px-5 py-2 text-[12px] cursor-pointer">

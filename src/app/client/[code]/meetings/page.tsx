@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { Video, Clock, ExternalLink, PlayCircle, CalendarOff } from 'lucide-react'
 import { PageHeader, EmptyState, Loading, SectionLabel } from '@/components/portal/PortalUI'
 import { useClientPortalProject } from '@/hooks/useClientPortalProject'
+import { safeHttpUrl } from '@/lib/safeUrl'
 
 export default function MeetingsPage() {
   const { project, loading } = useClientPortalProject()
@@ -71,9 +72,9 @@ export default function MeetingsPage() {
                         {meet.medium}
                       </span>
                     )}
-                    {meet.link && (
+                    {safeHttpUrl(meet.link) && (
                       <a
-                        href={meet.link}
+                        href={safeHttpUrl(meet.link)!}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="cp-btn-primary flex items-center justify-center gap-2 w-full py-2.5 text-[12.5px]"
@@ -108,9 +109,9 @@ export default function MeetingsPage() {
                         {meet.meeting_date ? new Date(meet.meeting_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : ''}
                       </span>
                     </div>
-                    {(meet.recording_url || meet.recording) && (
+                    {safeHttpUrl(meet.recording_url || meet.recording) && (
                       <a
-                        href={meet.recording_url || meet.recording}
+                        href={safeHttpUrl(meet.recording_url || meet.recording)!}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="cp-btn-secondary flex items-center gap-1.5 px-4 py-2 text-[12px] shrink-0"

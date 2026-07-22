@@ -151,7 +151,7 @@ function ClientLoginGate() {
                 Enter your access code.
               </h2>
               <p className="text-[13.5px] mb-10 leading-relaxed max-w-sm" style={{ color: 'var(--cp-text-secondary)' }}>
-                Your project manager sent a six-character code with your kickoff email.
+                Your project manager sent a unique project access code with your kickoff email.
               </p>
 
               <form onSubmit={handleLogin} className="flex flex-col gap-7">
@@ -167,10 +167,10 @@ function ClientLoginGate() {
                     <input
                       id="access-code"
                       type="text"
-                      placeholder="AURA123"
+                      placeholder="K7QP-R9XM"
                       value={accessCode}
                       onChange={(e) => setAccessCode(e.target.value.toUpperCase())}
-                      maxLength={12}
+                      maxLength={24}
                       autoComplete="off"
                       spellCheck={false}
                       className="w-full px-0 pb-4 pt-2 text-[28px] sm:text-[32px] font-display font-bold tracking-[0.18em] uppercase outline-none bg-transparent border-0 border-b transition-colors"

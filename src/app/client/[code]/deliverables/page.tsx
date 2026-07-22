@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { Download, ExternalLink, FileImage, FileCode2, FileType2, PackageOpen } from 'lucide-react'
 import { PageHeader, EmptyState, Loading } from '@/components/portal/PortalUI'
 import { useClientPortalProject } from '@/hooks/useClientPortalProject'
+import { safeHttpUrl } from '@/lib/safeUrl'
 
 const ICON_MAP: Record<string, any> = { design: FileImage, code: FileCode2, document: FileType2 }
 
@@ -28,6 +29,7 @@ export default function DeliverablesPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-px" style={{ background: 'var(--cp-border-soft)' }}>
           {deliverables.map((item, idx) => {
             const IconComp = ICON_MAP[item.type] || FileType2
+            const fileUrl = safeHttpUrl(item.file_url)
             return (
               <motion.div
                 initial={{ opacity: 0, y: 15 }}
@@ -48,17 +50,19 @@ export default function DeliverablesPage() {
                 </div>
                 <div className="flex items-center gap-2 pt-4 border-t" style={{ borderColor: 'var(--cp-border-soft)' }}>
                   <a
-                    href={item.file_url || '#'}
+                    href={fileUrl || '#'}
                     target="_blank"
                     rel="noopener noreferrer"
+                    aria-disabled={!fileUrl}
                     className="cp-btn-primary flex-1 py-2.5 text-[12.5px] flex items-center justify-center gap-1.5"
                   >
                     <Download className="w-3.5 h-3.5" /> Download
                   </a>
                   <a
-                    href={item.file_url || '#'}
+                    href={fileUrl || '#'}
                     target="_blank"
                     rel="noopener noreferrer"
+                    aria-disabled={!fileUrl}
                     className="cp-btn-secondary p-2.5 flex items-center justify-center"
                     aria-label="Open in new tab"
                   >

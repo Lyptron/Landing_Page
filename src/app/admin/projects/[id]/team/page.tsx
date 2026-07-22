@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { Plus, X, Search, Briefcase } from 'lucide-react'
 import { assignTeamMember, removeTeamFromProject } from '@/lib/db'
 import { supabase } from '@/lib/supabase'
-import { useProject } from '../layout'
+import { useProject } from '@/lib/AdminProjectContext'
 
 function generateTempId() {
   return 'temp-' + Date.now()

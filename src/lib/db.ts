@@ -20,7 +20,7 @@ export async function fetchInquiries() {
 export async function fetchProjects() {
   return supabase
     .from('projects')
-    .select('*, milestones(*), payments(*)')
+    .select('*, milestones(*)')
     .order('created_at', { ascending: false })
 }
 
@@ -732,6 +732,8 @@ export async function deleteAdminUser(id: string) {
 // Deletes every payment/invoice for this project. Used by the
 // "Reset finance" danger action in the client portal.
 export async function resetProjectFinance(projectId: string) {
+  const invoiceResult = await supabase.from('invoices').delete().eq('project_id', projectId)
+  if (invoiceResult.error) return invoiceResult
   return supabase.from('payments').delete().eq('project_id', projectId)
 }
 
@@ -753,6 +755,8 @@ export async function resetClientFinance(clientId: string) {
   if (projErr) return { error: projErr }
   const projectIds = (clientProjects ?? []).map((p) => p.id)
   if (projectIds.length === 0) return { error: null }
+  const invoiceResult = await supabase.from('invoices').delete().in('project_id', projectIds)
+  if (invoiceResult.error) return invoiceResult
   return supabase.from('payments').delete().in('project_id', projectIds)
 }
 
@@ -803,14 +807,18 @@ async function callDangerEndpoint(action: DangerAction): Promise<{ error: unknow
   }
 }
 
-// Hard-deletes the client, every project they own, and every row
-// in any per-project table tied to those projects. Server-side; the
-// browser never sees the service-role key.
-export async function deleteClientCascade(clientId: string) {
+// Hard-deletes the client, every project they own, and every row in any
+// per-project table tied to those projects. Runs client-side under the
+// founder/admin session (RLS gates it): delete the client's projects first —
+// every per-project child table FKs with `on delete cascade`, so Postgres
+// wipes milestones/payments/invoices/approvals/activities/deployments/
+// documents/meetings/feedback/gallery/project_team/announcements
+// automatically — then delete the client row itself.
+export async function deleteClientCascade(clientId: string): Promise<{ error: unknown }> {
   return callDangerEndpoint({ type: 'delete_client_cascade', clientId })
 }
 
-// Deletes every payment row across the entire agency.
+// Deletes every finance row across the entire agency.
 export async function resetAllFinance() {
   return callDangerEndpoint({ type: 'reset_all_finance' })
 }

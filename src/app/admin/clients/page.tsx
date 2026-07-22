@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Plus, Mail, Phone, MapPin, Globe, Briefcase, X, Users2, AlertTriangle, Trash2, RotateCcw, Wallet } from 'lucide-react'
-import { fetchClients, insertClient, fetchProjects, fetchDocuments, fetchMeetings, fetchActivities, resetClientFinance, resetAllClientData, deleteClientCascade } from '@/lib/db'
+import { fetchClients, insertClient, updateClient, fetchProjects, fetchDocuments, fetchMeetings, fetchActivities, resetClientFinance, resetAllClientData, deleteClientCascade } from '@/lib/db'
 import { clientTierStyle } from '@/lib/badges'
 import { useAdminAuth } from '@/lib/AdminAuthContext'
 import RestrictedValue from '@/components/ui/RestrictedValue'
@@ -111,6 +111,14 @@ export default function ClientsPage() {
     if (data) setClients([data, ...clients])
     setFormCompany(''); setFormContact(''); setFormEmail(''); setFormPhone(''); setFormIndustry(''); setFormLocation(''); setFormWebsite('')
     setSaving(false); setModalOpen(false)
+  }
+
+  const changeStatus = async (status: string) => {
+    if (!selectedClient) return
+    const id = selectedClient.id
+    setSelectedClient((prev: any) => (prev ? { ...prev, status } : prev))
+    setClients((prev) => prev.map((c) => (c.id === id ? { ...c, status } : c)))
+    await updateClient(id, { status })
   }
 
   function openDanger(action: 'finance' | 'data' | 'delete') {
@@ -268,6 +276,22 @@ export default function ClientsPage() {
 
             {/* Slide-out Body */}
             <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-6">
+              <div>
+                <p className="text-[9px] font-mono uppercase tracking-[0.15em] mb-3" style={{ color: 'var(--cp-text-faint)' }}>Status</p>
+                <select
+                  value={selectedClient.status || 'Onboarding'}
+                  onChange={(e) => changeStatus(e.target.value)}
+                  className="w-full px-3 py-2.5 rounded-xl text-[13px] outline-none appearance-none cursor-pointer [&>option]:bg-(--cp-bg-elevated) [&>option]:text-(--cp-text)"
+                  style={{ background: 'var(--cp-bg-soft)', border: '1px solid var(--cp-border)', color: 'var(--cp-text)' }}
+                >
+                  <option value="Onboarding">Onboarding</option>
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
+                </select>
+              </div>
+
+              <div className="h-px" style={{ background: 'var(--cp-border-soft)' }} />
+
               <div>
                 <p className="text-[9px] font-mono uppercase tracking-[0.15em] mb-3" style={{ color: 'var(--cp-text-faint)' }}>Contact</p>
                 <div className="flex flex-col gap-2.5">

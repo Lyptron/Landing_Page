@@ -4,7 +4,7 @@ import { Plus, Trash2 } from 'lucide-react'
 import { insertApproval } from '@/lib/db'
 import { supabase } from '@/lib/supabase'
 import Modal, { ModalInput, ModalSelect } from '@/components/ui/Modal'
-import { useProject } from '../layout'
+import { useProject } from '@/lib/AdminProjectContext'
 
 const APPROVAL_TYPES = [
   { value: 'Design', label: 'Design' },

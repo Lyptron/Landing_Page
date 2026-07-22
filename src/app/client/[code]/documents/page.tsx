@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { FileText, Search, Download, FileSignature, Receipt, FolderOpen } from 'lucide-react'
 import { PageHeader, EmptyState, Loading } from '@/components/portal/PortalUI'
 import { useClientPortalProject } from '@/hooks/useClientPortalProject'
+import { safeHttpUrl } from '@/lib/safeUrl'
 
 const ICON_MAP: Record<string, any> = {
   Contract: FileSignature,
@@ -17,6 +18,7 @@ const ICON_MAP: Record<string, any> = {
 function DocumentRow({ doc, signing = false }: { doc: any; signing?: boolean }) {
   const DocIcon = ICON_MAP[doc.type] || (signing ? FileSignature : FileText)
   const date = doc.uploaded_at ? new Date(doc.uploaded_at) : null
+  const fileUrl = safeHttpUrl(doc.file_url)
   const content = (
     <>
       <div className="flex items-center gap-3.5 min-w-0">
@@ -33,11 +35,11 @@ function DocumentRow({ doc, signing = false }: { doc: any; signing?: boolean }) 
           </p>
         </div>
       </div>
-      <Download className={`w-4 h-4 shrink-0 transition-colors mr-1 ${doc.file_url ? 'text-(--cp-text-faint) group-hover:text-(--cp-text-muted)' : 'text-(--cp-text-faint) opacity-35'}`} />
+      <Download className={`w-4 h-4 shrink-0 transition-colors mr-1 ${fileUrl ? 'text-(--cp-text-faint) group-hover:text-(--cp-text-muted)' : 'text-(--cp-text-faint) opacity-35'}`} />
     </>
   )
 
-  if (!doc.file_url) {
+  if (!fileUrl) {
     return (
       <div className="flex items-center justify-between p-4 opacity-80">
         {content}
@@ -47,7 +49,7 @@ function DocumentRow({ doc, signing = false }: { doc: any; signing?: boolean }) 
 
   return (
     <a
-      href={doc.file_url}
+      href={fileUrl}
       target="_blank"
       rel="noopener noreferrer"
       className="group flex items-center justify-between p-4 transition-colors hover:bg-(--cp-bg-soft)"

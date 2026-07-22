@@ -3,8 +3,9 @@ import { useState } from 'react'
 import { Plus, Trash2 } from 'lucide-react'
 import { insertMeeting } from '@/lib/db'
 import { supabase } from '@/lib/supabase'
+import { safeHttpUrl } from '@/lib/safeUrl'
 import Modal, { ModalInput, ModalSelect } from '@/components/ui/Modal'
-import { useProject } from '../layout'
+import { useProject } from '@/lib/AdminProjectContext'
 
 export default function ProjectMeetingsPage() {
   const { projectId, meetings, setMeetings } = useProject()
@@ -17,13 +18,19 @@ export default function ProjectMeetingsPage() {
     if (!form.title || !form.meeting_date) return
     setSaving(true)
     setError(null)
+    const meetingUrl = form.link ? safeHttpUrl(form.link) || undefined : undefined
+    if (form.link && !meetingUrl) {
+      setError('Enter a valid http:// or https:// meeting link.')
+      setSaving(false)
+      return
+    }
     const { data, error: insertError } = await insertMeeting({
       project_id: projectId,
       title: form.title,
       medium: form.medium,
       meeting_date: form.meeting_date,
       meeting_time: form.meeting_time || undefined,
-      link: form.link || undefined,
+      link: meetingUrl,
     })
     if (insertError) {
       setError(insertError.message)
@@ -59,8 +66,8 @@ export default function ProjectMeetingsPage() {
               </span>
             </div>
             <div className="flex items-center gap-2">
-              {m.link && (
-                <a href={m.link} target="_blank" rel="noopener noreferrer" className="text-[11.5px] text-(--cp-cyan) hover:underline">
+              {safeHttpUrl(m.link) && (
+                <a href={safeHttpUrl(m.link)!} target="_blank" rel="noopener noreferrer" className="text-[11.5px] text-(--cp-cyan) hover:underline">
                   Join Call
                 </a>
               )}

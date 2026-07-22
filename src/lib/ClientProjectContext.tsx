@@ -24,19 +24,21 @@ const ClientProjectContext = createContext<ClientProjectValue>({
  */
 export function ClientProjectProvider({ code, children }: { code: string; children: ReactNode }) {
   const [project, setProject] = useState<ProjectRow | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [loadedCode, setLoadedCode] = useState<string | null>(null)
+  const loading = loadedCode !== code
 
   useEffect(() => {
     let cancelled = false
-    setLoading(true)
     fetchProjectByAccessCode(code)
       .then(({ data }) => {
         if (cancelled) return
         setProject(data)
-        setLoading(false)
+        setLoadedCode(code)
       })
       .catch(() => {
-        if (!cancelled) setLoading(false)
+        if (cancelled) return
+        setProject(null)
+        setLoadedCode(code)
       })
     return () => {
       cancelled = true

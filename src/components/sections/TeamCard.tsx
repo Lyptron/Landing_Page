@@ -10,28 +10,33 @@ const SCRAMBLE_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ01'
 const EASE = [0.22, 1, 0.36, 1] as const
 
 function useScramble(text: string, active: boolean) {
-  const [display, setDisplay] = useState(text)
+  const [scrambledDisplay, setScrambledDisplay] = useState(text)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const tickRef  = useRef(0)
 
   useEffect(() => {
     if (timerRef.current) clearInterval(timerRef.current)
-    if (!active) { setDisplay(text); tickRef.current = 0; return }
+    tickRef.current = 0
+    if (!active) return
     const TICKS = 18
     timerRef.current = setInterval(() => {
       tickRef.current++
       const revealed = Math.floor((tickRef.current / TICKS) * text.length)
-      setDisplay(
+      setScrambledDisplay(
         text.split('').map((ch, i) =>
           ch === ' ' ? ' ' : i < revealed ? text[i] : SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)]
         ).join('')
       )
-      if (tickRef.current >= TICKS) { clearInterval(timerRef.current!); setDisplay(text); tickRef.current = 0 }
+      if (tickRef.current >= TICKS) {
+        clearInterval(timerRef.current!)
+        setScrambledDisplay(text)
+        tickRef.current = 0
+      }
     }, 38)
     return () => { if (timerRef.current) clearInterval(timerRef.current) }
   }, [active, text])
 
-  return display
+  return active ? scrambledDisplay : text
 }
 
 interface TeamCardProps {

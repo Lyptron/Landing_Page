@@ -3,8 +3,9 @@ import { useState } from 'react'
 import { FileText, Plus, ExternalLink, Trash2 } from 'lucide-react'
 import { insertDocument } from '@/lib/db'
 import { supabase } from '@/lib/supabase'
+import { safeHttpUrl } from '@/lib/safeUrl'
 import Modal, { ModalInput, ModalSelect } from '@/components/ui/Modal'
-import { useProject } from '../layout'
+import { useProject } from '@/lib/AdminProjectContext'
 
 const DOCUMENT_TYPES = [
   { value: 'PDF', label: 'PDF' },
@@ -41,11 +42,17 @@ export default function ProjectDocumentsPage() {
     if (!form.title) return
     setSaving(true)
     setError(null)
+    const fileUrl = form.file_url ? safeHttpUrl(form.file_url) || undefined : undefined
+    if (form.file_url && !fileUrl) {
+      setError('Enter a valid http:// or https:// file URL.')
+      setSaving(false)
+      return
+    }
     const { data, error: insertError } = await insertDocument({
       project_id: projectId,
       title: form.title,
       type: form.type,
-      file_url: form.file_url || undefined,
+      file_url: fileUrl,
       category: form.category,
     })
     if (insertError) {
@@ -82,8 +89,8 @@ export default function ProjectDocumentsPage() {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              {d.file_url && (
-                <a href={d.file_url} target="_blank" rel="noopener noreferrer" className="p-1.5 text-(--cp-cyan) hover:text-(--cp-cyan-strong) transition-colors">
+              {safeHttpUrl(d.file_url) && (
+                <a href={safeHttpUrl(d.file_url)!} target="_blank" rel="noopener noreferrer" className="p-1.5 text-(--cp-cyan) hover:text-(--cp-cyan-strong) transition-colors">
                   <ExternalLink className="w-3.5 h-3.5" />
                 </a>
               )}

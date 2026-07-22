@@ -106,8 +106,8 @@ export default function SettingsPage() {
     async function loadSettings() {
       const { data } = await fetchAgencySettings()
       if (data) {
-        if (data.name) setAgencyName(data.name)
-        if (data.email) setAgencyEmail(data.email)
+        if (data.agency_name) setAgencyName(data.agency_name)
+        if (data.contact_email) setAgencyEmail(data.contact_email)
         if (data.website) setAgencyWebsite(data.website)
         if (data.logo_url) setLogoUrl(data.logo_url)
         if (data.notifications && typeof data.notifications === 'object') {
@@ -146,7 +146,12 @@ export default function SettingsPage() {
 
   async function handleSaveGeneral() {
     setSavingGeneral(true)
-    await upsertAgencySettings({ name: agencyName, email: agencyEmail, website: agencyWebsite, logo_url: logoUrl })
+    await upsertAgencySettings({
+      agency_name: agencyName,
+      contact_email: agencyEmail,
+      website: agencyWebsite,
+      logo_url: logoUrl,
+    })
     setSavingGeneral(false)
   }
 

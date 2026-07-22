@@ -8,6 +8,7 @@ export const ROLE_ROUTE_MAP: Record<string, AdminRole[]> = {
   '/admin/settings': ['founder', 'admin'],
   '/admin/dashboard': ['founder', 'admin', 'marketing'],
   '/admin/projects': ['founder', 'admin', 'marketing'],
+  '/admin/projects/[id]/finance': ['founder'],
   '/admin/clients': ['founder', 'admin'],
   '/admin/crm': ['founder', 'admin', 'marketing'],
   '/admin/leads': ['founder', 'admin', 'marketing'],
@@ -22,16 +23,22 @@ export const ROLE_ROUTE_MAP: Record<string, AdminRole[]> = {
 export function canAccessRoute(role: AdminRole | undefined, pathname: string): boolean {
   if (!role) return false
   
-  // Exact match first
-  if (ROLE_ROUTE_MAP[pathname]) {
-    return ROLE_ROUTE_MAP[pathname].includes(role)
+  const routeMatches = (route: string) => {
+    const routeParts = route.split('/').filter(Boolean)
+    const pathnameParts = pathname.split('/').filter(Boolean)
+    if (routeParts.length > pathnameParts.length) return false
+
+    return routeParts.every((part, index) => {
+      if (part.startsWith('[') && part.endsWith(']')) return Boolean(pathnameParts[index])
+      return part === pathnameParts[index]
+    })
   }
-  
-  // Handle dynamic routes like /admin/projects/[id]
-  const basePath = Object.keys(ROLE_ROUTE_MAP).find(path => pathname.startsWith(path + '/'))
-  if (basePath) {
-    return ROLE_ROUTE_MAP[basePath].includes(role)
-  }
+
+  const matchedRoute = Object.keys(ROLE_ROUTE_MAP)
+    .filter(routeMatches)
+    .sort((a, b) => b.length - a.length)[0]
+
+  if (matchedRoute) return ROLE_ROUTE_MAP[matchedRoute].includes(role)
 
   // Default to false for unknown routes
   // But if it's just /admin, we can map it to dashboard

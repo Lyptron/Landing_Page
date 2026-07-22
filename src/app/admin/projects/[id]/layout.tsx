@@ -1,10 +1,12 @@
 'use client'
-import React, { createContext, useCallback, useContext, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useParams, useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Save, Trash2, CheckCircle2, AlertTriangle } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { updateProject, deleteProject, fetchTeamMembers } from '@/lib/db'
+import { ProjectContext } from '@/lib/AdminProjectContext'
+import { useAdminAuth } from '@/lib/AdminAuthContext'
 import Modal from '@/components/ui/Modal'
 import type {
   ProjectRow,
@@ -22,61 +24,6 @@ import type {
   TeamMemberRow,
   AssignedTeamMember,
 } from '@/lib/db-types'
-
-interface ProjectContextType {
-  project: ProjectRow | null
-  loading: boolean
-  loadProject: () => Promise<void>
-  saving: boolean
-  name: string
-  setName: (n: string) => void
-  clientEmail: string
-  setClientEmail: (e: string) => void
-  description: string
-  setDescription: (d: string) => void
-  status: string
-  setStatus: (s: string) => void
-  stage: string
-  setStage: (s: string) => void
-  progress: number
-  setProgress: (p: number) => void
-  accessCode: string | null
-  setAccessCode: (c: string | null) => void
-  saveProject: () => Promise<void>
-  projectId: string
-  teamAssigned: AssignedTeamMember[]
-  setTeamAssigned: React.Dispatch<React.SetStateAction<AssignedTeamMember[]>>
-  allTeamMembers: TeamMemberRow[]
-  milestones: MilestoneRow[]
-  setMilestones: React.Dispatch<React.SetStateAction<MilestoneRow[]>>
-  payments: PaymentRow[]
-  setPayments: React.Dispatch<React.SetStateAction<PaymentRow[]>>
-  approvals: ApprovalRow[]
-  setApprovals: React.Dispatch<React.SetStateAction<ApprovalRow[]>>
-  gallery: GalleryItemRow[]
-  setGallery: React.Dispatch<React.SetStateAction<GalleryItemRow[]>>
-  documents: DocumentRow[]
-  setDocuments: React.Dispatch<React.SetStateAction<DocumentRow[]>>
-  meetings: MeetingRow[]
-  setMeetings: React.Dispatch<React.SetStateAction<MeetingRow[]>>
-  deployments: DeploymentRow[]
-  setDeployments: React.Dispatch<React.SetStateAction<DeploymentRow[]>>
-  activities: ActivityRow[]
-  setActivities: React.Dispatch<React.SetStateAction<ActivityRow[]>>
-  announcements: AnnouncementRow[]
-  setAnnouncements: React.Dispatch<React.SetStateAction<AnnouncementRow[]>>
-  feedback: FeedbackRow[]
-  setFeedback: React.Dispatch<React.SetStateAction<FeedbackRow[]>>
-}
-
-
-const ProjectContext = createContext<ProjectContextType | undefined>(undefined)
-
-export function useProject() {
-  const context = useContext(ProjectContext)
-  if (!context) throw new Error('useProject must be used within a ProjectProvider')
-  return context
-}
 
 const TABS = (id: string) => [
   { name: 'Overview', path: `/admin/projects/${id}` },
@@ -96,6 +43,8 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
   const router = useRouter()
   const pathname = usePathname()
   const projectId = params.id as string
+  const { user } = useAdminAuth()
+  const canReadFinance = user?.role === 'founder'
 
   const [project, setProject] = useState<ProjectRow | null>(null)
   const [loading, setLoading] = useState(true)
@@ -130,9 +79,13 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
 
   const loadProject = useCallback(async () => {
     setLoading(true)
+    const projectSelect = canReadFinance
+      ? '*, milestones(*), payments(*), approvals(*), gallery(*), documents(*), meetings(*), deployments(*), activities(*), announcements(*), feedback(*), project_team(*, team_members(*))'
+      : '*, milestones(*), approvals(*), gallery(*), documents(*), meetings(*), deployments(*), activities(*), announcements(*), feedback(*), project_team(*, team_members(*))'
+
     const { data, error } = await supabase
       .from('projects')
-      .select('*, milestones(*), payments(*), approvals(*), gallery(*), documents(*), meetings(*), deployments(*), activities(*), announcements(*), feedback(*), project_team(*, team_members(*))')
+      .select(projectSelect)
       .eq('id', projectId)
       .single<ProjectRow>()
 
@@ -151,7 +104,7 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
     setAccessCode(data.access_code || null)
 
     setMilestones(data.milestones || [])
-    setPayments(data.payments || [])
+    setPayments(canReadFinance ? data.payments || [] : [])
     setApprovals(data.approvals || [])
     setGallery(data.gallery || [])
     setDocuments(data.documents || [])
@@ -173,7 +126,7 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
     const { data: team } = await fetchTeamMembers()
     if (team) setAllTeamMembers(team as TeamMemberRow[])
     setLoading(false)
-  }, [projectId])
+  }, [canReadFinance, projectId])
 
   useEffect(() => {
     // Data fetch on mount + when projectId changes — fires setLoading synchronously,

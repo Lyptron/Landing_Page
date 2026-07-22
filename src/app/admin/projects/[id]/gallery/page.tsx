@@ -5,7 +5,7 @@ import { Image as ImageIcon, Plus, Trash2, Upload } from 'lucide-react'
 import { insertGalleryImage, uploadGalleryImage } from '@/lib/db'
 import { supabase } from '@/lib/supabase'
 import Modal, { ModalInput } from '@/components/ui/Modal'
-import { useProject } from '../layout'
+import { useProject } from '@/lib/AdminProjectContext'
 
 export default function ProjectGalleryPage() {
   const { projectId, gallery, setGallery } = useProject()

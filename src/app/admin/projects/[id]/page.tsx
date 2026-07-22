@@ -8,7 +8,7 @@ import { newAccessCode, normalizeAccessCode } from '@/lib/accessCode'
 import Modal, { ModalInput, ModalSelect } from '@/components/ui/Modal'
 import { ListBox, ListRow, Textarea, IconButton } from '@/components/admin/AdminUI'
 import { Badge } from '@/components/portal/PortalUI'
-import { useProject } from './layout'
+import { useProject } from '@/lib/AdminProjectContext'
 
 const ANNOUNCEMENT_TONES = [
   { value: 'info', label: 'Info' },

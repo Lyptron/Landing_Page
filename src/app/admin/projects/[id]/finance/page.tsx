@@ -4,7 +4,7 @@ import { Plus, Trash2 } from 'lucide-react'
 import { insertPayment, updatePayment, deletePayment } from '@/lib/db'
 import Modal from '@/components/ui/Modal'
 import SalaryStepper from '@/components/ui/SalaryStepper'
-import { useProject } from '../layout'
+import { useProject } from '@/lib/AdminProjectContext'
 
 export default function ProjectFinancePage() {
   const { projectId, payments, setPayments } = useProject()

@@ -30,7 +30,7 @@ export function newAccessCode(): string {
   crypto.getRandomValues(bytes)
   const chars: string[] = []
   for (let i = 0; i < CODE_BYTES; i++) {
-    // Modulo bias against a 31-char alphabet across an 8-bit byte is
+    // Modulo bias against a 32-char alphabet across an 8-bit byte is
     // negligible for a human-facing code (~0.4% skew on the last char);
     // for a real key we'd use rejection sampling. Not a real key here.
     chars.push(ALPHABET[bytes[i] % ALPHABET.length])

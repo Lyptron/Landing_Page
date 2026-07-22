@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { Hammer, Globe, FlaskConical, Activity, ExternalLink } from 'lucide-react'
 import { PageHeader, EmptyState, Loading, SectionLabel, Badge } from '@/components/portal/PortalUI'
 import { useClientPortalProject } from '@/hooks/useClientPortalProject'
+import { safeHttpUrl } from '@/lib/safeUrl'
 
 function timeAgo(date: string) {
   const diff = Date.now() - new Date(date).getTime()
@@ -86,6 +87,7 @@ export default function ClientDevelopmentPage() {
                   const isProd = (dep.environment || dep.env) === 'Production'
                   const EnvIcon = isProd ? Globe : FlaskConical
                   const envColor = isProd ? 'var(--cp-emerald)' : 'var(--cp-cyan)'
+                  const deploymentUrl = safeHttpUrl(dep.url)
                   return (
                     <motion.div
                       initial={{ opacity: 0, y: 10 }}
@@ -111,14 +113,14 @@ export default function ClientDevelopmentPage() {
                           <Badge tone="cyan" icon={Activity}>In Progress</Badge>
                         )}
                       </div>
-                      {dep.url && (
+                      {deploymentUrl && (
                         <a
-                          href={dep.url}
+                          href={deploymentUrl}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="group flex items-center justify-between gap-2 mt-1"
                         >
-                          <span className="text-[12px] truncate transition-colors group-hover:underline" style={{ color: 'var(--cp-cyan)' }}>{dep.url}</span>
+                          <span className="text-[12px] truncate transition-colors group-hover:underline" style={{ color: 'var(--cp-cyan)' }}>{deploymentUrl}</span>
                           <ExternalLink className="w-3.5 h-3.5 shrink-0" style={{ color: 'var(--cp-text-faint)' }} />
                         </a>
                       )}

@@ -211,13 +211,13 @@ export default function ServiceCard({ service, index, onDetailClick }: ServiceCa
                 {service.tagline} {service.desc}
               </m.p>
 
-              {service.url && (
-                <m.div
-                  className="mt-auto"
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={titleInView ? { opacity: 1, y: 0 } : {}}
-                  transition={{ duration: 0.7, delay: 0.6, ease: EASE }}
-                >
+              <m.div
+                className="mt-auto flex flex-wrap items-center gap-3"
+                initial={{ opacity: 0, y: 16 }}
+                animate={titleInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.7, delay: 0.6, ease: EASE }}
+              >
+                {service.url && (
                   <Link
                     href={service.url}
                     className="relative group/btn overflow-hidden rounded-full inline-block cursor-none"
@@ -230,8 +230,21 @@ export default function ServiceCard({ service, index, onDetailClick }: ServiceCa
                       <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 transition-transform duration-300" />
                     </div>
                   </Link>
-                </m.div>
-              )}
+                )}
+                <button
+                  type="button"
+                  onClick={onDetailClick}
+                  className="relative group/details overflow-hidden rounded-full inline-block cursor-none"
+                  onMouseEnter={() => setCursorState('cta')}
+                  onMouseLeave={() => setCursorState('default')}
+                >
+                  <div className="absolute inset-0 border border-white/10 rounded-full transition-all duration-300 group-hover/details:border-white/28 group-hover/details:bg-white/8" />
+                  <div className="relative flex items-center gap-2 px-7 py-3 font-semibold text-[13px] text-white/58 group-hover/details:text-white/88 tracking-[0.02em] transition-colors duration-300">
+                    View details
+                    <ArrowRight className="w-3.5 h-3.5 group-hover/details:translate-x-0.5 transition-transform duration-300" />
+                  </div>
+                </button>
+              </m.div>
             </div>
 
             {/* Middle Column: Capabilities */}

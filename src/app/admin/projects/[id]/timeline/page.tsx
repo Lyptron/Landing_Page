@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { CheckCircle2, Plus, Trash2 } from 'lucide-react'
 import { insertMilestone, updateMilestone, deleteMilestone } from '@/lib/db'
 import Modal, { ModalInput } from '@/components/ui/Modal'
-import { useProject } from '../layout'
+import { useProject } from '@/lib/AdminProjectContext'
 
 export default function ProjectTimelinePage() {
   const { projectId, milestones, setMilestones } = useProject()
