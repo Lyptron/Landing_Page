@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import { Plus, Receipt, Wallet, TrendingDown, Trash2, Users2, Search, ArrowUpDown, Activity, Percent, UserMinus } from 'lucide-react'
 import { motion } from 'framer-motion'
-import { fetchInvoices, fetchAllPayments, insertInvoice, deleteInvoice, fetchExpenses, insertExpense, deleteExpense, fetchTeamMembers, updateTeamMember, fetchSubscriptions, fetchProjects } from '@/lib/db'
+import { fetchInvoices, fetchAllPayments, insertInvoice, deleteInvoice, updateInvoice, fetchExpenses, insertExpense, deleteExpense, fetchTeamMembers, updateTeamMember, fetchSubscriptions, fetchProjects } from '@/lib/db'
 import Modal, { ModalInput, ModalSelect } from '@/components/ui/Modal'
 import { useChartTheme } from '@/lib/theme/chartTheme'
 import SalaryStepper from '@/components/ui/SalaryStepper'
@@ -74,12 +74,15 @@ export default function FinanceHubPage() {
     load()
   }, [])
 
+  const [invoiceError, setInvoiceError] = useState<string | null>(null)
+
   const addInvoice = async () => {
     if (!formNumber || !formClient || !formAmount) return
     // Enforce: must link to a project OR provide a reason
     if (!formProjectId && !formReason.trim()) return
     setSaving(true)
-    const { data } = await insertInvoice({
+    setInvoiceError(null)
+    const { data, error } = await insertInvoice({
       invoice_number: formNumber,
       client_name: formClient,
       amount: Number(formAmount),
@@ -87,8 +90,14 @@ export default function FinanceHubPage() {
       reason: formReason || undefined,
       project_id: formProjectId || undefined,
     })
+    setSaving(false)
+    if (error) {
+      console.error('[insertInvoice]', error)
+      setInvoiceError(error.message || 'Insert failed — check console.')
+      return
+    }
     if (data) setInvoices([data, ...invoices])
-    setFormNumber(''); setFormClient(''); setFormReason(''); setFormAmount(''); setFormProjectId(''); setSaving(false); setModalOpen(false)
+    setFormNumber(''); setFormClient(''); setFormReason(''); setFormAmount(''); setFormProjectId(''); setModalOpen(false)
   }
 
   const addExpense = async () => {
@@ -110,6 +119,19 @@ export default function FinanceHubPage() {
   const removeExpense = async (id: string) => {
     setExpenses(expenses.filter(e => e.id !== id))
     await deleteExpense(id)
+  }
+
+  const toggleInvoicePaid = async (id: string, current: string) => {
+    const next = current === 'Paid' ? 'Pending' : 'Paid'
+    const patch: Record<string, unknown> = { status: next }
+    if (next === 'Paid') patch.paid_date = new Date().toISOString().slice(0, 10)
+    else patch.paid_date = null
+    setInvoices(prev => prev.map(inv => inv.id === id ? { ...inv, ...patch } : inv))
+    const { error } = await updateInvoice(id, patch)
+    if (error) {
+      console.error('[updateInvoice]', error)
+      setInvoices(prev => prev.map(inv => inv.id === id ? { ...inv, status: current, paid_date: current === 'Paid' ? inv.paid_date : null } : inv))
+    }
   }
 
   const removeInvoice = (id: string, number: string) => {
@@ -404,7 +426,17 @@ export default function FinanceHubPage() {
                         </span>
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <span className={`px-2 py-0.5 rounded-md text-[8px] font-bold uppercase tracking-widest border ${statusStyle(inv.status)}`}>{inv.status}</span>
+                        {inv.isPayment ? (
+                          <span className={`px-2 py-0.5 rounded-md text-[8px] font-bold uppercase tracking-widest border ${statusStyle(inv.status)}`}>{inv.status}</span>
+                        ) : (
+                          <button
+                            onClick={() => toggleInvoicePaid(inv.id, inv.status)}
+                            title={inv.status === 'Paid' ? 'Click to mark Pending' : 'Click to mark Paid'}
+                            className={`px-2 py-0.5 rounded-md text-[8px] font-bold uppercase tracking-widest border cursor-pointer hover:opacity-80 transition-opacity ${statusStyle(inv.status)}`}
+                          >
+                            {inv.status}
+                          </button>
+                        )}
                         {!inv.isPayment && (
                           <button onClick={() => removeInvoice(inv.id, inv.invoice_number)} aria-label="Delete invoice" className="p-1 rounded-md text-(--cp-text-faint) hover:text-(--cp-red) hover:bg-(--cp-red-soft) transition-all opacity-0 group-hover:opacity-100"><Trash2 className="w-3 h-3" /></button>
                         )}
@@ -724,6 +756,9 @@ export default function FinanceHubPage() {
             )}
           </div>
           <SalaryStepper label="Amount (₹)" value={formAmount} onChange={setFormAmount} placeholder="50000" required />
+          {invoiceError && (
+            <p className="text-[11px] text-(--cp-red) font-medium">DB error: {invoiceError}</p>
+          )}
           <div className="flex justify-end gap-3 pt-4 border-t border-(--cp-border-soft)">
             <button onClick={() => setModalOpen(false)} className="px-4 py-2 rounded-xl text-[12px] font-medium text-(--cp-text-faint) hover:text-(--cp-text-secondary) transition-colors">Cancel</button>
             <button onClick={addInvoice} disabled={saving || !formNumber || !formClient || !formAmount || (!formProjectId && !formReason.trim())} className="px-5 py-2 bg-(--cp-cyan) text-white font-semibold text-[12px] rounded-xl hover:bg-(--cp-cyan-strong) transition-all disabled:opacity-30">

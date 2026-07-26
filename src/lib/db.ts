@@ -147,6 +147,19 @@ export async function deleteInvoice(id: string) {
   return supabase.from('invoices').delete().eq('id', id)
 }
 
+export async function updateInvoice(id: string, data: Record<string, unknown>) {
+  return supabase.from('invoices').update(data).eq('id', id).select('*, projects(id, name)').single()
+}
+
+// Invoices for a single project (used by the per-project finance view).
+export async function fetchProjectInvoices(project_id: string) {
+  return supabase
+    .from('invoices')
+    .select('*')
+    .eq('project_id', project_id)
+    .order('issued_date', { ascending: false })
+}
+
 // ─── Revenue Analytics ──────────────────────────────────────
 export async function fetchRevenueAnalytics() {
   return supabase.from('revenue_analytics').select('*').order('month', { ascending: true })
@@ -613,12 +626,23 @@ export async function insertExpense(data: {
   expense_date: string;
   subscription_id?: string;
   notes?: string;
+  project_id?: string;
+  founder_id?: string;
 }) {
-  return supabase.from('expenses').insert(data).select('*, subscriptions(name)').single()
+  return supabase.from('expenses').insert(data).select('*, subscriptions(name), team_members:founder_id(id, name, initials, accent_color)').single()
 }
 
 export async function deleteExpense(id: string) {
   return supabase.from('expenses').delete().eq('id', id)
+}
+
+// Per-project expenses, joined to the founder who spent.
+export async function fetchProjectExpenses(project_id: string) {
+  return supabase
+    .from('expenses')
+    .select('*, team_members:founder_id(id, name, initials, accent_color)')
+    .eq('project_id', project_id)
+    .order('expense_date', { ascending: false })
 }
 
 // ─── Campaigns (Marketing) ───────────────────────────────────
